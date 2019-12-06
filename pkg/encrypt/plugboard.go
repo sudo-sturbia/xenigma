@@ -7,6 +7,8 @@ var connections map[byte]byte // Map with max size of 26
 
 // Validate and set plugboard connections
 func setConnections(connectionsArr [2][]byte) error {
+	connections = make(map[byte]byte)
+
 	// Validate length
 	if len(connectionsArr[0]) != len(connectionsArr[1]) || len(connectionsArr[0]) > 13 || len(connectionsArr[1]) > 13 {
 		return &connectionErr{"Incorrect number of connections"}
@@ -32,7 +34,7 @@ func setConnections(connectionsArr [2][]byte) error {
 
 // Change character based on plugboard connections
 func changeChar(char byte) byte {
-	if connections[char] != nil {
+	if connections[char] != 0 {
 		return connections[char]
 	} else {
 		return char
