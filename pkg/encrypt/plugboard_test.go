@@ -31,11 +31,11 @@ func TestSetConnections(t *testing.T) {
 		{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'o'},
 	}
 
-	err1 := setConnections(correct)
-	err2 := setConnections(wrong1)
-	err3 := setConnections(wrong2)
-	err4 := setConnections(wrong3)
-	err5 := setConnections(wrong4)
+	err1 := createPlugboardConnections(correct)
+	err2 := createPlugboardConnections(wrong1)
+	err3 := createPlugboardConnections(wrong2)
+	err4 := createPlugboardConnections(wrong3)
+	err5 := createPlugboardConnections(wrong4)
 
 	if err1 != nil {
 		t.Errorf("Correct connection fails")
@@ -64,7 +64,7 @@ func TestChangeChar(t *testing.T) {
 		{'j', 'k', 'l', 'y', 'u', 'z'},
 	}
 
-	setConnections(connection)
+	createPlugboardConnections(connection)
 
 	for i := 0; i < len(connection[0]); i++ {
 		if changeChar(connection[0][i]) != connection[1][i] || changeChar(connection[1][i]) != connection[0][i] {

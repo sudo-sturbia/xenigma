@@ -3,8 +3,10 @@ package encrypt
 
 import ()
 
-const NUMBER_OF_ROTORS = 3
-const ALPHABET_SIZE = 26
+const (
+	NUMBER_OF_ROTORS = 3
+	ALPHABET_SIZE    = 26
+)
 
 var pathConnections [NUMBER_OF_ROTORS][ALPHABET_SIZE]int // Connections that form electric pathways
 
