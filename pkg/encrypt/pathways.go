@@ -3,11 +3,6 @@ package encrypt
 
 import ()
 
-const (
-	NUMBER_OF_ROTORS = 3
-	ALPHABET_SIZE    = 26
-)
-
 // Specify electric path connections.
 //		config: specifies which configuration to use, default value: 0.
 func (m *machine) createPathConnections(config int) {

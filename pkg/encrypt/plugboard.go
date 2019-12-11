@@ -1,40 +1,42 @@
 // Encrypt messages using engima code
 package encrypt
 
-import ()
+import (
+	"fmt"
+)
 
-// Validate and set plugboard connections
-func (m *machine) createPlugboardConnections(connectionsArr [2][]byte) error {
-	m.plugboardConnections = make(map[byte]byte)
-
+// Validate and create plugboard connections
+func (m *machine) createPlugboardConnections(plugCons map[byte]byte) error {
 	// Validate length
-	if len(connectionsArr[0]) != len(connectionsArr[1]) || len(connectionsArr[0]) > 13 || len(connectionsArr[1]) > 13 {
-		return &connectionErr{"Incorrect number of connections"}
+	if len(plugCons) > 13 {
+		return &connectionErr{"number of connections is invalid"}
 	}
 
-	// Validate character connections
-	isConnected := make(map[byte]bool)
-
-	for i := 0; i < len(connectionsArr[0]); i++ {
-		if (connectionsArr[0][i] != connectionsArr[1][i]) && !isConnected[connectionsArr[0][i]] && !isConnected[connectionsArr[1][i]] {
-			isConnected[connectionsArr[0][i]] = true
-			isConnected[connectionsArr[1][i]] = true
-
-			m.plugboardConnections[connectionsArr[0][i]] = connectionsArr[1][i]
-			m.plugboardConnections[connectionsArr[1][i]] = connectionsArr[0][i]
-		} else {
-			return &connectionErr{"Incorrect number of connections for a character"}
+	for i := 0; i < ALPHABET_SIZE; i++ {
+		// If character was mapped before
+		if m.plugboardConnections[i] != 0 {
+			continue
 		}
+
+		// If character is not alphabetical and lowercase
+		if plugCons[byte(i)] < 97 || plugCons[byte(i)] > 122 {
+			return &connectionErr{fmt.Sprintf("input character '%v' is incorrect", plugCons[byte(i)])}
+		}
+
+		m.plugboardConnections[i] = int(plugCons[byte(i)])
 	}
 
 	return nil
 }
 
-// Change character based on plugboard connections
-func (m *machine) changeChar(char byte) byte {
-	if m.plugboardConnections[char] != 0 {
-		return m.plugboardConnections[char]
-	} else {
-		return char
-	}
+// Change byte (character) to an int (0 -> 25) based on plugboard connections
+// Used when character is entered
+func (m *machine) plugIn(char byte) int {
+	return int(m.plugboardConnections[int(char-'a')])
+}
+
+// Change int to a byte (character) based on plugboard connections
+// Used when character is returned
+func (m *machine) plugOut(char int) byte {
+	return byte(m.plugboardConnections[int(char-'a')] + 'a')
 }
