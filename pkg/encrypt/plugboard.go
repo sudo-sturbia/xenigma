@@ -13,17 +13,20 @@ func (m *machine) createPlugboardConnections(plugCons map[byte]byte) error {
 	}
 
 	for i := 0; i < ALPHABET_SIZE; i++ {
-		// If character was mapped before
-		if m.plugboardConnections[i] != 0 {
-			continue
+		m.plugboardConnections[i] = i
+	}
+
+	for key, value := range plugCons {
+		if m.plugboardConnections[int(key-'a')] != int(key-'a') || m.plugboardConnections[int(value-'a')] != int(value-'a') {
+			return &connectionErr{fmt.Sprintf("characters '%c' and '%c' are mapped several times", key, value)}
 		}
 
-		// If character is not alphabetical and lowercase
-		if plugCons[byte(i)] < 97 || plugCons[byte(i)] > 122 {
-			return &connectionErr{fmt.Sprintf("input character '%v' is incorrect", plugCons[byte(i)])}
+		if key < 97 || key > 122 || value < 97 || value > 122 {
+			return &connectionErr{"mappings contain non alphabetical characters"}
 		}
 
-		m.plugboardConnections[i] = int(plugCons[byte(i)])
+		m.plugboardConnections[int(key-'a')] = int(value - 'a')
+		m.plugboardConnections[int(value-'a')] = int(key - 'a')
 	}
 
 	return nil
@@ -38,5 +41,5 @@ func (m *machine) plugIn(char byte) int {
 // Change int to a byte (character) based on plugboard connections
 // Used when character is returned
 func (m *machine) plugOut(char int) byte {
-	return byte(m.plugboardConnections[int(char-'a')] + 'a')
+	return byte(m.plugboardConnections[char]) + 'a'
 }

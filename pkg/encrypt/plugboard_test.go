@@ -2,43 +2,23 @@
 package encrypt
 
 import (
+	"fmt"
 	"testing"
 )
 
-func TestSetConnections(t *testing.T) {
-	correct := [2][]byte{
-		{'a', 'b', 'c', 'd', 'e', 'f'},
-		{'j', 'k', 'l', 'y', 'u', 'z'},
-	}
+func TestCreatePlugboardConnections(t *testing.T) {
+	correct := map[byte]byte{'a': 'j', 'b': 'k', 'c': 'l', 'd': 'y', 'e': 'u', 'f': 'z'}
 
-	wrong1 := [2][]byte{
-		{'a', 'b', 'k', 'h'},
-		{'h', 'g', 'l', 'd'},
-	}
+	wrong1 := map[byte]byte{'a': 'h', 'b': 'g', 'k': 'l', 'h': 'd'}
+	wrong2 := map[byte]byte{'a': 'a', 'b': 'a', 'c': 'a', 'd': 'a', 'e': 'a', 'f': 'a', 'g': 'a', 'h': 'a', 'j': 'a', 'k': 'a', 'l': 'a', 'm': 'a', 'n': 'a', 'o': 'a'}
 
-	wrong2 := [2][]byte{
-		{'a'},
-		{'a'},
-	}
-
-	wrong3 := [2][]byte{
-		{'h', 'l', 't', 'y', 'j', 'd', 'v', 'i'},
-		{'g', 'k', 'f', 'g'},
-	}
-
-	wrong4 := [2][]byte{
-		{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'o'},
-		{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'o'},
-	}
-
-	err1 := createPlugboardConnections(correct)
-	err2 := createPlugboardConnections(wrong1)
-	err3 := createPlugboardConnections(wrong2)
-	err4 := createPlugboardConnections(wrong3)
-	err5 := createPlugboardConnections(wrong4)
+	testMachine := new(machine)
+	err1 := testMachine.createPlugboardConnections(correct)
+	err2 := testMachine.createPlugboardConnections(wrong1)
+	err3 := testMachine.createPlugboardConnections(wrong2)
 
 	if err1 != nil {
-		t.Errorf("Correct connection fails")
+		t.Errorf(fmt.Sprintf("Correct connection fails, %s", err1.Error()))
 	}
 
 	if err2 == nil {
@@ -46,29 +26,31 @@ func TestSetConnections(t *testing.T) {
 	}
 
 	if err3 == nil {
-		t.Errorf("Wrong connection passed, character mapped to itself")
-	}
-
-	if err4 == nil {
-		t.Errorf("Wrong connection passed, invalid number of connections")
-	}
-
-	if err5 == nil {
-		t.Errorf("Wrong connection passed, more than 13 characters in a row")
+		t.Errorf(fmt.Sprintf("Wrong connection passed, invalid number of connections"))
 	}
 }
 
-func TestChangeChar(t *testing.T) {
-	connection := [2][]byte{
-		{'a', 'b', 'c', 'd', 'e', 'f'},
-		{'j', 'k', 'l', 'y', 'u', 'z'},
-	}
+func TestPlug(t *testing.T) {
+	connection := map[byte]byte{'a': 'j', 'b': 'k', 'c': 'l', 'd': 'y', 'e': 'u', 'f': 'z'}
 
-	createPlugboardConnections(connection)
+	testMachine := new(machine)
+	testMachine.createPlugboardConnections(connection)
 
-	for i := 0; i < len(connection[0]); i++ {
-		if changeChar(connection[0][i]) != connection[1][i] || changeChar(connection[1][i]) != connection[0][i] {
-			t.Errorf("Mapping incorrect, expected %v -> %v, got %v -> %v", connection[0][i], connection[1][i], connection[0][i], changeChar(connection[0][i]))
+	for key, value := range connection {
+		if testMachine.plugIn(key) != int(value-'a') {
+			t.Errorf("Incorrect mapping plugIn 1, expected %c -> %c, got %c -> %c", key, value, key, byte(testMachine.plugIn(key))+'a')
+		}
+
+		if testMachine.plugIn(value) != int(key-'a') {
+			t.Errorf("Incorrect mapping plugIn 2, expected %c -> %c, got %c -> %c", value, key, value, byte(testMachine.plugIn(value))+'a')
+		}
+
+		if testMachine.plugOut(int(key-'a')) != value {
+			t.Errorf("Incorrect mapping plugOut 1, expected %c -> %c, got %c -> %c", key, value, key, testMachine.plugOut(int(key-'a')))
+		}
+
+		if testMachine.plugOut(int(value-'a')) != key {
+			t.Errorf("Incorrect mapping plugOut 2, expected %c -> %c, got %c -> %c", value, key, value, testMachine.plugOut(int(value-'a')))
 		}
 	}
 }
