@@ -3,11 +3,9 @@ package encrypt
 
 import ()
 
-var collector [ALPHABET_SIZE]int
-
 // Create collector connections
 //		config: specifies which configuration to use, default value: 0.
-func createCollectorConnections(config int) {
+func (m *machine) createCollectorConnections(config int) {
 	if config < 0 || config > 9 {
 		config = 0
 	}
@@ -37,7 +35,7 @@ func createCollectorConnections(config int) {
 	}
 
 	for i := 0; i < len(halfConnections); i++ {
-		collector[i] = halfConnections[i]
-		collector[halfConnections[i]] = i
+		m.collector[i] = halfConnections[i]
+		m.collector[halfConnections[i]] = i
 	}
 }
