@@ -9,3 +9,12 @@ type connectionErr struct {
 func (err *connectionErr) Error() string {
 	return err.message
 }
+
+// Rotor configuration error
+type rotorConfigErr struct {
+	message string
+}
+
+func (err *rotorConfigErr) Error() string {
+	return err.message
+}
