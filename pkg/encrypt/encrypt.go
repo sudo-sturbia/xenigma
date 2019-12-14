@@ -14,5 +14,6 @@ type machine struct {
 	collector            [ALPHABET_SIZE]int                   // Collector connections, symmetric
 	plugboardConnections [ALPHABET_SIZE]int                   // Plugboard connections, symmetric
 
-	rotors [NUMBER_OF_ROTORS][ALPHABET_SIZE]int // Mechanical rotors, 1st element of each array represents rotor's current position
+	rotors [NUMBER_OF_ROTORS][ALPHABET_SIZE]int // Mechanical rotors, 1st element represents rotor's current position
+	step   int                                  // Size of shift between rotor steps (move)
 }
