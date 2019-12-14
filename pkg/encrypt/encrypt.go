@@ -3,6 +3,12 @@ package encrypt
 
 import ()
 
+const (
+	NUMBER_OF_ROTORS = 3
+	ALPHABET_SIZE    = 26
+)
+
+// Represents an Enigma machine's components
 type machine struct {
 	pathConnections      [NUMBER_OF_ROTORS][ALPHABET_SIZE]int // Connections that form electric pathways
 	collector            [ALPHABET_SIZE]int                   // Collector connections, symmetric
@@ -10,8 +16,3 @@ type machine struct {
 
 	rotors [NUMBER_OF_ROTORS][ALPHABET_SIZE]int // Mechanical rotors, 1st element of each array represents rotor's current position
 }
-
-const (
-	NUMBER_OF_ROTORS = 3
-	ALPHABET_SIZE    = 26
-)
