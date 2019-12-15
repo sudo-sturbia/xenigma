@@ -1,4 +1,5 @@
-// Encrypt messages using engima code
+// Components of the enigma machine.
+// Used for encryption and decryption of messages.
 package encrypt
 
 import (

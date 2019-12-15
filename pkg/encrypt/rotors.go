@@ -1,16 +1,29 @@
-// Encrypt messages using engima code
+// Components of the enigma machine.
+// Used for encryption and decryption of messages.
 package encrypt
 
 import (
 	"fmt"
 )
 
-// Set initial rotors' position
-func (m *machine) setInitialRotors() {
-	for i := 0; i < ALPHABET_SIZE; i++ {
-		m.rotors[0][i] = i
-		m.rotors[1][i] = i
-		m.rotors[2][i] = i
+// Initialize all components related to rotors.
+// Values are set to default if incorrect.
+func (m *machine) initRotors(positions [NUMBER_OF_ROTORS]int, stepSize int, cycleSize int) {
+	var err error
+
+	err = m.setStep(stepSize)
+	if err != nil {
+		m.setStep(1)
+	}
+
+	err = m.setFullCycle(cycleSize)
+	if err != nil {
+		m.setFullCycle(ALPHABET_SIZE)
+	}
+
+	err = m.setRotorsPosition(positions)
+	if err != nil {
+		m.resetRotors()
 	}
 }
 
@@ -30,6 +43,15 @@ func (m *machine) setRotorsPosition(positions [NUMBER_OF_ROTORS]int) error {
 	}
 
 	return nil
+}
+
+// Reset all rotors (set positions to zero)
+func (m *machine) resetRotors() {
+	for i := 0; i < ALPHABET_SIZE; i++ {
+		m.rotors[0][i] = i
+		m.rotors[1][i] = i
+		m.rotors[2][i] = i
+	}
 }
 
 // Set value of rotors step
