@@ -3,7 +3,6 @@
 package encrypt
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -19,7 +18,7 @@ func TestCreatePlugboardConnections(t *testing.T) {
 	err3 := testMachine.createPlugboardConnections(wrong2)
 
 	if err1 != nil {
-		t.Errorf(fmt.Sprintf("Correct connection fails, %s", err1.Error()))
+		t.Errorf("Correct connection fails, %s", err1.Error())
 	}
 
 	if err2 == nil {
@@ -27,7 +26,7 @@ func TestCreatePlugboardConnections(t *testing.T) {
 	}
 
 	if err3 == nil {
-		t.Errorf(fmt.Sprintf("Wrong connection passed, invalid number of connections"))
+		t.Errorf("Wrong connection passed, invalid number of connections")
 	}
 }
 
