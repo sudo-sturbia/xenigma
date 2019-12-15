@@ -7,24 +7,30 @@ import (
 )
 
 // Initialize all components related to rotors.
-// Values are set to default if incorrect.
-func (m *machine) initRotors(positions [NUMBER_OF_ROTORS]int, stepSize int, cycleSize int) {
-	var err error
+// If incorrect values are given fields are set
+// to default and an error is returned.
+func (m *machine) initRotors(positions [NUMBER_OF_ROTORS]int, stepSize int, cycleSize int) (err error) {
+	var tempErr error
 
-	err = m.setStep(stepSize)
-	if err != nil {
+	tempErr = m.setStep(stepSize)
+	if tempErr != nil {
 		m.setStep(1)
+		err = tempErr
 	}
 
-	err = m.setFullCycle(cycleSize)
-	if err != nil {
+	tempErr = m.setFullCycle(cycleSize)
+	if tempErr != nil {
 		m.setFullCycle(ALPHABET_SIZE)
+		err = tempErr
 	}
 
-	err = m.setRotorsPosition(positions)
-	if err != nil {
+	tempErr = m.setRotorsPosition(positions)
+	if tempErr != nil {
 		m.resetRotors()
+		err = tempErr
 	}
+
+	return err
 }
 
 // Set position of each rotor
@@ -38,7 +44,7 @@ func (m *machine) setRotorsPosition(positions [NUMBER_OF_ROTORS]int) error {
 
 	for i := 0; i < NUMBER_OF_ROTORS; i++ {
 		for j := 0; j < ALPHABET_SIZE; j++ {
-			m.rotors[i][j] = (i + positions[i]) % ALPHABET_SIZE
+			m.rotors[i][j] = (j + positions[i]) % ALPHABET_SIZE
 		}
 	}
 
@@ -60,7 +66,7 @@ func (m *machine) setStep(value int) error {
 		return &rotorConfigErr{"invalid step value"}
 	}
 
-	m.step = value
+	m.step = value % ALPHABET_SIZE
 	return nil
 }
 
