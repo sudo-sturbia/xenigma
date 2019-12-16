@@ -118,12 +118,12 @@ func TestCycleSetter(t *testing.T) {
 
 	testMachine := new(machine)
 
-	err = testMachine.setFullCycle(5)
+	err = testMachine.setCycle(5)
 	if err != nil {
 		t.Errorf("correct cycle size \"%d\" not accepted", 5)
 	}
 
-	err = testMachine.setFullCycle(0)
+	err = testMachine.setCycle(0)
 	if err == nil {
 		t.Errorf("incorrect cycle size \"%d\" accepted", 0)
 	}
@@ -234,7 +234,7 @@ func verifyValues(testMachine *machine, positions [NUMBER_OF_ROTORS]int, step in
 		return false
 	}
 
-	if cycleSize != testMachine.fullCycle {
+	if cycleSize != testMachine.cycle {
 		return false
 	}
 
