@@ -135,6 +135,8 @@ func TestCycleSetter(t *testing.T) {
 // with different steps and cycle sizes.
 func TestStepRotors(t *testing.T) {
 	testMachine := new(machine)
+
+	// Default setting
 	testMachine.initRotors([NUMBER_OF_ROTORS]int{0, 0, 0}, 1, ALPHABET_SIZE)
 
 	testMachine.stepRotors()
@@ -155,15 +157,23 @@ func TestStepRotors(t *testing.T) {
 
 	testMachine.stepRotors()
 	if !verifyRotorsPos(testMachine, [NUMBER_OF_ROTORS]int{5, 0, 0}) {
-		t.Errorf("incorrect positions after 1 step of size 5")
+		t.Errorf(
+			"incorrect positions after 1 step of size 5, expected %v, got %v",
+			[NUMBER_OF_ROTORS]int{5, 0, 0},
+			[NUMBER_OF_ROTORS]int{testMachine.rotors[0][0], testMachine.rotors[1][0], testMachine.rotors[2][0]},
+		)
 	}
 
 	for i := 0; i < ALPHABET_SIZE; i++ {
 		testMachine.stepRotors()
 	}
 
-	if !verifyRotorsPos(testMachine, [NUMBER_OF_ROTORS]int{1, 5, 0}) {
-		t.Errorf("incorrect positions after full cycle with step 5")
+	if !verifyRotorsPos(testMachine, [NUMBER_OF_ROTORS]int{5, 5, 0}) {
+		t.Errorf(
+			"incorrect positions after 26 steps of with step size 5, expected %v, got %v",
+			[NUMBER_OF_ROTORS]int{5, 5, 0},
+			[NUMBER_OF_ROTORS]int{testMachine.rotors[0][0], testMachine.rotors[1][0], testMachine.rotors[2][0]},
+		)
 	}
 
 	// Different cycle -> 3
@@ -171,7 +181,11 @@ func TestStepRotors(t *testing.T) {
 
 	testMachine.stepRotors()
 	if !verifyRotorsPos(testMachine, [NUMBER_OF_ROTORS]int{1, 0, 0}) {
-		t.Errorf("incorrect positions after 1 step")
+		t.Errorf(
+			"incorrect positions after 1 step with cycle size 3, expected %v, got %v",
+			[NUMBER_OF_ROTORS]int{1, 0, 0},
+			[NUMBER_OF_ROTORS]int{testMachine.rotors[0][0], testMachine.rotors[1][0], testMachine.rotors[2][0]},
+		)
 	}
 
 	for i := 0; i < ALPHABET_SIZE; i++ {
@@ -179,7 +193,35 @@ func TestStepRotors(t *testing.T) {
 	}
 
 	if !verifyRotorsPos(testMachine, [NUMBER_OF_ROTORS]int{1, 9, 3}) {
-		t.Errorf("incorrect positions with cycle size 3")
+		t.Errorf(
+			"incorrect positions after 26 steps with cycle size 3, expected %v, got %v",
+			[NUMBER_OF_ROTORS]int{1, 9, 3},
+			[NUMBER_OF_ROTORS]int{testMachine.rotors[0][0], testMachine.rotors[1][0], testMachine.rotors[2][0]},
+		)
+	}
+
+	// Different cycle size -> 4, step size -> 7
+	testMachine.initRotors([NUMBER_OF_ROTORS]int{0, 0, 0}, 7, 4)
+
+	testMachine.stepRotors()
+	if !verifyRotorsPos(testMachine, [NUMBER_OF_ROTORS]int{7, 0, 0}) {
+		t.Errorf(
+			"incorrect positions after 1 step with step 7, and cycle 4, expected %v, got %v",
+			[NUMBER_OF_ROTORS]int{7, 0, 0},
+			[NUMBER_OF_ROTORS]int{testMachine.rotors[0][0], testMachine.rotors[1][0], testMachine.rotors[2][0]},
+		)
+	}
+
+	for i := 0; i < ALPHABET_SIZE; i++ {
+		testMachine.stepRotors()
+	}
+
+	if !verifyRotorsPos(testMachine, [NUMBER_OF_ROTORS]int{7, 16, 7}) {
+		t.Errorf(
+			"incorrect positions after 26 steps with step 7, and cycle 4, expected %v, got %v",
+			[NUMBER_OF_ROTORS]int{7, 16, 7},
+			[NUMBER_OF_ROTORS]int{testMachine.rotors[0][0], testMachine.rotors[1][0], testMachine.rotors[2][0]},
+		)
 	}
 }
 
