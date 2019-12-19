@@ -2,15 +2,14 @@
 // Used for encryption and decryption of messages.
 package encrypt
 
-import ()
+import (
+	"math/rand"
+)
 
 // Specify electric path connections.
-//		config: specifies which configuration to use, default value: 0.
+//	config: specifies which configuration to use.
+//			if no config is specified a random config is used.
 func (m *machine) createPathConnections(config int) {
-	if config < 0 || config > 9 {
-		config = 0
-	}
-
 	switch config {
 	case 0:
 		m.pathConnections[0] = [ALPHABET_SIZE]int{23, 18, 2, 11, 25, 9, 20, 5, 12, 10, 0, 13, 8, 14, 17, 3, 1, 24, 6, 15, 19, 22, 16, 4, 21, 7}
@@ -52,5 +51,15 @@ func (m *machine) createPathConnections(config int) {
 		m.pathConnections[0] = [ALPHABET_SIZE]int{20, 13, 17, 7, 8, 5, 25, 4, 6, 15, 22, 3, 9, 11, 24, 10, 18, 19, 23, 12, 1, 2, 21, 14, 16, 0}
 		m.pathConnections[1] = [ALPHABET_SIZE]int{13, 16, 8, 5, 21, 9, 19, 2, 20, 24, 7, 22, 6, 23, 15, 10, 11, 12, 25, 1, 3, 17, 14, 18, 0, 4}
 		m.pathConnections[2] = [ALPHABET_SIZE]int{19, 20, 14, 0, 7, 24, 23, 12, 15, 21, 8, 5, 2, 11, 16, 18, 13, 4, 10, 22, 25, 1, 17, 3, 6, 9}
+	default:
+		m.pathConnections[0] = [ALPHABET_SIZE]int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}
+		m.pathConnections[1] = [ALPHABET_SIZE]int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}
+		m.pathConnections[2] = [ALPHABET_SIZE]int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}
+
+		for i := 0; i < NUMBER_OF_ROTORS; i++ {
+			rand.Shuffle(ALPHABET_SIZE, func(j, k int) {
+				m.pathConnections[i][j], m.pathConnections[i][k] = m.pathConnections[i][k], m.pathConnections[i][j]
+			})
+		}
 	}
 }
