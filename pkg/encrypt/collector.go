@@ -46,3 +46,8 @@ func (m *machine) createCollectorConnections(config int) {
 		m.collector[halfConnections[i]] = i
 	}
 }
+
+// Get collector connections array
+func (m *machine) Collector() [ALPHABET_SIZE]int {
+	return m.collector
+}

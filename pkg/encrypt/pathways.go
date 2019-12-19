@@ -63,3 +63,8 @@ func (m *machine) createPathConnections(config int) {
 		}
 	}
 }
+
+// Get electric pathway connections
+func (m *machine) PathConnections() [NUMBER_OF_ROTORS][ALPHABET_SIZE]int {
+	return m.pathConnections
+}

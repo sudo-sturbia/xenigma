@@ -33,6 +33,11 @@ func (m *machine) createPlugboardConnections(plugCons map[byte]byte) error {
 	return nil
 }
 
+// Get plugboard connections
+func (m *machine) PlugboardConnections() [ALPHABET_SIZE]int {
+	return m.plugboardConnections
+}
+
 // Change byte (character) to an int (0 -> 25) based on plugboard connections
 // Used when character is entered
 func (m *machine) plugIn(char byte) int {
