@@ -9,7 +9,7 @@ func AreElementsIndices(slice []int) bool {
 	checkArr := make([]bool, length)
 
 	for _, element := range slice {
-		if element >= 0 || element < length {
+		if element >= 0 && element < length {
 			checkArr[element] = true
 		}
 	}
