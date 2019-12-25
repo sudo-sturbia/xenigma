@@ -2,7 +2,7 @@
 // Used for encryption and decryption of messages.
 package encrypt
 
-// Connection Error
+// Connection error
 type connectionErr struct {
 	message string
 }
@@ -17,5 +17,14 @@ type rotorConfigErr struct {
 }
 
 func (err *rotorConfigErr) Error() string {
+	return err.message
+}
+
+// Initializion error
+type initError struct {
+	message string
+}
+
+func (err *initError) Error() string {
 	return err.message
 }

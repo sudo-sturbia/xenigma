@@ -7,16 +7,28 @@ import (
 )
 
 // Check if all fields of a machine were initialized correctly
-func (m *machine) isInitialized() bool {
-	// ...
+func (m *machine) isInit() bool {
+	isInit := m.areRotorsInit() && m.arePathwaysInit() && m.isCollectorInit() &&
+		m.isPlugboardInit() && (m.step > 0) && (m.cycle > 0)
 
-	return false
+	return isInit
+}
+
+// Return true if rotors are initialized correctly
+func (m *machine) areRotorsInit() bool {
+	for _, rotor := range m.rotors {
+		if !helper.AreElementsOrderedIndices(rotor[:]) {
+			return false
+		}
+	}
+
+	return true
 }
 
 // Return true if pathways are initialized correctly
-func (m *machine) isPathwayInit() bool {
-	for i := 0; i < NUMBER_OF_ROTORS; i++ {
-		if !helper.AreElementsIndices(m.pathConnections[i][:]) {
+func (m *machine) arePathwaysInit() bool {
+	for _, pathwaysArr := range m.pathConnections {
+		if !helper.AreElementsIndices(pathwaysArr[:]) {
 			return false
 		}
 	}

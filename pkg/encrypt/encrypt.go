@@ -20,3 +20,14 @@ type machine struct {
 	step       int                                  // Size of shift between rotor steps (move)
 	cycle      int                                  // Number of steps considered a full cycle, considered by following rotor when stepping
 }
+
+// Encrypt a character using engima
+// Returns encrypted character and an error indicating a machine configuration problem.
+func (m *machine) Encrypt(char byte) (byte, error) {
+	if !m.isInit() {
+		return ' ', &initError{"Enigma machine is not initialized correctly"}
+	}
+
+	// ...
+	return ' ', nil
+}
