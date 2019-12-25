@@ -31,3 +31,16 @@ func TestIsSymmetric(t *testing.T) {
 		t.Errorf("Incorrect input: %v accepted", wrong)
 	}
 }
+
+// Test are elements ordered indices method
+func TestAreElementsOrderedIndices(t *testing.T) {
+	correct := []int{4, 5, 0, 1, 2, 3}
+	if !AreElementsOrderedIndices(correct) {
+		t.Errorf("Correct input: %v not accepted", correct)
+	}
+
+	wrong := []int{1, 2, 4, 3, 21, -4}
+	if AreElementsOrderedIndices(wrong) {
+		t.Errorf("Incorrect input: %v accepted", wrong)
+	}
+}
