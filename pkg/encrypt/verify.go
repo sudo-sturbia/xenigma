@@ -7,7 +7,7 @@ import (
 )
 
 // Check if all fields of a machine were initialized correctly
-func (m *machine) isInit() bool {
+func (m *Machine) isInit() bool {
 	isInit := m.areRotorsInit() && m.arePathwaysInit() && m.isCollectorInit() &&
 		m.isPlugboardInit() && (m.step > 0) && (m.cycle > 0)
 
@@ -15,7 +15,7 @@ func (m *machine) isInit() bool {
 }
 
 // Return true if rotors are initialized correctly
-func (m *machine) areRotorsInit() bool {
+func (m *Machine) areRotorsInit() bool {
 	for _, rotor := range m.rotors {
 		if !helper.AreElementsOrderedIndices(rotor[:]) {
 			return false
@@ -26,7 +26,7 @@ func (m *machine) areRotorsInit() bool {
 }
 
 // Return true if pathways are initialized correctly
-func (m *machine) arePathwaysInit() bool {
+func (m *Machine) arePathwaysInit() bool {
 	for _, pathwaysArr := range m.pathConnections {
 		if !helper.AreElementsIndices(pathwaysArr[:]) {
 			return false
@@ -37,19 +37,11 @@ func (m *machine) arePathwaysInit() bool {
 }
 
 // Return true if collector is initialized correctly
-func (m *machine) isCollectorInit() bool {
-	if !helper.AreElementsIndices(m.collector[:]) || !helper.IsSymmetric(m.collector[:]) {
-		return false
-	}
-
-	return true
+func (m *Machine) isCollectorInit() bool {
+	return helper.AreElementsIndices(m.collector[:]) && helper.IsSymmetric(m.collector[:])
 }
 
 // Return true if plugboard connections initialized correctly
-func (m *machine) isPlugboardInit() bool {
-	if !helper.AreElementsIndices(m.plugboardConnections[:]) || !helper.IsSymmetric(m.plugboardConnections[:]) {
-		return false
-	}
-
-	return true
+func (m *Machine) isPlugboardInit() bool {
+	return helper.AreElementsIndices(m.plugboardConnections[:]) && helper.IsSymmetric(m.plugboardConnections[:])
 }

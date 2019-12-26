@@ -9,7 +9,7 @@ import (
 // Initialize all components related to rotors.
 // If incorrect values are given fields are set
 // to default and an error is returned.
-func (m *machine) initRotors(positions [NUMBER_OF_ROTORS]int, stepSize int, cycleSize int) (err error) {
+func (m *Machine) initRotors(positions [NUMBER_OF_ROTORS]int, stepSize int, cycleSize int) (err error) {
 	var tempErr error
 
 	tempErr = m.setStep(stepSize)
@@ -38,7 +38,7 @@ func (m *machine) initRotors(positions [NUMBER_OF_ROTORS]int, stepSize int, cycl
 }
 
 // Set position of each rotor
-func (m *machine) setRotorsPosition(positions [NUMBER_OF_ROTORS]int) error {
+func (m *Machine) setRotorsPosition(positions [NUMBER_OF_ROTORS]int) error {
 	// Verify positions
 	for i := 0; i < NUMBER_OF_ROTORS; i++ {
 		if positions[i] < 0 || positions[i] > ALPHABET_SIZE {
@@ -56,14 +56,14 @@ func (m *machine) setRotorsPosition(positions [NUMBER_OF_ROTORS]int) error {
 }
 
 // Get current position of rotors
-func (m *machine) CurrentRotors() [NUMBER_OF_ROTORS]int {
+func (m *Machine) CurrentRotors() [NUMBER_OF_ROTORS]int {
 	return [NUMBER_OF_ROTORS]int{
 		m.rotors[0][0], m.rotors[1][0], m.rotors[2][0],
 	}
 }
 
 // Reset all rotors (set positions to zero)
-func (m *machine) resetRotors() {
+func (m *Machine) resetRotors() {
 	for i := 0; i < ALPHABET_SIZE; i++ {
 		m.rotors[0][i] = i
 		m.rotors[1][i] = i
@@ -72,7 +72,7 @@ func (m *machine) resetRotors() {
 }
 
 // Set value of rotors step
-func (m *machine) setStep(value int) error {
+func (m *Machine) setStep(value int) error {
 	if value <= 0 {
 		return &rotorConfigErr{"invalid step value"}
 	}
@@ -82,7 +82,7 @@ func (m *machine) setStep(value int) error {
 }
 
 // Get step value
-func (m *machine) Step() int {
+func (m *Machine) Step() int {
 	return m.step
 }
 
@@ -90,7 +90,7 @@ func (m *machine) Step() int {
 // Indicates number of steps considered a full rotor cycle.
 // Used to signal when a following rotor should step based
 // on current rotor's step count.
-func (m *machine) setCycle(value int) error {
+func (m *Machine) setCycle(value int) error {
 	if value <= 0 {
 		return &rotorConfigErr{"invalid cycle size"}
 	}
@@ -100,12 +100,12 @@ func (m *machine) setCycle(value int) error {
 }
 
 // Get cycle value
-func (m *machine) Cycle() int {
+func (m *Machine) Cycle() int {
 	return m.cycle
 }
 
 // Turn rotors one step
-func (m *machine) stepRotors() {
+func (m *Machine) stepRotors() {
 	for i := 0; i < NUMBER_OF_ROTORS; i++ {
 		// If previous rotor completed a full cycle
 		if i == 0 || (m.takenSteps[i-1] == m.cycle) {

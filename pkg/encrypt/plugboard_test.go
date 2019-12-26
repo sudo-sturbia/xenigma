@@ -12,7 +12,7 @@ func TestCreatePlugboardConnections(t *testing.T) {
 	wrong1 := map[byte]byte{'a': 'h', 'b': 'g', 'k': 'l', 'h': 'd'}
 	wrong2 := map[byte]byte{'a': 'a', 'b': 'a', 'c': 'a', 'd': 'a', 'e': 'a', 'f': 'a', 'g': 'a', 'h': 'a', 'j': 'a', 'k': 'a', 'l': 'a', 'm': 'a', 'n': 'a', 'o': 'a'}
 
-	testMachine := new(machine)
+	testMachine := new(Machine)
 	err1 := testMachine.createPlugboardConnections(correct)
 	err2 := testMachine.createPlugboardConnections(wrong1)
 	err3 := testMachine.createPlugboardConnections(wrong2)
@@ -33,7 +33,7 @@ func TestCreatePlugboardConnections(t *testing.T) {
 func TestPlug(t *testing.T) {
 	connection := map[byte]byte{'a': 'j', 'b': 'k', 'c': 'l', 'd': 'y', 'e': 'u', 'f': 'z'}
 
-	testMachine := new(machine)
+	testMachine := new(Machine)
 	testMachine.createPlugboardConnections(connection)
 
 	for key, value := range connection {

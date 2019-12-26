@@ -10,7 +10,7 @@ const (
 )
 
 // Represents an Enigma machine's components
-type machine struct {
+type Machine struct {
 	pathConnections      [NUMBER_OF_ROTORS][ALPHABET_SIZE]int // Connections that form electric pathways
 	collector            [ALPHABET_SIZE]int                   // Collector connections, symmetric
 	plugboardConnections [ALPHABET_SIZE]int                   // Plugboard connections, symmetric
@@ -23,7 +23,7 @@ type machine struct {
 
 // Encrypt a character using engima
 // Returns encrypted character and an error indicating a machine configuration problem.
-func (m *machine) Encrypt(char byte) (byte, error) {
+func (m *Machine) encryptChar(char byte) (byte, error) {
 	if !m.isInit() {
 		return ' ', &initError{"Enigma machine is not initialized correctly"}
 	}

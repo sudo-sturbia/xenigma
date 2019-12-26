@@ -9,7 +9,7 @@ import (
 // Create collector connections
 //	config: specifies which configuration to use.
 //			if no config is specified a random config is used.
-func (m *machine) createCollectorConnections(config int) {
+func (m *Machine) createCollectorConnections(config int) {
 	var halfConnections [ALPHABET_SIZE / 2]int
 
 	switch config {
@@ -48,6 +48,6 @@ func (m *machine) createCollectorConnections(config int) {
 }
 
 // Get collector connections array
-func (m *machine) Collector() [ALPHABET_SIZE]int {
+func (m *Machine) Collector() [ALPHABET_SIZE]int {
 	return m.collector
 }

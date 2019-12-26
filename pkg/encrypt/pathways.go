@@ -9,7 +9,7 @@ import (
 // Specify electric path connections.
 //	config: specifies which configuration to use.
 //			if no config is specified a random config is used.
-func (m *machine) createPathConnections(config int) {
+func (m *Machine) createPathConnections(config int) {
 	switch config {
 	case 0:
 		m.pathConnections[0] = [ALPHABET_SIZE]int{23, 18, 2, 11, 25, 9, 20, 5, 12, 10, 0, 13, 8, 14, 17, 3, 1, 24, 6, 15, 19, 22, 16, 4, 21, 7}
@@ -65,6 +65,6 @@ func (m *machine) createPathConnections(config int) {
 }
 
 // Get electric pathway connections
-func (m *machine) PathConnections() [NUMBER_OF_ROTORS][ALPHABET_SIZE]int {
+func (m *Machine) PathConnections() [NUMBER_OF_ROTORS][ALPHABET_SIZE]int {
 	return m.pathConnections
 }

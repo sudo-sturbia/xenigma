@@ -11,7 +11,7 @@ import (
 // Test full initialization
 func TestInitRotors(t *testing.T) {
 	var (
-		testMachine   *machine
+		testMachine   *Machine
 		testPositions [NUMBER_OF_ROTORS]int
 		testStep      int
 		testCycleSize int
@@ -19,7 +19,7 @@ func TestInitRotors(t *testing.T) {
 		err error
 	)
 
-	testMachine = new(machine)
+	testMachine = new(Machine)
 
 	// Correct initialization
 	testPositions = [NUMBER_OF_ROTORS]int{2, 3, 4}
@@ -76,7 +76,7 @@ func TestInitRotors(t *testing.T) {
 
 // Test position setter
 func TestSetPosition(t *testing.T) {
-	testMachine := new(machine)
+	testMachine := new(Machine)
 
 	// Test wrong positions
 	wrongPositions := [NUMBER_OF_ROTORS]int{3, -22, 6}
@@ -99,7 +99,7 @@ func TestSetPosition(t *testing.T) {
 func TestSetStep(t *testing.T) {
 	var err error
 
-	testMachine := new(machine)
+	testMachine := new(Machine)
 
 	err = testMachine.setStep(23)
 	if err != nil {
@@ -116,7 +116,7 @@ func TestSetStep(t *testing.T) {
 func TestCycleSetter(t *testing.T) {
 	var err error
 
-	testMachine := new(machine)
+	testMachine := new(Machine)
 
 	err = testMachine.setCycle(5)
 	if err != nil {
@@ -134,7 +134,7 @@ func TestCycleSetter(t *testing.T) {
 // Test rotor stepping
 // with different steps and cycle sizes.
 func TestStepRotors(t *testing.T) {
-	testMachine := new(machine)
+	testMachine := new(Machine)
 
 	// Default setting
 	testMachine.initRotors([NUMBER_OF_ROTORS]int{0, 0, 0}, 1, ALPHABET_SIZE)
@@ -229,7 +229,7 @@ func TestStepRotors(t *testing.T) {
 
 // Check if values in machine were initialized
 // correctly based on given input
-func verifyValues(testMachine *machine, positions [NUMBER_OF_ROTORS]int, step int, cycleSize int) bool {
+func verifyValues(testMachine *Machine, positions [NUMBER_OF_ROTORS]int, step int, cycleSize int) bool {
 	if step != testMachine.step {
 		return false
 	}
@@ -242,7 +242,7 @@ func verifyValues(testMachine *machine, positions [NUMBER_OF_ROTORS]int, step in
 }
 
 // Verify current position of rotors
-func verifyRotorsPos(testMachine *machine, positions [NUMBER_OF_ROTORS]int) bool {
+func verifyRotorsPos(testMachine *Machine, positions [NUMBER_OF_ROTORS]int) bool {
 	for i := 0; i < NUMBER_OF_ROTORS; i++ {
 		for j := 0; j < ALPHABET_SIZE; j++ {
 			if testMachine.rotors[i][j] != (j+positions[i])%ALPHABET_SIZE {

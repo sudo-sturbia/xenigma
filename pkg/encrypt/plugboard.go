@@ -7,7 +7,7 @@ import (
 )
 
 // Validate and create plugboard connections
-func (m *machine) createPlugboardConnections(plugCons map[byte]byte) error {
+func (m *Machine) createPlugboardConnections(plugCons map[byte]byte) error {
 	// Validate length
 	if len(plugCons) > 13 {
 		return &connectionErr{"number of connections is invalid"}
@@ -34,18 +34,18 @@ func (m *machine) createPlugboardConnections(plugCons map[byte]byte) error {
 }
 
 // Get plugboard connections
-func (m *machine) PlugboardConnections() [ALPHABET_SIZE]int {
+func (m *Machine) PlugboardConnections() [ALPHABET_SIZE]int {
 	return m.plugboardConnections
 }
 
 // Change byte (character) to an int (0 -> 25) based on plugboard connections
 // Used when character is entered
-func (m *machine) plugIn(char byte) int {
+func (m *Machine) plugIn(char byte) int {
 	return int(m.plugboardConnections[int(char-'a')])
 }
 
 // Change int to a byte (character) based on plugboard connections
 // Used when character is returned
-func (m *machine) plugOut(char int) byte {
+func (m *Machine) plugOut(char int) byte {
 	return byte(m.plugboardConnections[char]) + 'a'
 }
