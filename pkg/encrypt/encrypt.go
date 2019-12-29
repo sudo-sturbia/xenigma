@@ -2,7 +2,10 @@
 // Used for encryption and decryption of messages.
 package encrypt
 
-import ()
+import (
+	"bytes"
+	"unicode"
+)
 
 const (
 	NUMBER_OF_ROTORS = 3
@@ -21,13 +24,29 @@ type Machine struct {
 	cycle      int                                  // Number of steps considered a full cycle, considered by following rotor when stepping
 }
 
-// Encrypt a character using engima
-// Returns encrypted character and an error indicating a machine configuration problem.
-func (m *Machine) encryptChar(char byte) (byte, error) {
+// Encrypt a full message using enigma
+// returns encrypted message and an error
+// indicating an initialization error.
+func (m *Machine) Encrypt(message string) (string, error) {
 	if !m.isInit() {
-		return ' ', &initError{"Enigma machine is not initialized correctly"}
+		return "", &initError{"Enigma machine is not initialized correctly"}
 	}
 
-	// ...
-	return ' ', nil
+	// Create a buffer to add encrypted characters to
+	encryptedBuffer := new(bytes.Buffer)
+
+	for _, char := range message {
+		encryptedBuffer.WriteByte(m.encryptChar(byte(char)))
+	}
+
+	return encryptedBuffer.String(), nil
+}
+
+// Encrypt a character using engima
+func (m *Machine) encryptChar(char byte) byte {
+	if !unicode.IsLetter(rune(char)) {
+		return char
+	}
+
+	return ' '
 }
