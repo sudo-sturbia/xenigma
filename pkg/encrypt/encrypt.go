@@ -4,6 +4,7 @@ package encrypt
 
 import (
 	"bytes"
+	"strings"
 	"unicode"
 )
 
@@ -33,6 +34,7 @@ func (m *Machine) Encrypt(message string) (string, error) {
 	}
 
 	// Create a buffer to add encrypted characters to
+	message = strings.ToLower(message)
 	encryptedBuffer := new(bytes.Buffer)
 
 	for _, char := range message {
@@ -48,5 +50,19 @@ func (m *Machine) encryptChar(char byte) byte {
 		return char
 	}
 
-	return ' '
+	// Plugboard
+	encryptedChar := m.plugIn(char)
+
+	// Rotors and electric pathways
+	for i := 0; i < NUMBER_OF_ROTORS; i++ {
+		encryptedChar = m.pathConnections[i][m.rotors[i][encryptedChar]]
+	}
+
+	// Collector and return through electric pathways
+	encryptedChar = m.collector[encryptedChar]
+	for i := 0; i < NUMBER_OF_ROTORS; i++ {
+		encryptedChar = m.rotors[i][m.pathConnections[i][encryptedChar]]
+	}
+
+	return m.plugOut(encryptedChar)
 }
