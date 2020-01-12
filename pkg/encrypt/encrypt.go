@@ -16,7 +16,7 @@ const (
 // Represents an Enigma machine's components
 type Machine struct {
 	pathConnections      [NUMBER_OF_ROTORS][ALPHABET_SIZE]int // Connections that form electric pathways
-	collector            [ALPHABET_SIZE]int                   // Collector connections, symmetric
+	reflector            [ALPHABET_SIZE]int                   // Reflector connections, symmetric
 	plugboardConnections [ALPHABET_SIZE]int                   // Plugboard connections, symmetric
 
 	rotors     [NUMBER_OF_ROTORS][ALPHABET_SIZE]int // Mechanical rotors, 1st element represents rotor's current position
@@ -58,8 +58,8 @@ func (m *Machine) encryptChar(char byte) byte {
 		encryptedChar = m.pathConnections[i][m.rotors[i][encryptedChar]]
 	}
 
-	// Collector and return through electric pathways
-	encryptedChar = m.collector[encryptedChar]
+	// Reflector and return through electric pathways
+	encryptedChar = m.reflector[encryptedChar]
 	for i := 0; i < NUMBER_OF_ROTORS; i++ {
 		encryptedChar = m.rotors[i][m.pathConnections[i][encryptedChar]]
 	}

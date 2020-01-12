@@ -6,10 +6,10 @@ import (
 	"math/rand"
 )
 
-// Create collector connections
+// Create reflector connections
 //	config: specifies which configuration to use.
 //			if no config is specified a random config is used.
-func (m *Machine) createCollectorConnections(config int) {
+func (m *Machine) createReflectorConnections(config int) {
 	var halfConnections [ALPHABET_SIZE / 2]int
 
 	switch config {
@@ -42,12 +42,12 @@ func (m *Machine) createCollectorConnections(config int) {
 	}
 
 	for i := 0; i < len(halfConnections); i++ {
-		m.collector[i] = halfConnections[i]
-		m.collector[halfConnections[i]] = i
+		m.reflector[i] = halfConnections[i]
+		m.reflector[halfConnections[i]] = i
 	}
 }
 
-// Get collector connections array
-func (m *Machine) Collector() [ALPHABET_SIZE]int {
-	return m.collector
+// Get reflector connections array
+func (m *Machine) Reflector() [ALPHABET_SIZE]int {
+	return m.reflector
 }

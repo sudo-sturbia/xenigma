@@ -8,7 +8,7 @@ import (
 
 // Check if all fields of a machine were initialized correctly
 func (m *Machine) isInit() bool {
-	isInit := m.areRotorsInit() && m.arePathwaysInit() && m.isCollectorInit() &&
+	isInit := m.areRotorsInit() && m.arePathwaysInit() && m.isReflectorInit() &&
 		m.isPlugboardInit() && (m.step > 0) && (m.cycle > 0)
 
 	return isInit
@@ -36,9 +36,9 @@ func (m *Machine) arePathwaysInit() bool {
 	return true
 }
 
-// Return true if collector is initialized correctly
-func (m *Machine) isCollectorInit() bool {
-	return helper.AreElementsIndices(m.collector[:]) && helper.IsSymmetric(m.collector[:])
+// Return true if reflector is initialized correctly
+func (m *Machine) isReflectorInit() bool {
+	return helper.AreElementsIndices(m.reflector[:]) && helper.IsSymmetric(m.reflector[:])
 }
 
 // Return true if plugboard connections initialized correctly
