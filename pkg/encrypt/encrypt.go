@@ -13,18 +13,6 @@ const (
 	ALPHABET_SIZE    = 26
 )
 
-// Represents an Enigma machine's components
-type Machine struct {
-	pathConnections      [NUMBER_OF_ROTORS][ALPHABET_SIZE]int // Connections that form electric pathways
-	reflector            [ALPHABET_SIZE]int                   // Reflector connections, symmetric
-	plugboardConnections [ALPHABET_SIZE]int                   // Plugboard connections, symmetric
-
-	rotors     [NUMBER_OF_ROTORS][ALPHABET_SIZE]int // Mechanical rotors, 1st element represents rotor's current position
-	takenSteps [NUMBER_OF_ROTORS - 1]int            // Number of steps taken by each rotor except the last
-	step       int                                  // Size of shift between rotor steps (move)
-	cycle      int                                  // Number of steps considered a full cycle, considered by following rotor when stepping
-}
-
 // Encrypt a full message using enigma
 // returns encrypted message and an error
 // indicating an initialization error.
@@ -65,4 +53,16 @@ func (m *Machine) encryptChar(char byte) byte {
 	}
 
 	return m.plugOut(encryptedChar)
+}
+
+// Change byte (character) to an int (0 -> 25) based on plugboard connections
+// Used when character is entered
+func (m *Machine) plugIn(char byte) int {
+	return int(m.plugboardConnections[int(char-'a')])
+}
+
+// Change int to a byte (character) based on plugboard connections
+// Used when character is returned
+func (m *Machine) plugOut(char int) byte {
+	return byte(m.plugboardConnections[char]) + 'a'
 }

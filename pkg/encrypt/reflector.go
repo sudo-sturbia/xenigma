@@ -46,8 +46,3 @@ func (m *Machine) createReflectorConnections(config int) {
 		m.reflector[halfConnections[i]] = i
 	}
 }
-
-// Get reflector connections array
-func (m *Machine) Reflector() [ALPHABET_SIZE]int {
-	return m.reflector
-}
