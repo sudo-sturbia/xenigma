@@ -1,4 +1,4 @@
-// Components of the enigma machine.
+// Package encrypt contains components of the enigma machine.
 // Used for encryption and decryption of messages.
 package encrypt
 
@@ -9,13 +9,14 @@ import (
 )
 
 const (
-	NUMBER_OF_ROTORS = 3
-	ALPHABET_SIZE    = 26
+	// NumberOfRotors is the number of rotors used in machine
+	NumberOfRotors = 3
+
+	alphabetSize = 26
 )
 
-// Encrypt a full message using enigma
-// returns encrypted message and an error
-// indicating an initialization error.
+// Encrypt encrypts a string using enigma.
+// returns encrypted string and an error incase of an initialization error.
 func (m *Machine) Encrypt(message string) (string, error) {
 	if !m.isInit() {
 		return "", &initError{"Enigma machine is not initialized correctly"}
@@ -42,13 +43,13 @@ func (m *Machine) encryptChar(char byte) byte {
 	encryptedChar := m.plugIn(char)
 
 	// Rotors and electric pathways
-	for i := 0; i < NUMBER_OF_ROTORS; i++ {
+	for i := 0; i < NumberOfRotors; i++ {
 		encryptedChar = m.pathConnections[i][m.rotors[i][encryptedChar]]
 	}
 
 	// Reflector and return through electric pathways
 	encryptedChar = m.reflector[encryptedChar]
-	for i := 0; i < NUMBER_OF_ROTORS; i++ {
+	for i := 0; i < NumberOfRotors; i++ {
 		encryptedChar = m.rotors[i][m.pathConnections[i][encryptedChar]]
 	}
 

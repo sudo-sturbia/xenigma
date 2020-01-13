@@ -1,4 +1,4 @@
-// Components of the enigma machine.
+// Package encrypt contains components of the enigma machine.
 // Used for encryption and decryption of messages.
 package encrypt
 
@@ -12,7 +12,7 @@ import (
 func TestInitRotors(t *testing.T) {
 	var (
 		testMachine   *Machine
-		testPositions [NUMBER_OF_ROTORS]int
+		testPositions [NumberOfRotors]int
 		testStep      int
 		testCycleSize int
 
@@ -22,9 +22,9 @@ func TestInitRotors(t *testing.T) {
 	testMachine = new(Machine)
 
 	// Correct initialization
-	testPositions = [NUMBER_OF_ROTORS]int{2, 3, 4}
+	testPositions = [NumberOfRotors]int{2, 3, 4}
 	testStep = 1
-	testCycleSize = ALPHABET_SIZE
+	testCycleSize = alphabetSize
 
 	err = testMachine.initRotors(testPositions, testStep, testCycleSize)
 	if err != nil {
@@ -36,19 +36,19 @@ func TestInitRotors(t *testing.T) {
 	}
 
 	// Incorrect initialization 1
-	testPositions = [NUMBER_OF_ROTORS]int{-1, 20, 28}
+	testPositions = [NumberOfRotors]int{-1, 20, 28}
 
 	err = testMachine.initRotors(testPositions, testStep, testCycleSize)
 	if err == nil {
 		t.Errorf("incorrect positions accepted")
 	}
 
-	if !verifyValues(testMachine, [NUMBER_OF_ROTORS]int{0, 0, 0}, testStep, testCycleSize) {
+	if !verifyValues(testMachine, [NumberOfRotors]int{0, 0, 0}, testStep, testCycleSize) {
 		t.Errorf("values incorrectly initialized")
 	}
 
 	// Incorrect initialization 2
-	testPositions = [NUMBER_OF_ROTORS]int{2, 3, 4}
+	testPositions = [NumberOfRotors]int{2, 3, 4}
 	testStep = -223
 
 	err = testMachine.initRotors(testPositions, testStep, testCycleSize)
@@ -69,7 +69,7 @@ func TestInitRotors(t *testing.T) {
 		t.Errorf("incorrect cycle size accepted")
 	}
 
-	if !verifyValues(testMachine, testPositions, testStep, ALPHABET_SIZE) {
+	if !verifyValues(testMachine, testPositions, testStep, alphabetSize) {
 		t.Errorf("values incorrectly initialized")
 	}
 }
@@ -79,7 +79,7 @@ func TestSetPosition(t *testing.T) {
 	testMachine := new(Machine)
 
 	// Test wrong positions
-	wrongPositions := [NUMBER_OF_ROTORS]int{3, -22, 6}
+	wrongPositions := [NumberOfRotors]int{3, -22, 6}
 	err1 := testMachine.setRotorsPosition(wrongPositions)
 
 	if err1 == nil {
@@ -87,7 +87,7 @@ func TestSetPosition(t *testing.T) {
 	}
 
 	// Test correct positions
-	correctPositions := [NUMBER_OF_ROTORS]int{3, 22, 6}
+	correctPositions := [NumberOfRotors]int{3, 22, 6}
 	err2 := testMachine.setRotorsPosition(correctPositions)
 
 	if err2 != nil {
@@ -137,90 +137,90 @@ func TestStepRotors(t *testing.T) {
 	testMachine := new(Machine)
 
 	// Default setting
-	testMachine.initRotors([NUMBER_OF_ROTORS]int{0, 0, 0}, 1, ALPHABET_SIZE)
+	testMachine.initRotors([NumberOfRotors]int{0, 0, 0}, 1, alphabetSize)
 
 	testMachine.stepRotors()
-	if !verifyRotorsPos(testMachine, [NUMBER_OF_ROTORS]int{1, 0, 0}) {
+	if !verifyRotorsPos(testMachine, [NumberOfRotors]int{1, 0, 0}) {
 		t.Errorf("incorrect positions after 1 step")
 	}
 
-	for i := 0; i < ALPHABET_SIZE; i++ {
+	for i := 0; i < alphabetSize; i++ {
 		testMachine.stepRotors()
 	}
 
-	if !verifyRotorsPos(testMachine, [NUMBER_OF_ROTORS]int{1, 1, 0}) {
+	if !verifyRotorsPos(testMachine, [NumberOfRotors]int{1, 1, 0}) {
 		t.Errorf("incorrect positions after full cycle")
 	}
 
 	// Different step -> 5
-	testMachine.initRotors([NUMBER_OF_ROTORS]int{0, 0, 0}, 5, ALPHABET_SIZE)
+	testMachine.initRotors([NumberOfRotors]int{0, 0, 0}, 5, alphabetSize)
 
 	testMachine.stepRotors()
-	if !verifyRotorsPos(testMachine, [NUMBER_OF_ROTORS]int{5, 0, 0}) {
+	if !verifyRotorsPos(testMachine, [NumberOfRotors]int{5, 0, 0}) {
 		t.Errorf(
 			"incorrect positions after 1 step of size 5, expected %v, got %v",
-			[NUMBER_OF_ROTORS]int{5, 0, 0},
-			[NUMBER_OF_ROTORS]int{testMachine.rotors[0][0], testMachine.rotors[1][0], testMachine.rotors[2][0]},
+			[NumberOfRotors]int{5, 0, 0},
+			[NumberOfRotors]int{testMachine.rotors[0][0], testMachine.rotors[1][0], testMachine.rotors[2][0]},
 		)
 	}
 
-	for i := 0; i < ALPHABET_SIZE; i++ {
+	for i := 0; i < alphabetSize; i++ {
 		testMachine.stepRotors()
 	}
 
-	if !verifyRotorsPos(testMachine, [NUMBER_OF_ROTORS]int{5, 5, 0}) {
+	if !verifyRotorsPos(testMachine, [NumberOfRotors]int{5, 5, 0}) {
 		t.Errorf(
 			"incorrect positions after 26 steps of with step size 5, expected %v, got %v",
-			[NUMBER_OF_ROTORS]int{5, 5, 0},
-			[NUMBER_OF_ROTORS]int{testMachine.rotors[0][0], testMachine.rotors[1][0], testMachine.rotors[2][0]},
+			[NumberOfRotors]int{5, 5, 0},
+			[NumberOfRotors]int{testMachine.rotors[0][0], testMachine.rotors[1][0], testMachine.rotors[2][0]},
 		)
 	}
 
 	// Different cycle -> 3
-	testMachine.initRotors([NUMBER_OF_ROTORS]int{0, 0, 0}, 1, 3)
+	testMachine.initRotors([NumberOfRotors]int{0, 0, 0}, 1, 3)
 
 	testMachine.stepRotors()
-	if !verifyRotorsPos(testMachine, [NUMBER_OF_ROTORS]int{1, 0, 0}) {
+	if !verifyRotorsPos(testMachine, [NumberOfRotors]int{1, 0, 0}) {
 		t.Errorf(
 			"incorrect positions after 1 step with cycle size 3, expected %v, got %v",
-			[NUMBER_OF_ROTORS]int{1, 0, 0},
-			[NUMBER_OF_ROTORS]int{testMachine.rotors[0][0], testMachine.rotors[1][0], testMachine.rotors[2][0]},
+			[NumberOfRotors]int{1, 0, 0},
+			[NumberOfRotors]int{testMachine.rotors[0][0], testMachine.rotors[1][0], testMachine.rotors[2][0]},
 		)
 	}
 
-	for i := 0; i < ALPHABET_SIZE; i++ {
+	for i := 0; i < alphabetSize; i++ {
 		testMachine.stepRotors()
 	}
 
-	if !verifyRotorsPos(testMachine, [NUMBER_OF_ROTORS]int{1, 9, 3}) {
+	if !verifyRotorsPos(testMachine, [NumberOfRotors]int{1, 9, 3}) {
 		t.Errorf(
 			"incorrect positions after 26 steps with cycle size 3, expected %v, got %v",
-			[NUMBER_OF_ROTORS]int{1, 9, 3},
-			[NUMBER_OF_ROTORS]int{testMachine.rotors[0][0], testMachine.rotors[1][0], testMachine.rotors[2][0]},
+			[NumberOfRotors]int{1, 9, 3},
+			[NumberOfRotors]int{testMachine.rotors[0][0], testMachine.rotors[1][0], testMachine.rotors[2][0]},
 		)
 	}
 
 	// Different cycle size -> 4, step size -> 7
-	testMachine.initRotors([NUMBER_OF_ROTORS]int{0, 0, 0}, 7, 4)
+	testMachine.initRotors([NumberOfRotors]int{0, 0, 0}, 7, 4)
 
 	testMachine.stepRotors()
-	if !verifyRotorsPos(testMachine, [NUMBER_OF_ROTORS]int{7, 0, 0}) {
+	if !verifyRotorsPos(testMachine, [NumberOfRotors]int{7, 0, 0}) {
 		t.Errorf(
 			"incorrect positions after 1 step with step 7, and cycle 4, expected %v, got %v",
-			[NUMBER_OF_ROTORS]int{7, 0, 0},
-			[NUMBER_OF_ROTORS]int{testMachine.rotors[0][0], testMachine.rotors[1][0], testMachine.rotors[2][0]},
+			[NumberOfRotors]int{7, 0, 0},
+			[NumberOfRotors]int{testMachine.rotors[0][0], testMachine.rotors[1][0], testMachine.rotors[2][0]},
 		)
 	}
 
-	for i := 0; i < ALPHABET_SIZE; i++ {
+	for i := 0; i < alphabetSize; i++ {
 		testMachine.stepRotors()
 	}
 
-	if !verifyRotorsPos(testMachine, [NUMBER_OF_ROTORS]int{7, 16, 7}) {
+	if !verifyRotorsPos(testMachine, [NumberOfRotors]int{7, 16, 7}) {
 		t.Errorf(
 			"incorrect positions after 26 steps with step 7, and cycle 4, expected %v, got %v",
-			[NUMBER_OF_ROTORS]int{7, 16, 7},
-			[NUMBER_OF_ROTORS]int{testMachine.rotors[0][0], testMachine.rotors[1][0], testMachine.rotors[2][0]},
+			[NumberOfRotors]int{7, 16, 7},
+			[NumberOfRotors]int{testMachine.rotors[0][0], testMachine.rotors[1][0], testMachine.rotors[2][0]},
 		)
 	}
 }
@@ -229,7 +229,7 @@ func TestStepRotors(t *testing.T) {
 
 // Check if values in machine were initialized
 // correctly based on given input
-func verifyValues(testMachine *Machine, positions [NUMBER_OF_ROTORS]int, step int, cycleSize int) bool {
+func verifyValues(testMachine *Machine, positions [NumberOfRotors]int, step int, cycleSize int) bool {
 	if step != testMachine.step {
 		return false
 	}
@@ -242,10 +242,10 @@ func verifyValues(testMachine *Machine, positions [NUMBER_OF_ROTORS]int, step in
 }
 
 // Verify current position of rotors
-func verifyRotorsPos(testMachine *Machine, positions [NUMBER_OF_ROTORS]int) bool {
-	for i := 0; i < NUMBER_OF_ROTORS; i++ {
-		for j := 0; j < ALPHABET_SIZE; j++ {
-			if testMachine.rotors[i][j] != (j+positions[i])%ALPHABET_SIZE {
+func verifyRotorsPos(testMachine *Machine, positions [NumberOfRotors]int) bool {
+	for i := 0; i < NumberOfRotors; i++ {
+		for j := 0; j < alphabetSize; j++ {
+			if testMachine.rotors[i][j] != (j+positions[i])%alphabetSize {
 				return false
 			}
 		}

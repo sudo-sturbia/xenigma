@@ -1,4 +1,4 @@
-// Components of the enigma machine.
+// Package encrypt contains components of the enigma machine.
 // Used for encryption and decryption of messages.
 package encrypt
 
@@ -13,7 +13,7 @@ func (m *Machine) createPlugboardConnections(plugCons map[byte]byte) error {
 		return &connectionErr{"number of connections is invalid"}
 	}
 
-	for i := 0; i < ALPHABET_SIZE; i++ {
+	for i := 0; i < alphabetSize; i++ {
 		m.plugboardConnections[i] = i
 	}
 

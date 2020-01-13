@@ -1,4 +1,4 @@
-// Components of the enigma machine.
+// Package encrypt contains components of the enigma machine.
 // Used for encryption and decryption of messages.
 package encrypt
 
@@ -9,7 +9,7 @@ import (
 // Initialize all components related to rotors.
 // If incorrect values are given fields are set
 // to default and an error is returned.
-func (m *Machine) initRotors(positions [NUMBER_OF_ROTORS]int, stepSize int, cycleSize int) (err error) {
+func (m *Machine) initRotors(positions [NumberOfRotors]int, stepSize int, cycleSize int) (err error) {
 	var tempErr error
 
 	tempErr = m.setStep(stepSize)
@@ -20,7 +20,7 @@ func (m *Machine) initRotors(positions [NUMBER_OF_ROTORS]int, stepSize int, cycl
 
 	tempErr = m.setCycle(cycleSize)
 	if tempErr != nil {
-		m.setCycle(ALPHABET_SIZE)
+		m.setCycle(alphabetSize)
 		err = tempErr
 	}
 
@@ -30,7 +30,7 @@ func (m *Machine) initRotors(positions [NUMBER_OF_ROTORS]int, stepSize int, cycl
 		err = tempErr
 	}
 
-	for i := 0; i < NUMBER_OF_ROTORS-1; i++ {
+	for i := 0; i < NumberOfRotors-1; i++ {
 		m.takenSteps[i] = 0
 	}
 
@@ -38,33 +38,33 @@ func (m *Machine) initRotors(positions [NUMBER_OF_ROTORS]int, stepSize int, cycl
 }
 
 // Set position of each rotor
-func (m *Machine) setRotorsPosition(positions [NUMBER_OF_ROTORS]int) error {
+func (m *Machine) setRotorsPosition(positions [NumberOfRotors]int) error {
 	// Verify positions
-	for i := 0; i < NUMBER_OF_ROTORS; i++ {
-		if positions[i] < 0 || positions[i] > ALPHABET_SIZE {
+	for i := 0; i < NumberOfRotors; i++ {
+		if positions[i] < 0 || positions[i] > alphabetSize {
 			return &connectionErr{fmt.Sprintf("invalid position for rotor %d", i)}
 		}
 	}
 
-	for i := 0; i < NUMBER_OF_ROTORS; i++ {
-		for j := 0; j < ALPHABET_SIZE; j++ {
-			m.rotors[i][j] = (j + positions[i]) % ALPHABET_SIZE
+	for i := 0; i < NumberOfRotors; i++ {
+		for j := 0; j < alphabetSize; j++ {
+			m.rotors[i][j] = (j + positions[i]) % alphabetSize
 		}
 	}
 
 	return nil
 }
 
-// Get current position of rotors
-func (m *Machine) CurrentRotors() [NUMBER_OF_ROTORS]int {
-	return [NUMBER_OF_ROTORS]int{
+// CurrentRotors returns current position of rotors
+func (m *Machine) CurrentRotors() [NumberOfRotors]int {
+	return [NumberOfRotors]int{
 		m.rotors[0][0], m.rotors[1][0], m.rotors[2][0],
 	}
 }
 
 // Reset all rotors (set positions to zero)
 func (m *Machine) resetRotors() {
-	for i := 0; i < ALPHABET_SIZE; i++ {
+	for i := 0; i < alphabetSize; i++ {
 		m.rotors[0][i] = i
 		m.rotors[1][i] = i
 		m.rotors[2][i] = i
@@ -77,11 +77,11 @@ func (m *Machine) setStep(value int) error {
 		return &rotorConfigErr{"invalid step value"}
 	}
 
-	m.step = value % ALPHABET_SIZE
+	m.step = value % alphabetSize
 	return nil
 }
 
-// Get step value
+// Step returns rotors' step size.
 func (m *Machine) Step() int {
 	return m.step
 }
@@ -99,22 +99,22 @@ func (m *Machine) setCycle(value int) error {
 	return nil
 }
 
-// Get cycle value
+// Cycle returns rotors' cycle size.
 func (m *Machine) Cycle() int {
 	return m.cycle
 }
 
 // Turn rotors one step
 func (m *Machine) stepRotors() {
-	for i := 0; i < NUMBER_OF_ROTORS; i++ {
+	for i := 0; i < NumberOfRotors; i++ {
 		// If previous rotor completed a full cycle
 		if i == 0 || (m.takenSteps[i-1] == m.cycle) {
-			for j := 0; j < ALPHABET_SIZE; j++ {
-				m.rotors[i][j] = (m.rotors[i][j] + m.step) % ALPHABET_SIZE
+			for j := 0; j < alphabetSize; j++ {
+				m.rotors[i][j] = (m.rotors[i][j] + m.step) % alphabetSize
 			}
 
-			if i != NUMBER_OF_ROTORS-1 {
-				m.takenSteps[i] += 1
+			if i != NumberOfRotors-1 {
+				m.takenSteps[i]++
 			}
 		}
 
