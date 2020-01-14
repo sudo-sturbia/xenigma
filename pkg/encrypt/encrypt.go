@@ -8,13 +8,6 @@ import (
 	"unicode"
 )
 
-const (
-	// NumberOfRotors is the number of rotors used in machine
-	NumberOfRotors = 3
-
-	alphabetSize = 26
-)
-
 // Encrypt encrypts a string using enigma.
 // returns encrypted string and an error incase of an initialization error.
 func (m *Machine) Encrypt(message string) (string, error) {
@@ -43,13 +36,13 @@ func (m *Machine) encryptChar(char byte) byte {
 	encryptedChar := m.plugIn(char)
 
 	// Rotors and electric pathways
-	for i := 0; i < NumberOfRotors; i++ {
+	for i := 0; i < numberOfRotors; i++ {
 		encryptedChar = m.pathConnections[i][m.rotors[i][encryptedChar]]
 	}
 
 	// Reflector and return through electric pathways
 	encryptedChar = m.reflector[encryptedChar]
-	for i := 0; i < NumberOfRotors; i++ {
+	for i := 0; i < numberOfRotors; i++ {
 		encryptedChar = m.rotors[i][m.pathConnections[i][encryptedChar]]
 	}
 

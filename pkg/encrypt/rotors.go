@@ -6,10 +6,10 @@ import (
 	"fmt"
 )
 
-// Initialize all components related to rotors.
+// InitRotors initializes all components related to rotors.
 // If incorrect values are given fields are set
-// to default and an error is returned.
-func (m *Machine) initRotors(positions [NumberOfRotors]int, stepSize int, cycleSize int) (err error) {
+// to default values and an error is returned.
+func (m *Machine) InitRotors(positions [numberOfRotors]int, stepSize int, cycleSize int) (err error) {
 	var tempErr error
 
 	tempErr = m.setStep(stepSize)
@@ -30,7 +30,7 @@ func (m *Machine) initRotors(positions [NumberOfRotors]int, stepSize int, cycleS
 		err = tempErr
 	}
 
-	for i := 0; i < NumberOfRotors-1; i++ {
+	for i := 0; i < numberOfRotors-1; i++ {
 		m.takenSteps[i] = 0
 	}
 
@@ -38,15 +38,15 @@ func (m *Machine) initRotors(positions [NumberOfRotors]int, stepSize int, cycleS
 }
 
 // Set position of each rotor
-func (m *Machine) setRotorsPosition(positions [NumberOfRotors]int) error {
+func (m *Machine) setRotorsPosition(positions [numberOfRotors]int) error {
 	// Verify positions
-	for i := 0; i < NumberOfRotors; i++ {
+	for i := 0; i < numberOfRotors; i++ {
 		if positions[i] < 0 || positions[i] > alphabetSize {
 			return &connectionErr{fmt.Sprintf("invalid position for rotor %d", i)}
 		}
 	}
 
-	for i := 0; i < NumberOfRotors; i++ {
+	for i := 0; i < numberOfRotors; i++ {
 		for j := 0; j < alphabetSize; j++ {
 			m.rotors[i][j] = (j + positions[i]) % alphabetSize
 		}
@@ -56,8 +56,8 @@ func (m *Machine) setRotorsPosition(positions [NumberOfRotors]int) error {
 }
 
 // CurrentRotors returns current position of rotors
-func (m *Machine) CurrentRotors() [NumberOfRotors]int {
-	return [NumberOfRotors]int{
+func (m *Machine) CurrentRotors() [numberOfRotors]int {
+	return [numberOfRotors]int{
 		m.rotors[0][0], m.rotors[1][0], m.rotors[2][0],
 	}
 }
@@ -106,14 +106,14 @@ func (m *Machine) Cycle() int {
 
 // Turn rotors one step
 func (m *Machine) stepRotors() {
-	for i := 0; i < NumberOfRotors; i++ {
+	for i := 0; i < numberOfRotors; i++ {
 		// If previous rotor completed a full cycle
 		if i == 0 || (m.takenSteps[i-1] == m.cycle) {
 			for j := 0; j < alphabetSize; j++ {
 				m.rotors[i][j] = (m.rotors[i][j] + m.step) % alphabetSize
 			}
 
-			if i != NumberOfRotors-1 {
+			if i != numberOfRotors-1 {
 				m.takenSteps[i]++
 			}
 		}
