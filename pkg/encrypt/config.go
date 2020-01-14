@@ -15,8 +15,8 @@ import (
 // Fields mirror those in a Machine but use bytes.
 type loadTo struct {
 	pathConnections      [numberOfRotors][alphabetSize]byte `json:"paths"`
-	reflector            [alphabetSize]byte                 `json:"reflector"`
-	plugboardConnections [alphabetSize]byte                 `json:"plugboards"`
+	reflector            [alphabetSize / 2]byte             `json:"reflector"`
+	plugboardConnections [alphabetSize / 2]byte             `json:"plugboards"`
 	rotorsPositions      [numberOfRotors]byte               `json:"rotorsPositions"`
 }
 
@@ -48,23 +48,26 @@ func load(path string) (*Machine, error) {
 	var plugboard [alphabetSize]int
 	var rotorsPositions [numberOfRotors]int
 
-	for i := 0; i < alphabetSize; i++ {
-		// Electric pathways
-		for j := 0; j < numberOfRotors; j++ {
-			if char, isAlpha := byteToInt(loadedMachine.pathConnections[j][i]); isAlpha {
-				paths[j][i] = char
+	// Electric pathways
+	for i := 0; i < numberOfRotors; i++ {
+		for j := 0; j < alphabetSize; j++ {
+			if char, isAlpha := byteToInt(loadedMachine.pathConnections[i][j]); isAlpha {
+				paths[i][j] = char
 			} else {
 				// Return error
 				return nil, fmt.Errorf(
 					"paths contain invalid character %v, all characters must be alphabetical",
-					loadedMachine.pathConnections[j][i],
+					loadedMachine.pathConnections[i][j],
 				)
 			}
 		}
+	}
 
+	for i := 0; i < alphabetSize/2; i++ {
 		// Reflector
 		if char, isAlpha := byteToInt(loadedMachine.reflector[i]); isAlpha {
 			reflector[i] = char
+			reflector[char] = i
 		} else {
 			return nil, fmt.Errorf(
 				"reflector contains invalid character %v, all characters must be alphabetical",
@@ -75,6 +78,7 @@ func load(path string) (*Machine, error) {
 		// Plugboard
 		if char, isAlpha := byteToInt(loadedMachine.plugboardConnections[i]); isAlpha {
 			plugboard[i] = char
+			plugboard[char] = i
 		} else {
 			return nil, fmt.Errorf(
 				"plugboard contains invalid character %v, all characters must be alphabetical",
@@ -83,6 +87,7 @@ func load(path string) (*Machine, error) {
 		}
 	}
 
+	// Rotors
 	for i := 0; i < numberOfRotors; i++ {
 		if char, isAlpha := byteToInt(loadedMachine.rotorsPositions[i]); isAlpha {
 			rotorsPositions[i] = char
