@@ -6,7 +6,7 @@ import (
 	"github.com/sudo-sturbia/enigma/pkg/helper"
 )
 
-// Check if all fields of a machine were initialized correctly
+// isInit verifies that all fields of a machine were initialized correctly.
 func (m *Machine) isInit() bool {
 	isInit := m.areRotorsInit() && m.arePathwaysInit() && m.isReflectorInit() &&
 		m.isPlugboardInit() && (m.step > 0) && (m.cycle > 0)
@@ -14,7 +14,7 @@ func (m *Machine) isInit() bool {
 	return isInit
 }
 
-// Return true if rotors are initialized correctly
+// areRotorsInit returns true if rotors are initialized correctly.
 func (m *Machine) areRotorsInit() bool {
 	for _, rotor := range m.rotors {
 		if !helper.AreElementsOrderedIndices(rotor[:]) {
@@ -25,7 +25,7 @@ func (m *Machine) areRotorsInit() bool {
 	return true
 }
 
-// Return true if pathways are initialized correctly
+// arePathwaysInit returns true if pathways are initialized correctly.
 func (m *Machine) arePathwaysInit() bool {
 	for _, pathwaysArr := range m.pathConnections {
 		if !helper.AreElementsIndices(pathwaysArr[:]) {
@@ -36,12 +36,14 @@ func (m *Machine) arePathwaysInit() bool {
 	return true
 }
 
-// Return true if reflector is initialized correctly
+// isReflectorInit returns true if reflector is initialized correctly.
 func (m *Machine) isReflectorInit() bool {
-	return helper.AreElementsIndices(m.reflector[:]) && helper.IsSymmetric(m.reflector[:])
+	return helper.AreElementsIndices(m.reflector[:]) &&
+		helper.IsSymmetric(m.reflector[:])
 }
 
-// Return true if plugboard connections initialized correctly
+// isPlugboardInit returns true if plugboard connections initialized correctly.
 func (m *Machine) isPlugboardInit() bool {
-	return helper.AreElementsIndices(m.plugboardConnections[:]) && helper.IsSymmetric(m.plugboardConnections[:])
+	return helper.AreElementsIndices(m.plugboardConnections[:]) &&
+		helper.IsSymmetric(m.plugboardConnections[:])
 }

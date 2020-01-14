@@ -37,7 +37,7 @@ func (m *Machine) InitRotors(positions [numberOfRotors]int, stepSize int, cycleS
 	return err
 }
 
-// Set position of each rotor
+// setRotorsPosition sets current position of each rotor.
 func (m *Machine) setRotorsPosition(positions [numberOfRotors]int) error {
 	// Verify positions
 	for i := 0; i < numberOfRotors; i++ {
@@ -55,14 +55,14 @@ func (m *Machine) setRotorsPosition(positions [numberOfRotors]int) error {
 	return nil
 }
 
-// CurrentRotors returns current position of rotors
+// CurrentRotors returns current position of each rotor.
 func (m *Machine) CurrentRotors() [numberOfRotors]int {
 	return [numberOfRotors]int{
 		m.rotors[0][0], m.rotors[1][0], m.rotors[2][0],
 	}
 }
 
-// Reset all rotors (set positions to zero)
+// resetRotors sets current position of each rotor to 0.
 func (m *Machine) resetRotors() {
 	for i := 0; i < alphabetSize; i++ {
 		m.rotors[0][i] = i
@@ -71,7 +71,7 @@ func (m *Machine) resetRotors() {
 	}
 }
 
-// Set value of rotors step
+// setStep sets rotors' step size.
 func (m *Machine) setStep(value int) error {
 	if value <= 0 {
 		return &rotorConfigErr{"invalid step value"}
@@ -86,9 +86,8 @@ func (m *Machine) Step() int {
 	return m.step
 }
 
-// Set size of rotor's full cycle.
-// Indicates number of steps considered a full rotor cycle.
-// Used to signal when a following rotor should step based
+// setCycle sets size of rotor's full cycle.
+// Cycle is used to signal when a following rotor should step based
 // on current rotor's step count.
 func (m *Machine) setCycle(value int) error {
 	if value <= 0 {
@@ -104,7 +103,7 @@ func (m *Machine) Cycle() int {
 	return m.cycle
 }
 
-// Turn rotors one step
+// stepRotors turns first rotor one step.
 func (m *Machine) stepRotors() {
 	for i := 0; i < numberOfRotors; i++ {
 		// If previous rotor completed a full cycle

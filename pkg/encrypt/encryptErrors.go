@@ -8,7 +8,7 @@ type connectionErr struct {
 }
 
 func (err *connectionErr) Error() string {
-	return err.message
+	return "connections error: " + err.message
 }
 
 // Rotor configuration error
@@ -17,7 +17,7 @@ type rotorConfigErr struct {
 }
 
 func (err *rotorConfigErr) Error() string {
-	return err.message
+	return "rotor configuration error: " + err.message
 }
 
 // Initializion error
@@ -26,5 +26,5 @@ type initError struct {
 }
 
 func (err *initError) Error() string {
-	return err.message
+	return "initialization error: " + err.message
 }

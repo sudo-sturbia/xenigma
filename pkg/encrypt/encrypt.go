@@ -8,7 +8,7 @@ import (
 	"unicode"
 )
 
-// Encrypt encrypts a string using enigma.
+// Encrypt encrypts a string using a Machine object.
 // returns encrypted string and an error incase of an initialization error.
 func (m *Machine) Encrypt(message string) (string, error) {
 	if !m.isInit() {
@@ -26,7 +26,7 @@ func (m *Machine) Encrypt(message string) (string, error) {
 	return encryptedBuffer.String(), nil
 }
 
-// Encrypt a character using engima
+// encryptChar encrypts a character using machine.
 func (m *Machine) encryptChar(char byte) byte {
 	if !unicode.IsLetter(rune(char)) {
 		return char
@@ -49,14 +49,14 @@ func (m *Machine) encryptChar(char byte) byte {
 	return m.plugOut(encryptedChar)
 }
 
-// Change byte (character) to an int (0 -> 25) based on plugboard connections
-// Used when character is entered
+// plugIn changes a byte (character) to an int (0 -> 25) based on
+// plugboard connections. Used when character is entered.
 func (m *Machine) plugIn(char byte) int {
 	return int(m.plugboardConnections[int(char-'a')])
 }
 
-// Change int to a byte (character) based on plugboard connections
-// Used when character is returned
+// plugOut changes an int to a byte (character) based on
+// plugboard connections. Used when character is returned.
 func (m *Machine) plugOut(char int) byte {
 	return byte(m.plugboardConnections[char]) + 'a'
 }
