@@ -6,10 +6,10 @@ import (
 	"fmt"
 )
 
-// InitRotors initializes all components related to rotors.
+// initRotors initializes all components related to rotors.
 // If incorrect values are given fields are set
 // to default values and an error is returned.
-func (m *Machine) InitRotors(positions [numberOfRotors]int, stepSize int, cycleSize int) (err error) {
+func (m *Machine) initRotors(positions [numberOfRotors]int, stepSize int, cycleSize int) (err error) {
 	var tempErr error
 
 	tempErr = m.setStep(stepSize)

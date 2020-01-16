@@ -52,8 +52,8 @@ func (m *Machine) PathConnections() [numberOfRotors][alphabetSize]int {
 	return m.pathConnections
 }
 
-// SetPathConnections sets path connections array in Machine.
-func (m *Machine) SetPathConnections(paths [numberOfRotors][alphabetSize]int) {
+// setPathConnections sets path connections array in Machine.
+func (m *Machine) setPathConnections(paths [numberOfRotors][alphabetSize]int) {
 	m.pathConnections = paths
 }
 
@@ -62,8 +62,8 @@ func (m *Machine) Reflector() [alphabetSize]int {
 	return m.reflector
 }
 
-// SetReflector sets reflector connections.
-func (m *Machine) SetReflector(reflector [alphabetSize]int) {
+// setReflector sets reflector connections.
+func (m *Machine) setReflector(reflector [alphabetSize]int) {
 	m.reflector = reflector
 }
 
@@ -72,7 +72,7 @@ func (m *Machine) PlugboardConnections() [alphabetSize]int {
 	return m.plugboardConnections
 }
 
-// SetPlugboard sets reflector connections.
-func (m *Machine) SetPlugboard(plugboard [alphabetSize]int) {
+// setPlugboard sets reflector connections.
+func (m *Machine) setPlugboard(plugboard [alphabetSize]int) {
 	m.plugboardConnections = plugboard
 }
