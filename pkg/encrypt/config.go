@@ -15,8 +15,8 @@ import (
 // string arrays instead of int arrays.
 type jsonMachine struct {
 	PathConnections      [numberOfRotors][alphabetSize]string `json:"pathways"`
-	Reflector            [alphabetSize / 2]string             `json:"reflector"`
-	PlugboardConnections [alphabetSize / 2]string             `json:"plugboards"`
+	Reflector            [alphabetSize]string                 `json:"reflector"`
+	PlugboardConnections [alphabetSize]string                 `json:"plugboards"`
 	RotorsPositions      [numberOfRotors]string               `json:"rotorsPositions"`
 }
 
@@ -72,11 +72,10 @@ func parseMachineJSON(fileContents []byte) (*Machine, error) {
 		}
 	}
 
-	for i := 0; i < alphabetSize/2; i++ {
+	for i := 0; i < alphabetSize; i++ {
 		// Plugboard
 		if num, verify := strToInt(jsonM.PlugboardConnections[i]); verify {
 			m.plugboardConnections[i] = num
-			m.plugboardConnections[num] = i
 		} else {
 			return nil, fmt.Errorf("plugboard contains invalid value %v", jsonM.PlugboardConnections[i])
 		}
@@ -84,7 +83,6 @@ func parseMachineJSON(fileContents []byte) (*Machine, error) {
 		// Reflector
 		if num, verify := strToInt(jsonM.Reflector[i]); verify {
 			m.reflector[i] = num
-			m.reflector[num] = i
 		} else {
 			return nil, fmt.Errorf("plugboard contains invalid value %v", jsonM.Reflector[i])
 		}
@@ -105,6 +103,50 @@ func parseMachineJSON(fileContents []byte) (*Machine, error) {
 	return m, nil
 }
 
+// write writes configurations of a Machine object to a JSON file.
+// returns an error in case of incorrect writing.
+func write(m *Machine, path string) error {
+	file, err := os.Open(path)
+	if err != nil {
+		return fmt.Errorf("could not write to %s, %s", path, err.Error())
+	}
+	defer file.Close()
+
+	var jsonM jsonMachine
+
+	// Electric pathways
+	for i := 0; i < numberOfRotors; i++ {
+		for j := 0; j < alphabetSize; j++ {
+			jsonM.PathConnections[i][j] = intToStr(m.pathConnections[i][j])
+		}
+	}
+
+	for i := 0; i < alphabetSize; i++ {
+		// Plugboard
+		jsonM.PlugboardConnections[i] = intToStr(m.plugboardConnections[i])
+
+		// Reflector
+		jsonM.Reflector[i] = intToStr(m.reflector[i])
+	}
+
+	// Rotors
+	for i := 0; i < numberOfRotors; i++ {
+		jsonM.RotorsPositions[i] = intToStr(m.CurrentRotors()[i])
+	}
+
+	contents, err := json.Marshal(jsonM)
+	if err != nil {
+		return fmt.Errorf("could not create JSON file, %s", err.Error())
+	}
+
+	err = ioutil.WriteFile(path, contents, 0744)
+	if err != nil {
+		return fmt.Errorf("could not create JSON file, %s", err.Error())
+	}
+
+	return nil
+}
+
 // strToInt verifies that a given string contains one alphabetical
 // character and returns character's position in the alphabet.
 func strToInt(str string) (int, bool) {
@@ -117,4 +159,10 @@ func strToInt(str string) (int, bool) {
 	}
 
 	return -1, false
+}
+
+// intToStr returns a one character string representing the ASCII position
+// of the given integer.
+func intToStr(num int) string {
+	return fmt.Sprintf("%v", byte(num)+'a')
 }
