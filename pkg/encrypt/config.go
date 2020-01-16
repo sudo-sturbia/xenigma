@@ -4,123 +4,116 @@ package encrypt
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"unicode"
 )
 
-// loadTo is a struct to load Json configs to.
-// Fields mirror those in a Machine but use bytes.
-type loadTo struct {
-	pathConnections      [numberOfRotors][alphabetSize]byte `json:"paths"`
-	reflector            [alphabetSize / 2]byte             `json:"reflector"`
-	plugboardConnections [alphabetSize / 2]byte             `json:"plugboards"`
-	rotorsPositions      [numberOfRotors]byte               `json:"rotorsPositions"`
+// jsonMachine is a struct used for reading and writing of Machine's configs
+// into a json file. Fields in jsonMachine mirror those in a Machine but use
+// string arrays instead of int arrays.
+type jsonMachine struct {
+	PathConnections      [numberOfRotors][alphabetSize]string `json:"pathways"`
+	Reflector            [alphabetSize / 2]string             `json:"reflector"`
+	PlugboardConnections [alphabetSize / 2]string             `json:"plugboards"`
+	RotorsPositions      [numberOfRotors]string               `json:"rotorsPositions"`
 }
 
-// load loads engima configurations from a json file.
-// Returns a Machine object and an error in case of incorrect loading.
-func load(path string) (*Machine, error) {
+// read loads and verifies Machine's configurations from a json file.
+// It returns a pointer to a Machine, and an error in case of incorrect loading.
+func read(path string) (*Machine, error) {
 	file, err := os.Open(path)
-
 	if err != nil {
-		return nil, fmt.Errorf("could not load configuration file %s", path)
+		return nil, fmt.Errorf("could not load config file %s", path)
 	}
 	defer file.Close()
 
-	// Read from file
+	// Read file's contents into a byte array
 	fileContents, err := ioutil.ReadAll(file)
 	if err != nil {
 		return nil, fmt.Errorf("could not read contents of config file %s", path)
 	}
 
-	// Load object
-	var loadedMachine loadTo
-	if err := json.Unmarshal(fileContents, &loadedMachine); err != nil {
-		return nil, errors.New("could not load machine. configurations are incorrect")
+	m, err := parseMachineJSON(fileContents)
+	if err != nil {
+		return nil, fmt.Errorf("could not unmarshal %s: %s", path, err.Error())
 	}
 
-	// Create Machine components
-	var paths [numberOfRotors][alphabetSize]int
-	var reflector [alphabetSize]int
-	var plugboard [alphabetSize]int
-	var rotorsPositions [numberOfRotors]int
+	// Verify correct initialization
+	if !m.isInit() {
+		return nil, fmt.Errorf("configuration values are incorrect")
+	}
+
+	return m, nil
+}
+
+// parseMachineJSON parses a given file's byte array into character arrays,
+// Creates a Machine object, Sets Machine's fields, and returns a pointer.
+// An error is returned in case of invalid configs.
+func parseMachineJSON(fileContents []byte) (*Machine, error) {
+	var jsonM jsonMachine
+
+	if err := json.Unmarshal(fileContents, &jsonM); err != nil {
+		return nil, err
+	}
+
+	// Parse jsonM into a Machine
+	var m *Machine
 
 	// Electric pathways
 	for i := 0; i < numberOfRotors; i++ {
 		for j := 0; j < alphabetSize; j++ {
-			if char, isAlpha := byteToInt(loadedMachine.pathConnections[i][j]); isAlpha {
-				paths[i][j] = char
+			if num, verify := strToInt(jsonM.PathConnections[i][j]); verify {
+				m.pathConnections[i][j] = num
 			} else {
-				// Return error
-				return nil, fmt.Errorf(
-					"paths contain invalid character %v, all characters must be alphabetical",
-					loadedMachine.pathConnections[i][j],
-				)
+				return nil, fmt.Errorf("pathways contain invalid value %v", jsonM.PathConnections[i][j])
 			}
 		}
 	}
 
 	for i := 0; i < alphabetSize/2; i++ {
-		// Reflector
-		if char, isAlpha := byteToInt(loadedMachine.reflector[i]); isAlpha {
-			reflector[i] = char
-			reflector[char] = i
+		// Plugboard
+		if num, verify := strToInt(jsonM.PlugboardConnections[i]); verify {
+			m.plugboardConnections[i] = num
+			m.plugboardConnections[num] = i
 		} else {
-			return nil, fmt.Errorf(
-				"reflector contains invalid character %v, all characters must be alphabetical",
-				loadedMachine.reflector[i],
-			)
+			return nil, fmt.Errorf("plugboard contains invalid value %v", jsonM.PlugboardConnections[i])
 		}
 
-		// Plugboard
-		if char, isAlpha := byteToInt(loadedMachine.plugboardConnections[i]); isAlpha {
-			plugboard[i] = char
-			plugboard[char] = i
+		// Reflector
+		if num, verify := strToInt(jsonM.Reflector[i]); verify {
+			m.reflector[i] = num
+			m.reflector[num] = i
 		} else {
-			return nil, fmt.Errorf(
-				"plugboard contains invalid character %v, all characters must be alphabetical",
-				loadedMachine.plugboardConnections[i],
-			)
+			return nil, fmt.Errorf("plugboard contains invalid value %v", jsonM.Reflector[i])
 		}
 	}
 
 	// Rotors
+	var rotorsPositions [numberOfRotors]int
 	for i := 0; i < numberOfRotors; i++ {
-		if char, isAlpha := byteToInt(loadedMachine.rotorsPositions[i]); isAlpha {
-			rotorsPositions[i] = char
+		if num, verify := strToInt(jsonM.RotorsPositions[i]); verify {
+			rotorsPositions[i] = num
 		} else {
-			return nil, fmt.Errorf(
-				"rotorsPositions contains invalid character %v, all characters must be alphabetical",
-				loadedMachine.rotorsPositions[i],
-			)
+			return nil, fmt.Errorf("rotorsPositions contains invalid value %v", jsonM.RotorsPositions[i])
 		}
 	}
 
-	// Create Machine object
-	var machine *Machine
+	m.initRotors(rotorsPositions, 1, alphabetSize)
 
-	machine.SetPathConnections(paths)
-	machine.SetReflector(reflector)
-	machine.SetPlugboard(plugboard)
-	machine.InitRotors(rotorsPositions, 1, alphabetSize)
-
-	// Check values
-	if !machine.isInit() {
-		return nil, fmt.Errorf("values contained in configuration file are incorrect")
-	}
-
-	return machine, nil
+	return m, nil
 }
 
-// byteToInt takes a character char.
-// If char is alphabetical, it returns true and an int indicating
-// the position of char in the alphabet, else false and -1 are returned.
-func byteToInt(char byte) (int, bool) {
-	if unicode.IsLetter(rune(char)) {
-		return int(byte(unicode.ToLower(rune(char))) - 'a'), true
+// strToInt verifies that a given string contains one alphabetical
+// character and returns character's position in the alphabet.
+func strToInt(str string) (int, bool) {
+	if len(str) != 1 {
+		return -1, false
+	}
+
+	if unicode.IsLetter(rune(str[0])) {
+		return int(byte(unicode.ToLower(rune(str[0]))) - 'a'), true
 	}
 
 	return -1, false

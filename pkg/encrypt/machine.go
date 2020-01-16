@@ -33,7 +33,7 @@ type Machine struct {
 // are generated and written to file, machine is returned and error is `nil`.
 // Otherwise `nil` and an initError are returned.
 func New(write bool) (*Machine, error) {
-	machine, err := load(os.Getenv("HOME") + "/.config/enigma.json")
+	machine, err := read(os.Getenv("HOME") + "/.config/enigma.json")
 
 	if err != nil {
 		if write {
