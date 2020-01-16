@@ -25,7 +25,29 @@ type Machine struct {
 	cycle      int                               // Number of rotor steps considered a full cycle
 }
 
-// PathConnections returns electric pathways.
+// New returns a newly created, and initialized Machine object.
+// Machine's fields are read from config file ~/.config/enigma.json
+// If file's configs are correct the machine is initialized and returned
+// and error is `nil`.
+// Otherwise `write` parameter is checked. If write is true, random configs
+// are generated and written to file, machine is returned and error is `nil`.
+// Otherwise `nil` and an initError are returned.
+func New(write bool) (*Machine, error) {
+	machine, err := load(os.Getenv("HOME") + "/.config/enigma.json")
+
+	if err != nil {
+		if write {
+			// TODO
+			return nil, nil
+		}
+
+		return nil, &initError{fmt.Sprintf("configuration error: %v", err.Error())}
+	}
+
+	return machine, nil
+}
+
+// PathConnections returns electric pathway connections
 func (m *Machine) PathConnections() [numberOfRotors][alphabetSize]int {
 	return m.pathConnections
 }
