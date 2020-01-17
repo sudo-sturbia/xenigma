@@ -44,7 +44,7 @@ type Machine struct {
 	reflector            [alphabetSize]int                 // Reflector connections, symmetric
 	plugboardConnections [alphabetSize]int                 // Plugboard connections, symmetric
 
-	rotors     [numberOfRotors][alphabetSize]int // Mechanical rotors, 1st element is rotor's current position
+	rotors     [numberOfRotors][alphabetSize]int // Mechanical rotors, 1st element is rotor's position
 	takenSteps [numberOfRotors - 1]int           // Number of steps taken by each rotor except the last
 	step       int                               // Size of shift between rotor steps (move)
 	cycle      int                               // Number of rotor steps considered a full cycle
@@ -54,20 +54,24 @@ type Machine struct {
 // Machine's fields are read from config file $HOME/.config/enigma.json
 // If the file contains correct configurations, a machine object is
 // initialized and returned with error being nil.
-// Otherwise write parameter is checked. If write is true, random configs
-// are generated and written to file, a machine object with the same configs
-// is returned and error is nil. Otherwise an initialization error is returned
-// and Machine is nil.
-func New(write bool) (*Machine, error) {
+// Otherwise overwrite parameter is checked. If overwrite is true, random
+// configs are generated and written to file, a machine object with the
+// same configs is returned and error is nil. Otherwise an initialization
+// error is returned and Machine is nil.
+func New(overwrite bool) (*Machine, error) {
 	machine, err := read(os.Getenv("HOME") + "/.config/enigma.json")
 
 	if err != nil {
-		if write {
-			// TODO
-			return nil, nil
+		if overwrite {
+			machine = randMachine()
+			if err = write(machine, os.Getenv("HOME")+"/.config/enigma.json"); err != nil {
+				return machine, &initError{err.Error()}
+			}
+
+			return machine, nil
 		}
 
-		return nil, &initError{fmt.Sprintf("configuration error: %v", err.Error())}
+		return nil, &initError{err.Error()}
 	}
 
 	return machine, nil
