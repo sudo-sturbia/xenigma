@@ -1,6 +1,4 @@
-// Package encrypt contains components of the enigma machine.
-// Used for encryption and decryption of messages.
-package encrypt
+package machine
 
 import (
 	"fmt"
