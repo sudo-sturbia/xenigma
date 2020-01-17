@@ -1,5 +1,4 @@
-// Package helper contains helper functions used for validation
-// of slices and their properties.
+// Package helper contains helper functions for several purposes.
 package helper
 
 // AreElementsIndices returns true if a slice of size n
