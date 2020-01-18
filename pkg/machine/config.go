@@ -39,8 +39,8 @@ func read(path string) (*Machine, error) {
 	}
 
 	// Verify correct initialization
-	if !m.isInit() {
-		return nil, fmt.Errorf("configuration values are incorrect")
+	if err := m.isInit(); err != nil {
+		return nil, err
 	}
 
 	return m, nil
@@ -65,7 +65,8 @@ func parseMachineJSON(fileContents []byte) (*Machine, error) {
 			if num, verify := strToInt(jsonM.PathConnections[i][j]); verify {
 				m.pathConnections[i][j] = num
 			} else {
-				return nil, fmt.Errorf("pathways contain invalid value %v", jsonM.PathConnections[i][j])
+				return nil, &initError{fmt.Sprintf("pathways contain invalid value %v",
+					jsonM.PathConnections[i][j])}
 			}
 		}
 	}
@@ -75,14 +76,16 @@ func parseMachineJSON(fileContents []byte) (*Machine, error) {
 		if num, verify := strToInt(jsonM.PlugboardConnections[i]); verify {
 			m.plugboardConnections[i] = num
 		} else {
-			return nil, fmt.Errorf("plugboard contains invalid value %v", jsonM.PlugboardConnections[i])
+			return nil, &initError{fmt.Sprintf("plugboard contains invalid value %v",
+				jsonM.PlugboardConnections[i])}
 		}
 
 		// Reflector
 		if num, verify := strToInt(jsonM.Reflector[i]); verify {
 			m.reflector[i] = num
 		} else {
-			return nil, fmt.Errorf("plugboard contains invalid value %v", jsonM.Reflector[i])
+			return nil, &initError{fmt.Sprintf("plugboard contains invalid value %v",
+				jsonM.Reflector[i])}
 		}
 	}
 
@@ -92,7 +95,8 @@ func parseMachineJSON(fileContents []byte) (*Machine, error) {
 		if num, verify := strToInt(jsonM.RotorsPositions[i]); verify {
 			rotorsPositions[i] = num
 		} else {
-			return nil, fmt.Errorf("rotorsPositions contains invalid value %v", jsonM.RotorsPositions[i])
+			return nil, &initError{fmt.Sprintf("rotorsPositions contains invalid value %v",
+				jsonM.RotorsPositions[i])}
 		}
 	}
 

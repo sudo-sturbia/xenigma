@@ -82,10 +82,7 @@ func (m *Machine) SetComponents(
 	m.setReflector(reflector)
 	m.initRotors(rotorsPositions, step, cycle)
 
-	if !m.isInit() {
-		return &initError{"given configurations are incorrect"}
-	}
-	return nil
+	return m.isInit()
 }
 
 // PathConnections returns electric pathway connections

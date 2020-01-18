@@ -6,20 +6,11 @@ import (
 	"unicode"
 )
 
-// Initializion error
-type initError struct {
-	message string
-}
-
-func (err *initError) Error() string {
-	return "initialization error: " + err.message
-}
-
 // Encrypt encrypts a string using a Machine object.
 // returns encrypted string and an error incase of an initialization error.
 func (m *Machine) Encrypt(message string) (string, error) {
-	if !m.isInit() {
-		return "", &initError{"Enigma machine is not initialized correctly"}
+	if err := m.isInit(); err != nil {
+		return "", err
 	}
 
 	// Create a buffer to add encrypted characters to

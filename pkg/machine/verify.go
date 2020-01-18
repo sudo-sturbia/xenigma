@@ -4,12 +4,34 @@ import (
 	"github.com/sudo-sturbia/enigma/pkg/helper"
 )
 
-// isInit verifies that all fields of a machine were initialized correctly.
-func (m *Machine) isInit() bool {
-	isInit := m.areRotorsInit() && m.arePathwaysInit() && m.isReflectorInit() &&
-		m.isPlugboardInit() && (m.step > 0) && (m.cycle > 0)
+// Initializion error
+type initError struct {
+	message string
+}
 
-	return isInit
+func (err *initError) Error() string {
+	return "initialization error: " + err.message
+}
+
+// isInit verifies that all fields of a machine were initialized
+// correctly. If not an error is returned.
+func (m *Machine) isInit() error {
+	switch {
+	case m.areRotorsInit():
+		return &initError{"invalid rotor configs"}
+	case m.arePathwaysInit():
+		return &initError{"invalid pathway connections"}
+	case m.isReflectorInit():
+		return &initError{"invalid reflector connections"}
+	case m.isPlugboardInit():
+		return &initError{"invalid plugboard connections"}
+	case m.step <= 0:
+		return &initError{"invalid step size"}
+	case m.cycle <= 0:
+		return &initError{"invalid cycle size"}
+	default:
+		return nil
+	}
 }
 
 // areRotorsInit returns true if rotors are initialized correctly.
