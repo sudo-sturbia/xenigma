@@ -6,6 +6,15 @@ import (
 	"unicode"
 )
 
+// Initializion error
+type initError struct {
+	message string
+}
+
+func (err *initError) Error() string {
+	return "initialization error: " + err.message
+}
+
 // Encrypt encrypts a string using a Machine object.
 // returns encrypted string and an error incase of an initialization error.
 func (m *Machine) Encrypt(message string) (string, error) {

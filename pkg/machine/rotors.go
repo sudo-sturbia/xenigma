@@ -40,7 +40,7 @@ func (m *Machine) setRotorsPosition(positions [numberOfRotors]int) error {
 	// Verify positions
 	for i := 0; i < numberOfRotors; i++ {
 		if positions[i] < 0 || positions[i] > alphabetSize {
-			return &connectionErr{fmt.Sprintf("invalid position for rotor %d", i)}
+			return &initError{fmt.Sprintf("invalid position for rotor %d", i)}
 		}
 	}
 
@@ -72,7 +72,7 @@ func (m *Machine) resetRotors() {
 // setStep sets rotors' step size.
 func (m *Machine) setStep(value int) error {
 	if value <= 0 {
-		return &rotorConfigErr{"invalid step value"}
+		return &initError{"invalid step size"}
 	}
 
 	m.step = value % alphabetSize
@@ -89,7 +89,7 @@ func (m *Machine) Step() int {
 // on current rotor's step count.
 func (m *Machine) setCycle(value int) error {
 	if value <= 0 {
-		return &rotorConfigErr{"invalid cycle size"}
+		return &initError{"invalid cycle size"}
 	}
 
 	m.cycle = value
