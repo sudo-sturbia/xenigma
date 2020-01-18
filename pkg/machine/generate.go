@@ -5,8 +5,9 @@ import (
 	"time"
 )
 
-// randMachine returns a machine with random configurations.
-func randMachine() *Machine {
+// Generate returns a Machine object initialized using randomly generated
+// configurations for components.
+func Generate() *Machine {
 	rand.Seed(time.Now().UnixNano())
 
 	var m *Machine

@@ -1,34 +1,26 @@
 /*
-	Package machine represents an enigma machine used for encryption and
-	decryption of text messages.
+Package machine represents an enigma machine used for encryption and
+decryption of text messages.
 
-	The machine consists of the following components: electric pathways,
-	reflector, plugboard, and 3 rotors. Components are configurable through
-	JSON file $HOME/.config/enigma.json. See documentation of machine.New
-	for more details.
+The machine consists of the following components: electric pathways,
+reflector, plugboard, and 3 rotors.
 
-	enigma.json should be of the following form.
-		{
-			"pathways": [
-				["a", "b", "c", "d", ... "z"],
-				["a", "b", "c", "d", ... "z"],
-				["a", "b", "c", "d", ... "z"]
-			],
-			"reflector": ["a", "b", "c", "d", ... "z"],
-			"plugboard": ["a", "b", "c", "d", ... "z"],
-			"rotorPositions": ["a", "b", "c"]
-		}
+A machine can be created using machine.Load, machine.Generate, or by
+simply creating a Machine object and calling SetComponents method.
 
-	All arrays, except for "rotorPositions", should have 26 elements.
-	Both reflector and plugboard should be symmetric (every two elements
-	are connected to each other).
+machine.Load is meant for usage in an independent program. The other
+two options are more suitable for usage when the package is imported.
 
-	Licensed under MIT license @github.com/sudo-sturbia
+Encrypt method is used to encrypt (or decrypt) a given message as
+the following example
+	m := machine.Generate()
+	encrypted := m.Encrypt("message")
+
+Licensed under MIT license @github.com/sudo-sturbia
 */
 package machine
 
 import (
-	"fmt"
 	"os"
 )
 
@@ -50,7 +42,7 @@ type Machine struct {
 	cycle      int                               // Number of rotor steps considered a full cycle
 }
 
-// New returns a newly created, fully initialized Machine object.
+// Load returns a fully initialized Machine object. Configurations of
 // Machine's fields are read from config file $HOME/.config/enigma.json
 // If the file contains correct configurations, a machine object is
 // initialized and returned with error being nil.
@@ -58,12 +50,12 @@ type Machine struct {
 // configs are generated and written to file, a machine object with the
 // same configs is returned and error is nil. Otherwise an initialization
 // error is returned and Machine is nil.
-func New(overwrite bool) (*Machine, error) {
+func Load(overwrite bool) (*Machine, error) {
 	machine, err := read(os.Getenv("HOME") + "/.config/enigma.json")
 
 	if err != nil {
 		if overwrite {
-			machine = randMachine()
+			machine = Generate()
 			if err = write(machine, os.Getenv("HOME")+"/.config/enigma.json"); err != nil {
 				return machine, &initError{err.Error()}
 			}
@@ -75,6 +67,25 @@ func New(overwrite bool) (*Machine, error) {
 	}
 
 	return machine, nil
+}
+
+// SetComponents initializes all components of the machine.
+// Returns an error if given incorrect configurations.
+func (m *Machine) SetComponents(
+	pathways [numberOfRotors][alphabetSize]int,
+	plugboard [alphabetSize]int,
+	reflector [alphabetSize]int,
+	rotorsPositions [numberOfRotors]int, step int, cycle int) error {
+
+	m.setPathConnections(pathways)
+	m.setPlugboard(plugboard)
+	m.setReflector(reflector)
+	m.initRotors(rotorsPositions, step, cycle)
+
+	if !m.isInit() {
+		return &initError{"given configurations are incorrect"}
+	}
+	return nil
 }
 
 // PathConnections returns electric pathway connections
