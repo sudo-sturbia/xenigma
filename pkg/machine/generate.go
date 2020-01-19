@@ -30,7 +30,8 @@ func (m *Machine) randPathways() {
 
 	for i := 0; i < numberOfRotors; i++ {
 		rand.Shuffle(alphabetSize, func(j, k int) {
-			m.pathConnections[i][j], m.pathConnections[i][k] = m.pathConnections[i][k], m.pathConnections[i][j]
+			m.pathConnections[i][j], m.pathConnections[i][k] =
+				m.pathConnections[i][k], m.pathConnections[i][j]
 		})
 	}
 }
@@ -40,7 +41,8 @@ func (m *Machine) randPlugboard() {
 	// Create half of the connections
 	halfConnections := [alphabetSize / 2]int{13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}
 	rand.Shuffle(alphabetSize/2, func(i, j int) {
-		halfConnections[i], halfConnections[j] = halfConnections[j], halfConnections[i]
+		halfConnections[i], halfConnections[j] =
+			halfConnections[j], halfConnections[i]
 	})
 
 	for i := 0; i < len(halfConnections); i++ {
@@ -54,7 +56,8 @@ func (m *Machine) randReflector() {
 	// Create half of the connections
 	halfConnections := [alphabetSize / 2]int{13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}
 	rand.Shuffle(alphabetSize/2, func(i, j int) {
-		halfConnections[i], halfConnections[j] = halfConnections[j], halfConnections[i]
+		halfConnections[i], halfConnections[j] =
+			halfConnections[j], halfConnections[i]
 	})
 
 	for i := 0; i < len(halfConnections); i++ {

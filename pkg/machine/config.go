@@ -61,43 +61,47 @@ func parseMachineJSON(fileContents []byte) (*Machine, error) {
 
 	// Electric pathways
 	for i := 0; i < numberOfRotors; i++ {
-		for j := 0; j < alphabetSize; j++ {
-			if num, verify := strToInt(jsonM.PathConnections[i][j]); verify {
+		for j, connection := range jsonM.PathConnections[i] {
+			if num, verify := strToInt(connection); verify {
 				m.pathConnections[i][j] = num
 			} else {
 				return nil, &initError{fmt.Sprintf("pathways contain invalid value %v",
-					jsonM.PathConnections[i][j])}
+					connection)}
 			}
+
 		}
 	}
 
-	for i := 0; i < alphabetSize; i++ {
-		// Plugboard
-		if num, verify := strToInt(jsonM.PlugboardConnections[i]); verify {
+	// Plugboard
+	for i, connection := range jsonM.PlugboardConnections {
+		if num, verify := strToInt(connection); verify {
 			m.plugboardConnections[i] = num
 		} else {
 			return nil, &initError{fmt.Sprintf("plugboard contains invalid value %v",
-				jsonM.PlugboardConnections[i])}
+				connection)}
 		}
+	}
 
-		// Reflector
-		if num, verify := strToInt(jsonM.Reflector[i]); verify {
+	// Reflector
+	for i, connection := range jsonM.Reflector {
+		if num, verify := strToInt(connection); verify {
 			m.reflector[i] = num
 		} else {
 			return nil, &initError{fmt.Sprintf("plugboard contains invalid value %v",
-				jsonM.Reflector[i])}
+				connection)}
 		}
 	}
 
 	// Rotors
 	var rotorsPositions [numberOfRotors]int
-	for i := 0; i < numberOfRotors; i++ {
-		if num, verify := strToInt(jsonM.RotorsPositions[i]); verify {
+	for i, position := range jsonM.RotorsPositions {
+		if num, verify := strToInt(position); verify {
 			rotorsPositions[i] = num
 		} else {
 			return nil, &initError{fmt.Sprintf("rotorsPositions contains invalid value %v",
-				jsonM.RotorsPositions[i])}
+				position)}
 		}
+
 	}
 
 	m.initRotors(rotorsPositions, 1, alphabetSize)
