@@ -14,8 +14,8 @@ import (
 type jsonMachine struct {
 	PathConnections      [numberOfRotors][alphabetSize]string `json:"pathways"`
 	Reflector            [alphabetSize]string                 `json:"reflector"`
-	PlugboardConnections [alphabetSize]string                 `json:"plugboards"`
-	RotorsPositions      [numberOfRotors]string               `json:"rotorsPositions"`
+	PlugboardConnections [alphabetSize]string                 `json:"plugboard"`
+	RotorsPositions      [numberOfRotors]string               `json:"rotorPositions"`
 }
 
 // read loads and verifies Machine's configurations from a json file.
@@ -57,7 +57,7 @@ func parseMachineJSON(fileContents []byte) (*Machine, error) {
 	}
 
 	// Parse jsonM into a Machine
-	var m *Machine
+	m := new(Machine)
 
 	// Electric pathways
 	for i := 0; i < numberOfRotors; i++ {
@@ -84,7 +84,7 @@ func parseMachineJSON(fileContents []byte) (*Machine, error) {
 		if num, verify := strToInt(jsonM.Reflector[i]); verify {
 			m.reflector[i] = num
 		} else {
-			return nil, &initError{fmt.Sprintf("plugboard contains invalid value %v",
+			return nil, &initError{fmt.Sprintf("reflector contains invalid value %v",
 				jsonM.Reflector[i])}
 		}
 	}

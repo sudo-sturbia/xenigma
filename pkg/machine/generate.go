@@ -10,7 +10,8 @@ import (
 func Generate() *Machine {
 	rand.Seed(time.Now().UnixNano())
 
-	var m *Machine
+	m := new(Machine)
+
 	m.randPathways()
 	m.randPlugboard()
 	m.randReflector()
