@@ -17,13 +17,13 @@ func (err *initError) Error() string {
 // correctly. If not an error is returned.
 func (m *Machine) isInit() error {
 	switch {
-	case m.areRotorsInit():
+	case !m.areRotorsInit():
 		return &initError{"invalid rotor configs"}
-	case m.arePathwaysInit():
+	case !m.arePathwaysInit():
 		return &initError{"invalid pathway connections"}
-	case m.isReflectorInit():
+	case !m.isReflectorInit():
 		return &initError{"invalid reflector connections"}
-	case m.isPlugboardInit():
+	case !m.isPlugboardInit():
 		return &initError{"invalid plugboard connections"}
 	case m.step <= 0:
 		return &initError{"invalid step size"}
