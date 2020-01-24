@@ -130,7 +130,7 @@ func write(m *Machine, path string) error {
 		jsonM.RotorsPositions[i] = intToStr(m.CurrentRotors()[i])
 	}
 
-	contents, err := json.Marshal(jsonM)
+	contents, err := json.MarshalIndent(jsonM, "", "\t")
 	if err != nil {
 		return fmt.Errorf("could not create JSON file, %s", err.Error())
 	}
@@ -160,5 +160,5 @@ func strToInt(str string) (int, bool) {
 // intToStr returns a one character string representing the ASCII position
 // of the given integer.
 func intToStr(num int) string {
-	return fmt.Sprintf("%v", byte(num)+'a')
+	return fmt.Sprintf("%c", byte(num)+'a')
 }
