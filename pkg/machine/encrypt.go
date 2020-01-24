@@ -40,7 +40,7 @@ func (m *Machine) encryptChar(char byte) byte {
 	// Reflector and return through electric pathways
 	encryptedChar = m.reflector[encryptedChar]
 	for i := 0; i < numberOfRotors; i++ {
-		encryptedChar = m.rotors[i][m.pathConnections[i][encryptedChar]]
+		encryptedChar = m.rotors[numberOfRotors-i-1][m.pathConnections[numberOfRotors-i-1][encryptedChar]]
 	}
 
 	return m.plugOut(encryptedChar)
