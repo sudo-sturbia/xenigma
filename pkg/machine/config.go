@@ -108,13 +108,7 @@ func parseMachineJSON(fileContents []byte) (*Machine, error) {
 // write writes configurations of a Machine object to a JSON file.
 // returns an error in case of incorrect writing.
 func write(m *Machine, path string) error {
-	file, err := os.Open(path)
-	if err != nil {
-		return fmt.Errorf("could not write to %s, %s", path, err.Error())
-	}
-	defer file.Close()
-
-	var jsonM jsonMachine
+	jsonM := new(jsonMachine)
 
 	// Electric pathways
 	for i := 0; i < numberOfRotors; i++ {
