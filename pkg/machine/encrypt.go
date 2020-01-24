@@ -13,10 +13,9 @@ func (m *Machine) Encrypt(message string) (string, error) {
 		return "", err
 	}
 
-	// Create a buffer to add encrypted characters to
-	message = strings.ToLower(message)
 	encryptedBuffer := new(bytes.Buffer)
 
+	message = strings.ToLower(message)
 	for _, char := range message {
 		encryptedBuffer.WriteByte(m.encryptChar(byte(char)))
 	}
@@ -50,11 +49,11 @@ func (m *Machine) encryptChar(char byte) byte {
 // plugIn changes a byte (character) to an int (0 -> 25) based on
 // plugboard connections. Used when character is entered.
 func (m *Machine) plugIn(char byte) int {
-	return int(m.plugboardConnections[int(char-'a')])
+	return m.plugboardConnections[int(char-'a')]
 }
 
 // plugOut changes an int to a byte (character) based on
 // plugboard connections. Used when character is returned.
 func (m *Machine) plugOut(char int) byte {
-	return byte(m.plugboardConnections[char]) + 'a'
+	return byte(m.plugboardConnections[char] + 'a')
 }
