@@ -1,6 +1,7 @@
 package machine
 
 import (
+	"os"
 	"testing"
 )
 
@@ -38,4 +39,83 @@ func TestReadIncorrectConfig(t *testing.T) {
 	if err4 == nil {
 		t.Errorf("error not detected in incorrect configuration 4")
 	}
+}
+
+// Test loading of a generated machine.
+func TestWrite(t *testing.T) {
+	m := Generate()
+
+	os.MkdirAll("../../test/generate", os.ModePerm)
+	err := write(m, "../../test/generate/generated-1.json")
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	_, err = os.Open("../../test/generate/generated-1.json")
+	if err != nil {
+		t.Errorf("generated machine was not written correctly")
+	}
+}
+
+// Test saving and loading of a machine.
+func TestReadAndWrite(t *testing.T) {
+	m := Generate()
+
+	os.MkdirAll("../../test/generate", os.ModePerm)
+	err := write(m, "../../test/generate/generated-2.json")
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	loaded, err := read("../../test/generate/generated-2.json")
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	// Compare machines
+	if !areSimilar(m, loaded) {
+		t.Errorf("incorrect saving and reloading of a machine")
+	}
+}
+
+// Compare two machines.
+// Returns true if machines are similar, false otherwise.
+func areSimilar(m1 *Machine, m2 *Machine) bool {
+	if m1 == nil && m2 == nil {
+		return true
+	} else if m2 == nil || m1 == nil {
+		return false
+	}
+
+	// Pathways
+	for i := 0; i < numberOfRotors; i++ {
+		for j := 0; j < alphabetSize; j++ {
+			if m1.pathConnections[i][j] != m2.pathConnections[i][j] {
+				return false
+			}
+		}
+	}
+
+	// Reflector
+	for i := 0; i < alphabetSize; i++ {
+		if m1.reflector[i] != m2.reflector[i] {
+			return false
+		}
+	}
+
+	// Plugboard
+	for i := 0; i < alphabetSize; i++ {
+		if m1.plugboardConnections[i] != m2.plugboardConnections[i] {
+			return false
+		}
+	}
+
+	// Rotors
+	for i := 0; i < numberOfRotors; i++ {
+		if m1.rotors[i][0] != m2.rotors[i][0] {
+			return false
+		}
+	}
+
+	return true
 }
