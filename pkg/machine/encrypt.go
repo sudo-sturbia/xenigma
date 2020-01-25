@@ -7,7 +7,9 @@ import (
 )
 
 // Encrypt encrypts a string using a Machine object.
-// returns encrypted string and an error incase of an initialization error.
+// returns encrypted string and an error in case of an incorrect configuration.
+// Non-alphabetical characters are returned without change, and don't affect
+// rotors' movement (rotors are not shifted).
 func (m *Machine) Encrypt(message string) (string, error) {
 	if err := m.isInit(); err != nil {
 		return "", err
@@ -29,19 +31,17 @@ func (m *Machine) encryptChar(char byte) byte {
 		return char
 	}
 
-	// Plugboard
 	encryptedChar := m.plugIn(char)
-
-	// Rotors and electric pathways
 	for i := 0; i < numberOfRotors; i++ {
 		encryptedChar = m.pathConnections[i][m.rotors[i][encryptedChar]]
 	}
 
-	// Reflector and return through electric pathways
 	encryptedChar = m.reflector[encryptedChar]
 	for i := 0; i < numberOfRotors; i++ {
 		encryptedChar = m.rotors[numberOfRotors-i-1][m.pathConnections[numberOfRotors-i-1][encryptedChar]]
 	}
+
+	m.stepRotors()
 
 	return m.plugOut(encryptedChar)
 }
