@@ -14,8 +14,8 @@ import (
 type jsonMachine struct {
 	PathConnections      [numberOfRotors][alphabetSize]string `json:"pathways"`
 	Reflector            [alphabetSize]string                 `json:"reflector"`
-	PlugboardConnections [alphabetSize]string                 `json:"plugboards"`
-	RotorsPositions      [numberOfRotors]string               `json:"rotorsPositions"`
+	PlugboardConnections [alphabetSize]string                 `json:"plugboard"`
+	RotorsPositions      [numberOfRotors]string               `json:"rotorPositions"`
 }
 
 // read loads and verifies Machine's configurations from a json file.
@@ -57,7 +57,7 @@ func parseMachineJSON(fileContents []byte) (*Machine, error) {
 	}
 
 	// Parse jsonM into a Machine
-	var m *Machine
+	m := new(Machine)
 
 	// Electric pathways
 	for i := 0; i < numberOfRotors; i++ {
@@ -87,7 +87,7 @@ func parseMachineJSON(fileContents []byte) (*Machine, error) {
 		if num, verify := strToInt(connection); verify {
 			m.reflector[i] = num
 		} else {
-			return nil, &initError{fmt.Sprintf("plugboard contains invalid value %v",
+			return nil, &initError{fmt.Sprintf("reflector contains invalid value %v",
 				connection)}
 		}
 	}
@@ -112,13 +112,7 @@ func parseMachineJSON(fileContents []byte) (*Machine, error) {
 // write writes configurations of a Machine object to a JSON file.
 // returns an error in case of incorrect writing.
 func write(m *Machine, path string) error {
-	file, err := os.Open(path)
-	if err != nil {
-		return fmt.Errorf("could not write to %s, %s", path, err.Error())
-	}
-	defer file.Close()
-
-	var jsonM jsonMachine
+	jsonM := new(jsonMachine)
 
 	// Electric pathways
 	for i := 0; i < numberOfRotors; i++ {
@@ -140,7 +134,7 @@ func write(m *Machine, path string) error {
 		jsonM.RotorsPositions[i] = intToStr(m.CurrentRotors()[i])
 	}
 
-	contents, err := json.Marshal(jsonM)
+	contents, err := json.MarshalIndent(jsonM, "", "\t")
 	if err != nil {
 		return fmt.Errorf("could not create JSON file, %s", err.Error())
 	}
@@ -170,5 +164,5 @@ func strToInt(str string) (int, bool) {
 // intToStr returns a one character string representing the ASCII position
 // of the given integer.
 func intToStr(num int) string {
-	return fmt.Sprintf("%v", byte(num)+'a')
+	return fmt.Sprintf("%c", byte(num)+'a')
 }
