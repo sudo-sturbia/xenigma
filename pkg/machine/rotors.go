@@ -41,8 +41,17 @@ func (m *Machine) setNumberOfRotors(number int) {
 	m.numberOfRotors = number
 }
 
+// NumberOfRotors returns number of Machine's rotors.
+func (m *Machine) NumberOfRotors() int {
+	return m.numberOfRotors
+}
+
 // setRotorsPosition sets current position of each rotor.
 func (m *Machine) setRotorsPosition(positions []int) error {
+	if len(positions) != m.numberOfRotors {
+		return &initError{"number of rotors =/= number of given positions"}
+	}
+
 	// Verify positions
 	for i := 0; i < m.numberOfRotors; i++ {
 		if positions[i] < 0 || positions[i] > alphabetSize {

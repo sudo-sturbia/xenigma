@@ -17,6 +17,10 @@ func (err *initError) Error() string {
 // correctly. If not an error is returned.
 func (m *Machine) isInit() error {
 	switch {
+	case len(m.pathConnections) != m.numberOfRotors:
+		return &initError{"invalid number of pathway layers"}
+	case len(m.rotors) != m.numberOfRotors:
+		return &initError{"invalid number of rotors"}
 	case !m.areRotorsInit():
 		return &initError{"invalid rotor configs"}
 	case !m.arePathwaysInit():
