@@ -25,21 +25,22 @@ import (
 )
 
 const (
-	numberOfRotors = 3
-	alphabetSize   = 26
+	//numberOfRotors = 3
+	alphabetSize = 26
 )
 
 // Machine represents an enigma machine with mechanical components.
 // Components are electric pathways, reflector, plugboard, and rotors.
 type Machine struct {
-	pathConnections      [numberOfRotors][alphabetSize]int // Connections that form electric pathways
-	reflector            [alphabetSize]int                 // Reflector connections, symmetric
-	plugboardConnections [alphabetSize]int                 // Plugboard connections, symmetric
+	pathConnections      [][alphabetSize]int // Connections that form electric pathways
+	reflector            [alphabetSize]int   // Reflector connections, symmetric
+	plugboardConnections [alphabetSize]int   // Plugboard connections, symmetric
 
-	rotors     [numberOfRotors][alphabetSize]int // Mechanical rotors, 1st element is rotor's position
-	takenSteps [numberOfRotors - 1]int           // Number of steps taken by each rotor except the last
-	step       int                               // Size of shift between rotor steps (move)
-	cycle      int                               // Number of rotor steps considered a full cycle
+	numberOfRotors int                 // Number of rotors used in the machine
+	rotors         [][alphabetSize]int // Mechanical rotors, 1st element is rotor's position
+	takenSteps     []int               // Number of steps taken by each rotor except the last
+	step           int                 // Size of shift between rotor steps (move)
+	cycle          int                 // Number of rotor steps considered a full cycle
 }
 
 // Load returns a fully initialized Machine object. Configurations of
@@ -72,11 +73,16 @@ func Load(overwrite bool) (*Machine, error) {
 // SetComponents initializes all components of the machine.
 // Returns an error if given incorrect configurations.
 func (m *Machine) SetComponents(
-	pathways [numberOfRotors][alphabetSize]int,
+	pathways [][alphabetSize]int,
 	plugboard [alphabetSize]int,
 	reflector [alphabetSize]int,
-	rotorsPositions [numberOfRotors]int, step int, cycle int) error {
+	rotorsPositions []int, step int, cycle int) error {
 
+	if len(pathways) != len(rotorsPositions) {
+		return &initError{"rotors and electric pathways are of different sizes"}
+	}
+
+	m.setNumberOfRotors(len(pathways))
 	m.setPathConnections(pathways)
 	m.setPlugboard(plugboard)
 	m.setReflector(reflector)
@@ -86,12 +92,12 @@ func (m *Machine) SetComponents(
 }
 
 // PathConnections returns electric pathway connections
-func (m *Machine) PathConnections() [numberOfRotors][alphabetSize]int {
+func (m *Machine) PathConnections() [][alphabetSize]int {
 	return m.pathConnections
 }
 
 // setPathConnections sets path connections array in Machine.
-func (m *Machine) setPathConnections(paths [numberOfRotors][alphabetSize]int) {
+func (m *Machine) setPathConnections(paths [][alphabetSize]int) {
 	m.pathConnections = paths
 }
 
