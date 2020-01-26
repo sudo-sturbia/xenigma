@@ -12,10 +12,10 @@ import (
 // into a json file. Fields in jsonMachine mirror those in a Machine but use
 // string arrays instead of int arrays.
 type jsonMachine struct {
-	PathConnections      [numberOfRotors][alphabetSize]string `json:"pathways"`
-	Reflector            [alphabetSize]string                 `json:"reflector"`
-	PlugboardConnections [alphabetSize]string                 `json:"plugboard"`
-	RotorsPositions      [numberOfRotors]string               `json:"rotorPositions"`
+	PathConnections      [][alphabetSize]string `json:"pathways"`
+	Reflector            [alphabetSize]string   `json:"reflector"`
+	PlugboardConnections [alphabetSize]string   `json:"plugboard"`
+	RotorsPositions      []string               `json:"rotorPositions"`
 }
 
 // read loads and verifies Machine's configurations from a json file.
@@ -56,11 +56,19 @@ func parseMachineJSON(fileContents []byte) (*Machine, error) {
 		return nil, err
 	}
 
+	// Verify arrays' sizes
+	if len(jsonM.PathConnections) != len(jsonM.RotorsPositions) {
+		return nil, &initError{"pathways and rotors positions arrays are not of the same size"}
+	}
+
 	// Parse jsonM into a Machine
 	m := new(Machine)
+	m.setNumberOfRotors(len(jsonM.PathConnections))
 
 	// Electric pathways
-	for i := 0; i < numberOfRotors; i++ {
+	m.pathConnections = make([][alphabetSize]int, m.numberOfRotors)
+
+	for i := 0; i < m.numberOfRotors; i++ {
 		for j, connection := range jsonM.PathConnections[i] {
 			if num, verify := strToInt(connection); verify {
 				m.pathConnections[i][j] = num
@@ -93,7 +101,7 @@ func parseMachineJSON(fileContents []byte) (*Machine, error) {
 	}
 
 	// Rotors
-	var rotorsPositions [numberOfRotors]int
+	rotorsPositions := make([]int, m.numberOfRotors)
 	for i, position := range jsonM.RotorsPositions {
 		if num, verify := strToInt(position); verify {
 			rotorsPositions[i] = num
@@ -115,7 +123,8 @@ func write(m *Machine, path string) error {
 	jsonM := new(jsonMachine)
 
 	// Electric pathways
-	for i := 0; i < numberOfRotors; i++ {
+	jsonM.PathConnections = make([][alphabetSize]string, m.numberOfRotors)
+	for i := 0; i < m.numberOfRotors; i++ {
 		for j := 0; j < alphabetSize; j++ {
 			jsonM.PathConnections[i][j] = intToStr(m.pathConnections[i][j])
 		}
@@ -130,7 +139,8 @@ func write(m *Machine, path string) error {
 	}
 
 	// Rotors
-	for i := 0; i < numberOfRotors; i++ {
+	jsonM.RotorsPositions = make([]string, m.numberOfRotors)
+	for i := 0; i < m.numberOfRotors; i++ {
 		jsonM.RotorsPositions[i] = intToStr(m.CurrentRotors()[i])
 	}
 
