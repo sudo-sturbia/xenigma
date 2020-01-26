@@ -5,12 +5,13 @@ import (
 	"time"
 )
 
-// Generate returns a Machine object initialized using randomly generated
-// configurations for components.
-func Generate() *Machine {
+// Generate creates a machine object with a specified number of rotors
+// containing randomly generated component configurations.
+func Generate(numberOfRotors int) *Machine {
 	rand.Seed(time.Now().UnixNano())
 
 	m := new(Machine)
+	m.setNumberOfRotors(numberOfRotors)
 
 	m.randPathways()
 	m.randPlugboard()
@@ -22,14 +23,12 @@ func Generate() *Machine {
 
 // randPathways creates random pathway connections.
 func (m *Machine) randPathways() {
-	m.pathConnections[0] = [alphabetSize]int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
-		14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}
-	m.pathConnections[1] = [alphabetSize]int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
-		14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}
-	m.pathConnections[2] = [alphabetSize]int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
-		14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}
+	m.pathConnections = make([][alphabetSize]int, m.numberOfRotors)
+	for i := range m.pathConnections {
+		m.pathConnections[i] = [alphabetSize]int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
+			14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}
 
-	for i := 0; i < numberOfRotors; i++ {
+		// Shuffle array elements
 		rand.Shuffle(alphabetSize, func(j, k int) {
 			m.pathConnections[i][j], m.pathConnections[i][k] =
 				m.pathConnections[i][k], m.pathConnections[i][j]
@@ -69,8 +68,8 @@ func (m *Machine) randReflector() {
 
 // randRotors creates random rotor positions.
 func (m *Machine) randRotors() {
-	var rotorsPositions [numberOfRotors]int
-	for i := 0; i < numberOfRotors; i++ {
+	rotorsPositions := make([]int, m.numberOfRotors)
+	for i := range rotorsPositions {
 		rotorsPositions[i] = rand.Intn(alphabetSize)
 	}
 
