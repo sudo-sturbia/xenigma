@@ -43,7 +43,8 @@ func TestReadIncorrectConfig(t *testing.T) {
 
 // Test loading of a generated machine.
 func TestWrite(t *testing.T) {
-	m := Generate()
+	numberOfRotors := 3
+	m := Generate(numberOfRotors)
 
 	os.MkdirAll("../../test/generate", os.ModePerm)
 	err := write(m, "../../test/generate/generated-1.json")
@@ -59,7 +60,8 @@ func TestWrite(t *testing.T) {
 
 // Test saving and loading of a machine.
 func TestReadAndWrite(t *testing.T) {
-	m := Generate()
+	numberOfRotors := 3
+	m := Generate(numberOfRotors)
 
 	os.MkdirAll("../../test/generate", os.ModePerm)
 	err := write(m, "../../test/generate/generated-2.json")
@@ -86,6 +88,12 @@ func areSimilar(m1 *Machine, m2 *Machine) bool {
 	} else if m2 == nil || m1 == nil {
 		return false
 	}
+
+	if m1.numberOfRotors != m2.numberOfRotors {
+		return false
+	}
+
+	numberOfRotors := m1.numberOfRotors
 
 	// Pathways
 	for i := 0; i < numberOfRotors; i++ {

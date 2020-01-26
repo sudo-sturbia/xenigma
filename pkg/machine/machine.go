@@ -24,10 +24,7 @@ import (
 	"os"
 )
 
-const (
-	//numberOfRotors = 3
-	alphabetSize = 26
-)
+const alphabetSize = 26
 
 // Machine represents an enigma machine with mechanical components.
 // Components are electric pathways, reflector, plugboard, and rotors.

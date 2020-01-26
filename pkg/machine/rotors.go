@@ -59,6 +59,7 @@ func (m *Machine) setRotorsPosition(positions []int) error {
 		}
 	}
 
+	m.rotors = make([][alphabetSize]int, m.numberOfRotors)
 	for i := 0; i < m.numberOfRotors; i++ {
 		for j := 0; j < alphabetSize; j++ {
 			m.rotors[i][j] = (j + positions[i]) % alphabetSize
