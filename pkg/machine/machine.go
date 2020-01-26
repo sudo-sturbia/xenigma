@@ -48,15 +48,15 @@ type Machine struct {
 // If the file contains correct configurations, a machine object is
 // initialized and returned with error being nil.
 // Otherwise overwrite parameter is checked. If overwrite is true, random
-// configs are generated and written to file, a machine object with the
-// same configs is returned and error is nil. Otherwise an initialization
-// error is returned and Machine is nil.
-func Load(overwrite bool) (*Machine, error) {
+// configs are generated using the specified number of rotors and written
+// to file, a machine object with the same configs is returned and error
+// is nil. Otherwise an initialization error is returned and Machine is nil.
+func Load(numberOfRotors int, overwrite bool) (*Machine, error) {
 	machine, err := read(os.Getenv("HOME") + "/.config/enigma.json")
 
 	if err != nil {
 		if overwrite {
-			machine = Generate()
+			machine = Generate(numberOfRotors)
 			if err = write(machine, os.Getenv("HOME")+"/.config/enigma.json"); err != nil {
 				return machine, &initError{err.Error()}
 			}

@@ -32,13 +32,13 @@ func (m *Machine) encryptChar(char byte) byte {
 	}
 
 	encryptedChar := m.plugIn(char)
-	for i := 0; i < numberOfRotors; i++ {
+	for i := 0; i < m.numberOfRotors; i++ {
 		encryptedChar = m.pathConnections[i][m.rotors[i][encryptedChar]]
 	}
 
 	encryptedChar = m.reflector[encryptedChar]
-	for i := 0; i < numberOfRotors; i++ {
-		encryptedChar = m.rotors[numberOfRotors-i-1][m.pathConnections[numberOfRotors-i-1][encryptedChar]]
+	for i := 0; i < m.numberOfRotors; i++ {
+		encryptedChar = m.rotors[m.numberOfRotors-i-1][m.pathConnections[m.numberOfRotors-i-1][encryptedChar]]
 	}
 
 	m.stepRotors()
