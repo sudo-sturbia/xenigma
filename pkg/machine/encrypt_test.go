@@ -1,12 +1,31 @@
 package machine
 
 import (
+	"fmt"
 	"testing"
 )
 
+// Example of usage of the enigma package.
+func Example() {
+	// Generate a random configuration
+	m := Generate()
+
+	// Encrypt a message
+	message := "Hello, world!"
+	encrypted, _ := m.Encrypt(message)
+
+	fmt.Printf("message: %s, encryption: %s\n", message, encrypted)
+
+	// Write configurations to a JSON file
+	err := Write(m, "generate/generated.json")
+	if err != nil {
+		panic("couldn't save configuratoins")
+	}
+}
+
 // Test encryption of strings.
 func TestEncrypt(t *testing.T) {
-	m1, err := read("../../test/data/config-1.json")
+	m1, err := Read("../../test/data/config-1.json")
 	if err != nil {
 		t.Errorf("could not read configurations\n%s", err.Error())
 	}
@@ -16,7 +35,7 @@ func TestEncrypt(t *testing.T) {
 		t.Errorf("incorrect encryption of \"Hello, world!\",\nexpected \"suelb, dpkqr!\", got \"%s\"", encrypted1)
 	}
 
-	m2, err := read("../../test/data/config-2.json")
+	m2, err := Read("../../test/data/config-2.json")
 	if err != nil {
 		t.Errorf("could not read configurations\n%s", err.Error())
 	}
@@ -30,12 +49,12 @@ func TestEncrypt(t *testing.T) {
 func TestReadWriteEncrypt(t *testing.T) {
 	m := Generate()
 
-	err := write(m, "../../test/generate/generated-3.json")
+	err := Write(m, "../../test/generate/generated-3.json")
 	if err != nil {
 		t.Errorf(err.Error())
 	}
 
-	loaded, err := read("../../test/generate/generated-3.json")
+	loaded, err := Read("../../test/generate/generated-3.json")
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -59,7 +78,7 @@ func TestReadWriteEncrypt(t *testing.T) {
 // Test encryption of individual alphabetical characters.
 func TestEncryptCharAlpha(t *testing.T) {
 	// Using configuration 1
-	m1, err := read("../../test/data/config-1.json")
+	m1, err := Read("../../test/data/config-1.json")
 	if err != nil {
 		t.Errorf("could not read configurations\n%s", err.Error())
 	}
@@ -71,7 +90,7 @@ func TestEncryptCharAlpha(t *testing.T) {
 	}
 
 	// Using configuration 2
-	m2, err := read("../../test/data/config-2.json")
+	m2, err := Read("../../test/data/config-2.json")
 	if err != nil {
 		t.Errorf("could not read configurations\n%s", err.Error())
 	}

@@ -51,12 +51,12 @@ type Machine struct {
 // same configs is returned and error is nil. Otherwise an initialization
 // error is returned and Machine is nil.
 func Load(overwrite bool) (*Machine, error) {
-	machine, err := read(os.Getenv("HOME") + "/.config/enigma.json")
+	machine, err := Read(os.Getenv("HOME") + "/.config/enigma.json")
 
 	if err != nil {
 		if overwrite {
 			machine = Generate()
-			if err = write(machine, os.Getenv("HOME")+"/.config/enigma.json"); err != nil {
+			if err = Write(machine, os.Getenv("HOME")+"/.config/enigma.json"); err != nil {
 				return machine, &initError{err.Error()}
 			}
 

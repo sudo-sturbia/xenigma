@@ -18,9 +18,9 @@ type jsonMachine struct {
 	RotorsPositions      [numberOfRotors]string               `json:"rotorPositions"`
 }
 
-// read loads and verifies Machine's configurations from a json file.
-// It returns a pointer to a Machine, and an error in case of incorrect loading.
-func read(path string) (*Machine, error) {
+// Read loads a machine and verifies its configurations from a JSON file.
+// Returns a pointer to the loaded Machine and an error in case of incorrect loading.
+func Read(path string) (*Machine, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, fmt.Errorf("could not load config file %s", path)
@@ -109,9 +109,9 @@ func parseMachineJSON(fileContents []byte) (*Machine, error) {
 	return m, nil
 }
 
-// write writes configurations of a Machine object to a JSON file.
-// returns an error in case of incorrect writing.
-func write(m *Machine, path string) error {
+// Write writes configurations of a Machine object to a JSON file.
+// Returns an error if unable to write.
+func Write(m *Machine, path string) error {
 	jsonM := new(jsonMachine)
 
 	// Electric pathways
