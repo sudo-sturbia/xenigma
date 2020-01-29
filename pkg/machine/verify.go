@@ -10,7 +10,7 @@ type initError struct {
 }
 
 func (err *initError) Error() string {
-	return "initialization error: " + err.message
+	return "incorrect init, " + err.message
 }
 
 // isInit verifies that all fields of a machine were initialized

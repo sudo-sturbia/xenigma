@@ -11,13 +11,21 @@ import (
 func (m *Machine) initRotors(positions []int, stepSize int, cycleSize int) (err error) {
 	if tempErr := m.verifyStepCycle(stepSize, cycleSize); tempErr != nil {
 		err = tempErr
-	} else if tempErr := m.setStep(stepSize); tempErr != nil {
+	}
+
+	if tempErr := m.setStep(stepSize); tempErr != nil {
 		err = tempErr
-	} else if tempErr := m.setCycle(cycleSize); tempErr != nil {
+	}
+
+	if tempErr := m.setCycle(cycleSize); tempErr != nil {
 		err = tempErr
-	} else if tempErr := m.setRotorsPosition(positions); tempErr != nil {
+	}
+
+	if tempErr := m.setRotorsPosition(positions); tempErr != nil {
 		err = tempErr
-	} else if tempErr := m.setTakenSteps(positions); tempErr != nil {
+	}
+
+	if tempErr := m.setTakenSteps(positions); tempErr != nil {
 		err = tempErr
 	}
 
