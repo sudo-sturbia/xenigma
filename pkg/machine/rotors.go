@@ -2,6 +2,7 @@ package machine
 
 import (
 	"fmt"
+	"math"
 )
 
 // initRotors initializes all components related to rotors.
@@ -34,16 +35,6 @@ func (m *Machine) initRotors(positions []int, stepSize int, cycleSize int) (err 
 	}
 
 	return err
-}
-
-// setNumberOfRotors sets number of used rotors.
-func (m *Machine) setNumberOfRotors(number int) {
-	m.numberOfRotors = number
-}
-
-// NumberOfRotors returns number of Machine's rotors.
-func (m *Machine) NumberOfRotors() int {
-	return m.numberOfRotors
 }
 
 // setRotorsPosition sets current position of each rotor.
@@ -88,6 +79,39 @@ func (m *Machine) resetRotors() {
 	}
 }
 
+// setTakenSteps calculates the number of taken steps for each
+// of the rotors except the last and populates the takenSteps array
+// with the calculated values.
+// An error is returned if the given position of the rotors can't
+// be reached (takenSteps can't be calculated).
+func (m *Machine) setTakenSteps(position []int) error {
+	for i := 0; i < m.numberOfRotors-1; i++ {
+		steps := 0
+		for j := i; j < m.numberOfRotors; j++ {
+			steps += position[j] * int(math.Pow(float64(alphabetSize), float64(j)))
+		}
+
+		if (steps % m.step) != 0 {
+			return &initError{"given rotor position is incorrect"}
+		}
+
+		m.takenSteps[i] = (steps / m.step) % m.cycle
+	}
+
+	return nil
+}
+
+// verifyStepCycle verifies that given properties of the rotors are
+// correct. Verifications are that a full machine cycle can be achieved
+// using given step (full machine cycle breaks into a whole number of steps).
+func (m *Machine) verifyStepCycle(stepSize int, cycleSize int) error {
+	if (int(math.Pow(float64(alphabetSize), float64(m.numberOfRotors))) % (stepSize * cycleSize)) != 0 {
+		return &initError{"a full machine cycle can not be broken into a whole number of steps."}
+	}
+
+	return nil
+}
+
 // setStep sets rotors' step size.
 func (m *Machine) setStep(value int) error {
 	if value <= 0 {
@@ -118,6 +142,16 @@ func (m *Machine) setCycle(value int) error {
 // Cycle returns rotors' cycle size.
 func (m *Machine) Cycle() int {
 	return m.cycle
+}
+
+// setNumberOfRotors sets number of used rotors.
+func (m *Machine) setNumberOfRotors(number int) {
+	m.numberOfRotors = number
+}
+
+// NumberOfRotors returns number of Machine's rotors.
+func (m *Machine) NumberOfRotors() int {
+	return m.numberOfRotors
 }
 
 // stepRotors turns first rotor one step.
