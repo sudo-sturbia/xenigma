@@ -2,7 +2,6 @@ package machine
 
 import (
 	"fmt"
-	"math"
 )
 
 // initRotors initializes all components related to rotors.
@@ -83,22 +82,17 @@ func (m *Machine) resetRotors() {
 // of the rotors except the last and populates the takenSteps array
 // with the calculated values.
 // An error is returned if the given position of the rotors can't
-// be reached (takenSteps can't be calculated) and taken steps are
-// set to 0 for all rotors.
+// be reached using specified step and cycle values (takenSteps can't
+// be calculated) and taken steps are set to 0 for all rotors.
 func (m *Machine) setTakenSteps(position []int) error {
 	m.takenSteps = make([]int, m.numberOfRotors-1)
 	for i := 0; i < m.numberOfRotors-1; i++ {
-		steps := 0
-		for j := i; j < m.numberOfRotors; j++ {
-			steps += position[j] * int(math.Pow(float64(alphabetSize), float64(j)))
-		}
-
-		if (steps % m.step) != 0 {
+		if (position[i] % m.step) != 0 {
 			m.resetTakenSteps()
-			return &initError{"given rotor position is incorrect"}
+			return &initError{"given position of rotors is incorrect"}
 		}
 
-		m.takenSteps[i] = (steps / m.step) % m.cycle
+		m.takenSteps[i] = (position[i] / m.step) % m.cycle
 	}
 
 	return nil
@@ -111,12 +105,11 @@ func (m *Machine) resetTakenSteps() {
 	}
 }
 
-// verifyStepCycle verifies that given properties of the rotors are
-// correct. Verifications are that a full machine cycle can be achieved
+// verifyStepCycle verifies that a full machine cycle can be achieved
 // using given step (full machine cycle breaks into a whole number of steps).
 func (m *Machine) verifyStepCycle(stepSize int, cycleSize int) error {
-	if (int(math.Pow(float64(alphabetSize), float64(m.numberOfRotors))) % (stepSize * cycleSize)) != 0 {
-		return &initError{"a full machine cycle can not be broken into a whole number of steps."}
+	if ((alphabetSize) % (stepSize * cycleSize)) != 0 {
+		return &initError{"cycle size and step size are not compatible, some collisions may occur"}
 	}
 
 	return nil
