@@ -9,15 +9,7 @@ import (
 // If incorrect values are given fields are set to default
 // values and an error is returned.
 func (m *Machine) initRotors(positions []int, stepSize int, cycleSize int) (err error) {
-	if tempErr := m.verifyStepCycle(stepSize, cycleSize); tempErr != nil {
-		err = tempErr
-	}
-
-	if tempErr := m.setStep(stepSize); tempErr != nil {
-		err = tempErr
-	}
-
-	if tempErr := m.setCycle(cycleSize); tempErr != nil {
+	if tempErr := m.setStepAndCycle(stepSize, cycleSize); tempErr != nil {
 		err = tempErr
 	}
 
@@ -109,6 +101,30 @@ func (m *Machine) resetTakenSteps() {
 	for i := 0; i < m.numberOfRotors-1; i++ {
 		m.takenSteps[i] = 0
 	}
+}
+
+// setStepAndCycle verifies and sets both step size and cycle size.
+// If given values are incorrect or incompatibe both fields are set
+// to default. Step = 1, Cycle = 26.
+func (m *Machine) setStepAndCycle(stepSize int, cycleSize int) error {
+	if err := m.verifyStepCycle(stepSize, cycleSize); err != nil {
+		m.setStep(1)
+		m.setCycle(alphabetSize)
+		return err
+	}
+
+	err1 := m.setStep(stepSize)
+	err2 := m.setCycle(cycleSize)
+
+	if err1 != nil {
+		return err1
+	}
+
+	if err2 != nil {
+		return err2
+	}
+
+	return nil
 }
 
 // verifyStepCycle verifies that given properties of the rotors are
