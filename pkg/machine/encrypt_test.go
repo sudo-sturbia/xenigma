@@ -1,7 +1,9 @@
 package machine
 
 import (
+	"math/rand"
 	"testing"
+	"time"
 )
 
 // Test encryption of strings.
@@ -27,8 +29,11 @@ func TestEncrypt(t *testing.T) {
 	}
 }
 
+// Test reading, writing, and encryption.
 func TestReadWriteEncrypt(t *testing.T) {
-	numberOfRotors := 3
+	rand.Seed(time.Now().UnixNano())
+
+	numberOfRotors := rand.Intn(100)
 	m := Generate(numberOfRotors)
 
 	err := write(m, "../../test/generate/generated-3.json")
@@ -88,7 +93,9 @@ func TestEncryptCharAlpha(t *testing.T) {
 // Test encryption of a list of non-alphabetical characters.
 // Characters are not meant to change when encrypted.
 func TestEncryptCharNonAlpha(t *testing.T) {
-	numberOfRotors := 3
+	rand.Seed(time.Now().UnixNano())
+
+	numberOfRotors := rand.Intn(100)
 	m := Generate(numberOfRotors)
 
 	nonAlpha := []byte{',', ' ', '1', '\n', '[', '\t'}
