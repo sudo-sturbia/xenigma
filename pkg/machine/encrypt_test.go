@@ -2,7 +2,9 @@ package machine
 
 import (
 	"fmt"
+	"math/rand"
 	"testing"
+	"time"
 )
 
 // Example of usage of the enigma package.
@@ -46,8 +48,12 @@ func TestEncrypt(t *testing.T) {
 	}
 }
 
+// Test reading, writing, and encryption.
 func TestReadWriteEncrypt(t *testing.T) {
-	m := Generate()
+	rand.Seed(time.Now().UnixNano())
+
+	numberOfRotors := rand.Intn(100)
+	m := Generate(numberOfRotors)
 
 	err := Write(m, "../../test/generate/generated-3.json")
 	if err != nil {
@@ -106,7 +112,10 @@ func TestEncryptCharAlpha(t *testing.T) {
 // Test encryption of a list of non-alphabetical characters.
 // Characters are not meant to change when encrypted.
 func TestEncryptCharNonAlpha(t *testing.T) {
-	m := Generate()
+	rand.Seed(time.Now().UnixNano())
+
+	numberOfRotors := rand.Intn(100)
+	m := Generate(numberOfRotors)
 
 	nonAlpha := []byte{',', ' ', '1', '\n', '[', '\t'}
 	for _, char := range nonAlpha {

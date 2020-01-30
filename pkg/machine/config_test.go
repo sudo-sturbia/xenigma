@@ -1,8 +1,10 @@
 package machine
 
 import (
+	"math/rand"
 	"os"
 	"testing"
+	"time"
 )
 
 // Test reading of correct configs.
@@ -15,6 +17,11 @@ func TestReadCorrectConfig(t *testing.T) {
 	_, err2 := Read("../../test/data/config-2.json")
 	if err2 != nil {
 		t.Errorf("error occured while reading correct configuration 2\n%s", err2.Error())
+	}
+
+	_, err3 := read("../../test/data/config-3.json")
+	if err3 != nil {
+		t.Errorf("error occured while reading correct configuration 3\n%s", err3.Error())
 	}
 }
 
@@ -39,11 +46,19 @@ func TestReadIncorrectConfig(t *testing.T) {
 	if err4 == nil {
 		t.Errorf("error not detected in incorrect configuration 4")
 	}
+
+	_, err5 := read("../../test/data/wrong-config-5.json")
+	if err5 == nil {
+		t.Errorf("error not detected in incorrect configuration 5")
+	}
 }
 
 // Test loading of a generated machine.
 func TestWrite(t *testing.T) {
-	m := Generate()
+	rand.Seed(time.Now().UnixNano())
+
+	numberOfRotors := rand.Intn(100)
+	m := Generate(numberOfRotors)
 
 	os.MkdirAll("../../test/generate", os.ModePerm)
 	err := Write(m, "../../test/generate/generated-1.json")
@@ -59,7 +74,10 @@ func TestWrite(t *testing.T) {
 
 // Test saving and loading of a machine.
 func TestReadAndWrite(t *testing.T) {
-	m := Generate()
+	rand.Seed(time.Now().UnixNano())
+
+	numberOfRotors := rand.Intn(100)
+	m := Generate(numberOfRotors)
 
 	os.MkdirAll("../../test/generate", os.ModePerm)
 	err := Write(m, "../../test/generate/generated-2.json")
@@ -86,6 +104,12 @@ func areSimilar(m1 *Machine, m2 *Machine) bool {
 	} else if m2 == nil || m1 == nil {
 		return false
 	}
+
+	if m1.numberOfRotors != m2.numberOfRotors {
+		return false
+	}
+
+	numberOfRotors := m1.numberOfRotors
 
 	// Pathways
 	for i := 0; i < numberOfRotors; i++ {
