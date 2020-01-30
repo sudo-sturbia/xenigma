@@ -12,60 +12,76 @@ func TestStepRotors(t *testing.T) {
 	testMachine.setNumberOfRotors(3)
 	testMachine.initRotors([]int{0, 0, 0}, 1, alphabetSize)
 	if takeSteps(testMachine, 1); !isPosCorrect(testMachine, []int{1, 0, 0}) {
-		t.Errorf("incorrect positions after 1 step")
+		t.Errorf("incorrect positions after 1 step using default configurations")
 	}
 
 	if takeSteps(testMachine, alphabetSize); !isPosCorrect(testMachine, []int{1, 1, 0}) {
-		t.Errorf("incorrect positions after 27 steps")
+		t.Errorf("incorrect positions after 27 steps using default configurations")
 	}
 
-	// Different step -> 5
+	// Different step -> 13
 	testMachine.setNumberOfRotors(3)
-	testMachine.initRotors([]int{0, 0, 0}, 5, alphabetSize)
-	if takeSteps(testMachine, 1); !isPosCorrect(testMachine, []int{5, 0, 0}) {
+	testMachine.initRotors([]int{0, 0, 0}, 13, alphabetSize)
+	if takeSteps(testMachine, 1); !isPosCorrect(testMachine, []int{13, 0, 0}) {
 		t.Errorf(
-			"incorrect positions after 1 step of size 5, expected %v, got %v",
-			[]int{5, 0, 0}, testMachine.CurrentRotors(),
+			"incorrect positions after 1 step of size 13,\n expected %v, got %v",
+			[]int{13, 0, 0}, testMachine.CurrentRotors(),
 		)
 
 	}
 
-	if takeSteps(testMachine, alphabetSize); !isPosCorrect(testMachine, []int{5, 5, 0}) {
+	if takeSteps(testMachine, alphabetSize); !isPosCorrect(testMachine, []int{13, 13, 0}) {
 		t.Errorf(
-			"incorrect positions after 27 steps of with step size 5, expected %v, got %v",
-			[]int{5, 5, 0}, testMachine.CurrentRotors(),
+			"incorrect positions after 27 steps of size 13, expected %v, got %v",
+			[]int{13, 13, 0}, testMachine.CurrentRotors(),
 		)
 	}
 
-	// Different cycle -> 3
+	// Different cycle -> 2
 	testMachine.setNumberOfRotors(3)
-	testMachine.initRotors([]int{0, 0, 0}, 1, 3)
+	testMachine.initRotors([]int{0, 0, 0}, 1, 2)
 	if takeSteps(testMachine, 1); !isPosCorrect(testMachine, []int{1, 0, 0}) {
 		t.Errorf(
-			"incorrect positions after 1 step with cycle size 3, expected %v, got %v",
+			"incorrect positions after 1 step with cycle size 2, expected %v, got %v",
 			[]int{1, 0, 0}, testMachine.CurrentRotors(),
 		)
 	}
 
-	if takeSteps(testMachine, alphabetSize); !isPosCorrect(testMachine, []int{1, 9, 3}) {
+	if takeSteps(testMachine, alphabetSize); !isPosCorrect(testMachine, []int{1, 13, 6}) {
 		t.Errorf(
-			"incorrect positions after 27 steps with cycle size 3, expected %v, got %v",
-			[]int{1, 9, 3}, testMachine.CurrentRotors(),
+			"incorrect positions after 27 steps with cycle size 2, expected %v, got %v",
+			[]int{1, 13, 6}, testMachine.CurrentRotors(),
 		)
 	}
 
-	// TODO
-	// Different step size and cycle size
+	// Different step size -> 2 and cycle size -> 2
+	testMachine.setNumberOfRotors(3)
+	testMachine.initRotors([]int{2, 4, 0}, 2, 2)
 
-	// TODO
-	// Variable number of rotors
+	if takeSteps(testMachine, 20); !isPosCorrect(testMachine, []int{16, 14, 5}) {
+		t.Errorf(
+			"incorrect positions after 1 step with cycle size 2, expected %v, got %v",
+			[]int{16, 14, 5}, testMachine.CurrentRotors(),
+		)
+	}
+
+	// Different number of rotors -> 12
+	testMachine.setNumberOfRotors(12)
+	testMachine.initRotors([]int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, 1, 26)
+
+	if takeSteps(testMachine, 11881376); !isPosCorrect(testMachine, []int{0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0}) {
+		t.Errorf(
+			"incorrect positions after 11881376 steps for a 12 rotor machine, expected %v, got %v",
+			[]int{0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0}, testMachine.CurrentRotors(),
+		)
+	}
 }
 
 // Test initialization of rotors.
 func TestInitRotors(t *testing.T) {
 	testMachine := new(Machine)
 
-	// Correct initialization
+	// 3 rotors - correct initialization
 	testMachine.setNumberOfRotors(3)
 	if err := testMachine.initRotors([]int{4, 2, 0}, 2, 13); err != nil {
 		t.Errorf("correct init produces err, message %s", err.Error())
@@ -75,13 +91,43 @@ func TestInitRotors(t *testing.T) {
 		t.Errorf("machine properties are incorrect")
 	}
 
-	// Incorrect initialization
+	// 3 rotors - incorrect initialization
 	testMachine.setNumberOfRotors(3)
-	if err := testMachine.initRotors([]int{3, 1, 0}, 2, 26); err == nil {
+	if err := testMachine.initRotors([]int{3, 1, 0}, 2, 13); err == nil {
 		t.Errorf("incorrect init doesn't produce err")
 	}
 
-	if !arePropertiesCorrect(testMachine, []int{3, 1, 0}, 2, 26) {
+	if !arePropertiesCorrect(testMachine, []int{0, 0, 0}, 2, 13) {
+		t.Errorf("machine properties are incorrect")
+	}
+
+	// 15 rotors - correct initialization
+	testMachine.setNumberOfRotors(15)
+	if err := testMachine.initRotors([]int{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, 1, 26); err != nil {
+		t.Errorf("correct init produces err, message %s", err.Error())
+	}
+
+	if !arePropertiesCorrect(testMachine, []int{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, 1, 26) {
+		t.Errorf("machine properties are incorrect")
+	}
+
+	// 15 rotors - incorrect initialization
+	testMachine.setNumberOfRotors(15)
+	if err := testMachine.initRotors([]int{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0}, 2, 13); err == nil {
+		t.Errorf("incorrect init doesn't produce err")
+	}
+
+	if !arePropertiesCorrect(testMachine, []int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, 2, 13) {
+		t.Errorf("machine properties are incorrect")
+	}
+
+	// 15 rotors - incorrect initialization
+	testMachine.setNumberOfRotors(7)
+	if err := testMachine.initRotors([]int{2, 4, 2, 4, 2, 4, 2}, 23, 42); err == nil {
+		t.Errorf("incorrect init doesn't produce err")
+	}
+
+	if !arePropertiesCorrect(testMachine, []int{2, 4, 2, 4, 2, 4, 2}, 1, 26) {
 		t.Errorf("machine properties are incorrect")
 	}
 }

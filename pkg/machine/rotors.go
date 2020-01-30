@@ -7,7 +7,7 @@ import (
 
 // initRotors initializes all components related to rotors.
 // If incorrect values are given fields are set to default
-// values and an error is returned.
+// and an error is returned.
 func (m *Machine) initRotors(positions []int, stepSize int, cycleSize int) (err error) {
 	if tempErr := m.setStepAndCycle(stepSize, cycleSize); tempErr != nil {
 		err = tempErr
@@ -18,6 +18,8 @@ func (m *Machine) initRotors(positions []int, stepSize int, cycleSize int) (err 
 	}
 
 	if tempErr := m.setTakenSteps(positions); tempErr != nil {
+		m.resetRotors()
+
 		err = tempErr
 	}
 
