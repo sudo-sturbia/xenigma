@@ -7,7 +7,7 @@ import (
 )
 
 // Encrypt encrypts a string using a Machine object.
-// returns encrypted string and an error in case of an incorrect configuration.
+// Returns encrypted string and an error in case of an incorrect configuration.
 // Non-alphabetical characters are returned without change, and don't affect
 // rotors' movement (rotors are not shifted).
 func (m *Machine) Encrypt(message string) (string, error) {

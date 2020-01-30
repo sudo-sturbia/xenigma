@@ -10,7 +10,10 @@ import (
 // Example of usage of the enigma package.
 func Example() {
 	// Generate a random configuration
-	m := Generate()
+	rand.Seed(time.Now().UnixNano())
+
+	numberOfRotors := rand.Intn(100)
+	m := Generate(numberOfRotors)
 
 	// Encrypt a message
 	message := "Hello, world!"

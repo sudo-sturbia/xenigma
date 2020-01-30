@@ -18,7 +18,7 @@ type jsonMachine struct {
 	RotorsPositions      []string               `json:"rotorPositions"`
 }
 
-// Read loads a machine and verifies its configurations from a JSON file.
+// Read loads a machine from a JSON file and verifies its configurations.
 // Returns a pointer to the loaded Machine and an error in case of incorrect loading.
 func Read(path string) (*Machine, error) {
 	file, err := os.Open(path)

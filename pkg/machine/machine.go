@@ -3,18 +3,23 @@ Package machine represents an enigma machine used for encryption and
 decryption of text messages.
 
 The machine consists of the following components: electric pathways,
-reflector, plugboard, and 3 rotors.
+reflector, plugboard, and a variable number rotors. All of which can
+be configured through JSON or a collective setter.
 
-A machine can be created using machine.Load, machine.Generate, or by
-simply creating a Machine object and calling SetComponents method.
+A machine can be created using machine.Load, machine.Generate, machine.Read,
+or by simply creating a Machine object and calling SetComponents method.
 
 machine.Load is meant for usage in an independent program. The other
-two options are more suitable for usage when the package is imported.
+three options are more suitable for usage when the package is imported.
+
+A machine can have any number of rotors given that it's > 0. Other
+properties related to rotors such as step and cycle sizes can also be
+configured.
 
 Encrypt method is used to encrypt (or decrypt) a given message as
 the following example
-	m := machine.Generate()
-	encrypted := m.Encrypt("message")
+    m := machine.Generate(3)
+    encrypted := m.Encrypt("message")
 
 Licensed under MIT license @github.com/sudo-sturbia
 */
@@ -49,12 +54,12 @@ type Machine struct {
 // to file, a machine object with the same configs is returned and error
 // is nil. Otherwise an initialization error is returned and Machine is nil.
 func Load(numberOfRotors int, overwrite bool) (*Machine, error) {
-	machine, err := read(os.Getenv("HOME") + "/.config/enigma.json")
+	machine, err := Read(os.Getenv("HOME") + "/.config/enigma.json")
 
 	if err != nil {
 		if overwrite {
 			machine = Generate(numberOfRotors)
-			if err = write(machine, os.Getenv("HOME")+"/.config/enigma.json"); err != nil {
+			if err = Write(machine, os.Getenv("HOME")+"/.config/enigma.json"); err != nil {
 				return machine, &initError{err.Error()}
 			}
 

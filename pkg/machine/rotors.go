@@ -147,14 +147,13 @@ func (m *Machine) setStep(value int) error {
 	return nil
 }
 
-// Step returns rotors' step size.
+// Step returns rotors' step size. Step represents the number of positions
+// a rotor jumps when taking one step. The default size of a step is 1.
 func (m *Machine) Step() int {
 	return m.step
 }
 
 // setCycle sets size of rotor's full cycle.
-// Cycle is the number of steps that represent a rotor's full cycle
-// It indicates when the following rotor should be shifted.
 // If given value is invalid cycle size is set to 26.
 func (m *Machine) setCycle(value int) error {
 	if value <= 0 {
@@ -166,7 +165,10 @@ func (m *Machine) setCycle(value int) error {
 	return nil
 }
 
-// Cycle returns rotors' cycle size.
+// Cycle returns rotors' cycle size. Cycle is the number of steps that
+// represent a rotor's full cycle. Cycle is used to indicate when
+// rotor should step (move) based on the number of steps taken by preceding
+// rotor. The default size of a cycle is 26 (alphabet size).
 func (m *Machine) Cycle() int {
 	return m.cycle
 }

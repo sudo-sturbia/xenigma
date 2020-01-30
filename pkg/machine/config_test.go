@@ -19,7 +19,7 @@ func TestReadCorrectConfig(t *testing.T) {
 		t.Errorf("error occured while reading correct configuration 2\n%s", err2.Error())
 	}
 
-	_, err3 := read("../../test/data/config-3.json")
+	_, err3 := Read("../../test/data/config-3.json")
 	if err3 != nil {
 		t.Errorf("error occured while reading correct configuration 3\n%s", err3.Error())
 	}
@@ -47,7 +47,7 @@ func TestReadIncorrectConfig(t *testing.T) {
 		t.Errorf("error not detected in incorrect configuration 4")
 	}
 
-	_, err5 := read("../../test/data/wrong-config-5.json")
+	_, err5 := Read("../../test/data/wrong-config-5.json")
 	if err5 == nil {
 		t.Errorf("error not detected in incorrect configuration 5")
 	}
