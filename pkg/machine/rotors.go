@@ -80,12 +80,14 @@ func (m *Machine) resetRotors() {
 // be calculated) and taken steps are set to 0 for all rotors.
 func (m *Machine) setTakenSteps(position []int) error {
 	m.takenSteps = make([]int, m.numberOfRotors-1)
-	for i := 0; i < m.numberOfRotors-1; i++ {
+	for i := 0; i < m.numberOfRotors; i++ {
 		if (position[i] % m.step) != 0 {
 			m.resetTakenSteps()
 			return &initError{"given position of rotors is incorrect"}
 		}
+	}
 
+	for i := 0; i < m.numberOfRotors-1; i++ {
 		m.takenSteps[i] = (position[i] / m.step) % m.cycle
 	}
 

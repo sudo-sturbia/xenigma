@@ -19,9 +19,9 @@ func TestStepRotors(t *testing.T) {
 		t.Errorf("incorrect positions after 27 steps using default configurations")
 	}
 
-	// Different step -> 13
+	// Different step -> 13, different cycle 2
 	testMachine.setNumberOfRotors(3)
-	testMachine.initRotors([]int{0, 0, 0}, 13, alphabetSize)
+	testMachine.initRotors([]int{0, 0, 0}, 13, 2)
 	if takeSteps(testMachine, 1); !isPosCorrect(testMachine, []int{13, 0, 0}) {
 		t.Errorf(
 			"incorrect positions after 1 step of size 13,\n expected %v, got %v",
@@ -54,14 +54,14 @@ func TestStepRotors(t *testing.T) {
 		)
 	}
 
-	// Different step size -> 2 and cycle size -> 2
+	// Different step size -> 2 and cycle size -> 13
 	testMachine.setNumberOfRotors(3)
-	testMachine.initRotors([]int{2, 4, 0}, 2, 2)
+	testMachine.initRotors([]int{2, 4, 0}, 2, 13)
 
-	if takeSteps(testMachine, 20); !isPosCorrect(testMachine, []int{16, 14, 5}) {
+	if takeSteps(testMachine, 20); !isPosCorrect(testMachine, []int{16, 6, 0}) {
 		t.Errorf(
 			"incorrect positions after 1 step with cycle size 2, expected %v, got %v",
-			[]int{16, 14, 5}, testMachine.CurrentRotors(),
+			[]int{16, 6, 0}, testMachine.CurrentRotors(),
 		)
 	}
 
@@ -141,10 +141,10 @@ func TestSetTakenSteps(t *testing.T) {
 	testMachine.setCycle(13)
 
 	// Correct position
-	if err := testMachine.setTakenSteps([]int{2, 4, 3}); err != nil {
+	if err := testMachine.setTakenSteps([]int{2, 4, 4}); err != nil {
 		t.Errorf("correct position produces err")
 	} else {
-		steps := []int{1, 0, 0}
+		steps := []int{1, 2, 2}
 		for i, step := range testMachine.takenSteps {
 			if steps[i] != step {
 				t.Errorf("incorrect taken step\n expected %v, found %v", steps[i], step)
