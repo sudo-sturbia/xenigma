@@ -118,8 +118,13 @@ func parseMachineJSON(fileContents []byte) (*Machine, error) {
 }
 
 // Write writes configurations of a Machine object to a JSON file.
-// Returns an error if unable to write.
-func Write(m *Machine, path string) error {
+// Returns an error if Machine is not initialized correctly ot
+// unable to write to file.
+func (m *Machine) Write(path string) error {
+	if err := m.isInit(); err != nil {
+		return err
+	}
+
 	jsonM := new(jsonMachine)
 
 	// Electric pathways

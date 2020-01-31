@@ -61,7 +61,7 @@ func TestWrite(t *testing.T) {
 	m := Generate(numberOfRotors)
 
 	os.MkdirAll("../../test/generate", os.ModePerm)
-	err := Write(m, "../../test/generate/generated-1.json")
+	err := m.Write("../../test/generate/generated-1.json")
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -80,7 +80,7 @@ func TestReadAndWrite(t *testing.T) {
 	m := Generate(numberOfRotors)
 
 	os.MkdirAll("../../test/generate", os.ModePerm)
-	err := Write(m, "../../test/generate/generated-2.json")
+	err := m.Write("../../test/generate/generated-2.json")
 	if err != nil {
 		t.Errorf(err.Error())
 	}

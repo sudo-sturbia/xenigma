@@ -59,7 +59,7 @@ func Load(numberOfRotors int, overwrite bool) (*Machine, error) {
 	if err != nil {
 		if overwrite {
 			machine = Generate(numberOfRotors)
-			if err = Write(machine, os.Getenv("HOME")+"/.config/enigma.json"); err != nil {
+			if err = machine.Write(os.Getenv("HOME") + "/.config/enigma.json"); err != nil {
 				return machine, &initError{err.Error()}
 			}
 

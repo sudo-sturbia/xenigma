@@ -22,7 +22,7 @@ func Example() {
 	fmt.Printf("message: %s, encryption: %s\n", message, encrypted)
 
 	// Write configurations to a JSON file
-	err := Write(m, "generate/generated.json")
+	err := m.Write("generate/generated.json")
 	if err != nil {
 		panic("couldn't save configuratoins")
 	}
@@ -58,7 +58,7 @@ func TestReadWriteEncrypt(t *testing.T) {
 	numberOfRotors := rand.Intn(100)
 	m := Generate(numberOfRotors)
 
-	err := Write(m, "../../test/generate/generated-3.json")
+	err := m.Write("../../test/generate/generated-3.json")
 	if err != nil {
 		t.Errorf(err.Error())
 	}
