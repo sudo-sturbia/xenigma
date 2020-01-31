@@ -16,10 +16,13 @@ type jsonMachine struct {
 	Reflector            [alphabetSize]string   `json:"reflector"`
 	PlugboardConnections [alphabetSize]string   `json:"plugboard"`
 	RotorsPositions      []string               `json:"rotorPositions"`
+	Step                 int                    `json:"rotorStep"`
+	Cycle                int                    `json:"rotorCycle"`
 }
 
 // Read loads a machine from a JSON file and verifies its configurations.
 // Returns a pointer to the loaded Machine and an error in case of incorrect loading.
+// If rotor's step and cycle sizes are not determined defaults are used.
 func Read(path string) (*Machine, error) {
 	file, err := os.Open(path)
 	if err != nil {
@@ -112,7 +115,18 @@ func parseMachineJSON(fileContents []byte) (*Machine, error) {
 
 	}
 
-	m.initRotors(rotorsPositions, DefaultStep, DefaultCycle)
+	step := jsonM.Step
+	cycle := jsonM.Cycle
+
+	if step <= 0 {
+		step = DefaultStep
+	}
+
+	if cycle <= 0 {
+		cycle = DefaultCycle
+	}
+
+	m.initRotors(rotorsPositions, step, cycle)
 
 	return m, nil
 }
@@ -148,6 +162,9 @@ func (m *Machine) Write(path string) error {
 	for i := 0; i < m.numberOfRotors; i++ {
 		jsonM.RotorsPositions[i] = intToStr(m.CurrentRotors()[i])
 	}
+
+	jsonM.Step = m.step
+	jsonM.Cycle = m.cycle
 
 	contents, err := json.MarshalIndent(jsonM, "", "\t")
 	if err != nil {
