@@ -105,12 +105,6 @@ func (m *Machine) resetTakenSteps() {
 // If given values are incorrect or incompatibe both fields are set
 // to default. Step = 1, Cycle = 26.
 func (m *Machine) setStepAndCycle(stepSize int, cycleSize int) error {
-	if err := m.verifyStepCycle(stepSize, cycleSize); err != nil {
-		m.setStep(DefaultStep)
-		m.setCycle(DefaultCycle)
-		return err
-	}
-
 	err1 := m.setStep(stepSize)
 	err2 := m.setCycle(cycleSize)
 
@@ -120,6 +114,12 @@ func (m *Machine) setStepAndCycle(stepSize int, cycleSize int) error {
 
 	if err2 != nil {
 		return err2
+	}
+
+	if err := m.verifyStepCycle(m.step, m.cycle); err != nil {
+		m.setStep(DefaultStep)
+		m.setCycle(DefaultCycle)
+		return err
 	}
 
 	return nil

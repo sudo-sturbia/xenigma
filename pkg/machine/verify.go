@@ -40,6 +40,10 @@ func (m *Machine) isInit() error {
 
 // areRotorsInit returns true if rotors are initialized correctly.
 func (m *Machine) areRotorsInit() bool {
+	if m.rotors == nil {
+		return false
+	}
+
 	for _, rotor := range m.rotors {
 		if !helper.AreElementsOrderedIndices(rotor[:]) {
 			return false
@@ -51,6 +55,10 @@ func (m *Machine) areRotorsInit() bool {
 
 // arePathwaysInit returns true if pathways are initialized correctly.
 func (m *Machine) arePathwaysInit() bool {
+	if m.pathConnections == nil {
+		return false
+	}
+
 	for _, pathwaysArr := range m.pathConnections {
 		if !helper.AreElementsIndices(pathwaysArr[:]) {
 			return false
