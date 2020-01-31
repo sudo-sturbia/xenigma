@@ -29,7 +29,15 @@ import (
 	"os"
 )
 
-const alphabetSize = 26
+const (
+	alphabetSize = 26
+
+	// DefaultStep represents a Machine's default step size.
+	DefaultStep = 1
+
+	// DefaultCycle represents a Machine's default cycle size.
+	DefaultCycle = 26
+)
 
 // Machine represents an enigma machine with mechanical components.
 // Components are electric pathways, reflector, plugboard, and rotors.

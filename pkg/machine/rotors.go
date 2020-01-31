@@ -106,8 +106,8 @@ func (m *Machine) resetTakenSteps() {
 // to default. Step = 1, Cycle = 26.
 func (m *Machine) setStepAndCycle(stepSize int, cycleSize int) error {
 	if err := m.verifyStepCycle(stepSize, cycleSize); err != nil {
-		m.setStep(1)
-		m.setCycle(alphabetSize)
+		m.setStep(DefaultStep)
+		m.setCycle(DefaultCycle)
 		return err
 	}
 
@@ -139,7 +139,7 @@ func (m *Machine) verifyStepCycle(stepSize int, cycleSize int) error {
 // If given value is invalid step size is set to 1.
 func (m *Machine) setStep(value int) error {
 	if value <= 0 {
-		m.step = 1
+		m.step = DefaultStep
 		return &initError{"invalid step size"}
 	}
 
@@ -157,7 +157,7 @@ func (m *Machine) Step() int {
 // If given value is invalid cycle size is set to 26.
 func (m *Machine) setCycle(value int) error {
 	if value <= 0 {
-		m.cycle = alphabetSize
+		m.cycle = DefaultCycle
 		return &initError{"invalid cycle size"}
 	}
 

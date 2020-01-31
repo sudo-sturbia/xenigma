@@ -73,5 +73,5 @@ func (m *Machine) randRotors() {
 		rotorsPositions[i] = rand.Intn(alphabetSize)
 	}
 
-	m.initRotors(rotorsPositions, 1, alphabetSize)
+	m.initRotors(rotorsPositions, DefaultStep, DefaultCycle)
 }

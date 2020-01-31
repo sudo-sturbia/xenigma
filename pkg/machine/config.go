@@ -112,7 +112,7 @@ func parseMachineJSON(fileContents []byte) (*Machine, error) {
 
 	}
 
-	m.initRotors(rotorsPositions, 1, alphabetSize)
+	m.initRotors(rotorsPositions, DefaultStep, DefaultCycle)
 
 	return m, nil
 }
