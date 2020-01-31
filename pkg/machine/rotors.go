@@ -17,29 +17,35 @@ func (m *Machine) initRotors(positions []int, stepSize int, cycleSize int) (err 
 	}
 
 	if tempErr := m.setTakenSteps(positions); tempErr != nil {
-		m.resetRotors()
-
 		err = tempErr
 	}
 
 	return err
 }
 
+// UseRotorDefaults use default value for rotor related components.
+// Defaults are ["a", "a", "a"] for rotors' positions, 1 for step size,
+// and 26 for cycle size.
+func (m *Machine) UseRotorDefaults() {
+	m.resetRotors()
+	m.resetTakenSteps()
+
+	m.setStep(DefaultStep)
+	m.setCycle(DefaultCycle)
+}
+
 // setRotorsPosition sets current position of each rotor.
-// If given positions are invalid all positions are set to
-// default value (starting at 0).
+// If given positions are invalid an error is returned.
 func (m *Machine) setRotorsPosition(positions []int) error {
 	m.rotors = make([][alphabetSize]int, m.numberOfRotors)
 
 	if len(positions) != m.numberOfRotors {
-		m.resetRotors()
 		return &initError{"number of rotors =/= number of given positions"}
 	}
 
 	// Verify positions
 	for i := 0; i < m.numberOfRotors; i++ {
 		if positions[i] < 0 || positions[i] > alphabetSize {
-			m.resetRotors()
 			return &initError{fmt.Sprintf("invalid position for rotor %d", i)}
 		}
 	}
@@ -77,12 +83,11 @@ func (m *Machine) resetRotors() {
 // with the calculated values.
 // An error is returned if the given position of the rotors can't
 // be reached using specified step and cycle values (takenSteps can't
-// be calculated) and taken steps are set to 0 for all rotors.
+// be calculated).
 func (m *Machine) setTakenSteps(position []int) error {
 	m.takenSteps = make([]int, m.numberOfRotors-1)
 	for i := 0; i < m.numberOfRotors; i++ {
 		if (position[i] % m.step) != 0 {
-			m.resetTakenSteps()
 			return &initError{"given position of rotors is incorrect"}
 		}
 	}
@@ -125,9 +130,16 @@ func (m *Machine) setStepAndCycle(stepSize int, cycleSize int) error {
 	return nil
 }
 
-// verifyStepCycle verifies that a full machine cycle can be achieved
-// using given step (full machine cycle breaks into a whole number of steps).
+// verifyStepCycle verifies that both step and cycle sizes are positive
+// and that the given step-cycle combination produces no position collisions
+// when used (a position can not be achieved using several step sequences).
 func (m *Machine) verifyStepCycle(stepSize int, cycleSize int) error {
+	if stepSize <= 0 {
+		return &initError{"invalid step size"}
+	} else if cycleSize <= 0 {
+		return &initError{"invalid cycle size"}
+	}
+
 	if ((alphabetSize) % (stepSize * cycleSize)) != 0 {
 		return &initError{"cycle size and step size are not compatible, some collisions may occur"}
 	}
@@ -136,10 +148,8 @@ func (m *Machine) verifyStepCycle(stepSize int, cycleSize int) error {
 }
 
 // setStep sets rotors' step size.
-// If given value is invalid step size is set to 1.
 func (m *Machine) setStep(value int) error {
 	if value <= 0 {
-		m.step = DefaultStep
 		return &initError{"invalid step size"}
 	}
 
@@ -157,7 +167,6 @@ func (m *Machine) Step() int {
 // If given value is invalid cycle size is set to 26.
 func (m *Machine) setCycle(value int) error {
 	if value <= 0 {
-		m.cycle = DefaultCycle
 		return &initError{"invalid cycle size"}
 	}
 
@@ -188,7 +197,8 @@ func (m *Machine) NumberOfRotors() int {
 	return m.numberOfRotors
 }
 
-// stepRotors turns first rotor one step.
+// stepRotors turns first rotor one step forward and turns other rotors
+// accordingy (based on number of previously taken steps).
 func (m *Machine) stepRotors() {
 	for i := 0; i < m.numberOfRotors; i++ {
 		// If previous rotor completed a full cycle

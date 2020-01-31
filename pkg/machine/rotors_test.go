@@ -97,10 +97,6 @@ func TestInitRotors(t *testing.T) {
 		t.Errorf("incorrect init doesn't produce err")
 	}
 
-	if !arePropertiesCorrect(testMachine, []int{0, 0, 0}, 2, 13) {
-		t.Errorf("machine properties are incorrect")
-	}
-
 	// 15 rotors - correct initialization
 	testMachine.setNumberOfRotors(15)
 	if err := testMachine.initRotors([]int{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, 1, 26); err != nil {
@@ -115,10 +111,6 @@ func TestInitRotors(t *testing.T) {
 	testMachine.setNumberOfRotors(15)
 	if err := testMachine.initRotors([]int{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0}, 2, 13); err == nil {
 		t.Errorf("incorrect init doesn't produce err")
-	}
-
-	if !arePropertiesCorrect(testMachine, []int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, 2, 13) {
-		t.Errorf("machine properties are incorrect")
 	}
 
 	// 15 rotors - incorrect initialization
