@@ -46,11 +46,11 @@ type Machine struct {
 	reflector            [alphabetSize]int   // Reflector connections, symmetric
 	plugboardConnections [alphabetSize]int   // Plugboard connections, symmetric
 
-	numberOfRotors int                 // Number of rotors used in the machine
-	rotors         [][alphabetSize]int // Mechanical rotors, 1st element is rotor's position
-	takenSteps     []int               // Number of steps taken by each rotor except the last
-	step           int                 // Size of shift between rotor steps (move)
-	cycle          int                 // Number of rotor steps considered a full cycle
+	numberOfRotors int   // Number of rotors used in the machine
+	rotors         []int // Mechanical rotors' heads
+	takenSteps     []int // Number of steps taken by each rotor except the last
+	step           int   // Size of shift between rotor steps (move)
+	cycle          int   // Number of rotor steps considered a full cycle
 }
 
 // Load returns a fully initialized Machine object. Configurations of

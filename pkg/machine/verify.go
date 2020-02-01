@@ -45,8 +45,8 @@ func (m *Machine) areRotorsInit() bool {
 		return false
 	}
 
-	for _, rotor := range m.rotors {
-		if !helper.AreElementsOrderedIndices(rotor[:]) {
+	for _, rotorHead := range m.rotors {
+		if rotorHead < 0 || rotorHead >= alphabetSize {
 			return false
 		}
 	}
@@ -55,7 +55,7 @@ func (m *Machine) areRotorsInit() bool {
 		return false
 	}
 
-	if err := m.arePositionsValid(m.CurrentRotors()); err != nil {
+	if err := m.arePositionsValid(m.RotorPositions()); err != nil {
 		return false
 	}
 

@@ -146,7 +146,7 @@ func areSimilar(m1 *Machine, m2 *Machine) bool {
 
 	// Rotors
 	for i := 0; i < numberOfRotors; i++ {
-		if m1.rotors[i][0] != m2.rotors[i][0] {
+		if m1.rotors[i] != m2.rotors[i] {
 			return false
 		}
 	}
