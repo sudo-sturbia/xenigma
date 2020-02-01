@@ -7,5 +7,7 @@
     ],
     "reflector": ["q", "y", "x", "n", "o", "r", "t", "w", "v", "p", "u", "z", "s", "d", "e", "j", "a", "f", "m", "g", "k", "i", "h", "c", "b", "l"],
     "plugboard": ["q", "y", "x", "n", "o", "r", "t", "w", "v", "p", "u", "z", "s", "d", "e", "j", "a", "f", "m", "g", "k", "i", "h", "c", "b", "l"],
-    "rotorPositions": ["a", "b", "c"]
+    "rotorPositions": ["a", "b", "c"],
+    "rotorStep": 1,
+    "rotorCycle": 26
 }

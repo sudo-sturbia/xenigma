@@ -51,6 +51,16 @@ func TestReadIncorrectConfig(t *testing.T) {
 	if err5 == nil {
 		t.Errorf("error not detected in incorrect configuration 5")
 	}
+
+	_, err6 := Read("../../test/data/wrong-config-6.json")
+	if err6 == nil {
+		t.Errorf("error not detected in incorrect configuration 6")
+	}
+
+	_, err7 := Read("../../test/data/wrong-config-7.json")
+	if err7 == nil {
+		t.Errorf("error not detected in incorrect configuration 7")
+	}
 }
 
 // Test loading of a generated machine.
