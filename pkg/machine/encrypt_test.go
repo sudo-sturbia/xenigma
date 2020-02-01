@@ -3,6 +3,7 @@ package machine
 import (
 	"fmt"
 	"math/rand"
+	"strings"
 	"testing"
 	"time"
 )
@@ -24,7 +25,7 @@ func Example() {
 	// Write configurations to a JSON file
 	err := m.Write("generate/generated.json")
 	if err != nil {
-		panic("couldn't save configuratoins")
+		panic("couldn't save configurations")
 	}
 }
 
@@ -36,8 +37,8 @@ func TestEncrypt(t *testing.T) {
 	}
 
 	encrypted1, _ := m1.Encrypt("Hello, world!")
-	if encrypted1 != "suelb, dpkqr!" {
-		t.Errorf("incorrect encryption of \"Hello, world!\",\nexpected \"suelb, dpkqr!\", got \"%s\"", encrypted1)
+	if encrypted1 != "sispr, areko!" {
+		t.Errorf("incorrect encryption of \"Hello, world!\",\nexpected \"sispr, areko!\", got \"%s\"", encrypted1)
 	}
 
 	m2, err := Read("../../test/data/config-2.json")
@@ -46,8 +47,38 @@ func TestEncrypt(t *testing.T) {
 	}
 
 	encrypted2, _ := m2.Encrypt("Hello, again!")
-	if encrypted2 != "rbhxx, zihgu!" {
-		t.Errorf("incorrect encryption of \"Hello, again!\",\nexpected \"rbhxx, zihgu!\", got \"%s\"", encrypted2)
+	if encrypted2 != "lcsml, fccmb!" {
+		t.Errorf("incorrect encryption of \"Hello, again!\",\nexpected \"lcsml, fccmb!\", got \"%s\"", encrypted2)
+	}
+}
+
+// Test encryption and decryption of messages.
+func TestEncryptDecrypt(t *testing.T) {
+	encryptor, err := Read("../../test/data/config-1.json")
+	if err != nil {
+		t.Errorf("could not read configurations\n%s", err.Error())
+	}
+
+	decryptor, err := Read("../../test/data/config-1.json")
+	if err != nil {
+		t.Errorf("could not read configurations\n%s", err.Error())
+	}
+
+	message := "Hello, world!"
+	encrypted, _ := encryptor.Encrypt(message)
+	decrypted, _ := decryptor.Encrypt(encrypted)
+
+	if decrypted != strings.ToLower(message) {
+		t.Errorf("incorrect decryption of %s,\nexpected %s, got %s", encrypted, message, decrypted)
+	}
+
+	message = "This is an example of encryption using an enigma machine.\n" +
+		"Encrypted messages can also be decrypted using the same machine."
+	encrypted, _ = encryptor.Encrypt(message)
+	decrypted, _ = decryptor.Encrypt(encrypted)
+
+	if decrypted != strings.ToLower(message) {
+		t.Errorf("incorrect decryption of %s,\nexpected %s, got %s", encrypted, message, decrypted)
 	}
 }
 
@@ -94,8 +125,8 @@ func TestEncryptCharAlpha(t *testing.T) {
 
 	// r -> u
 	encrypted1 := m1.encryptChar('r')
-	if encrypted1 != 'u' {
-		t.Errorf("character 'r' encrypted to '%c', expected 'u'", encrypted1)
+	if encrypted1 != 'n' {
+		t.Errorf("character 'r' encrypted to '%c', expected 'n'", encrypted1)
 	}
 
 	// Using configuration 2
@@ -106,8 +137,8 @@ func TestEncryptCharAlpha(t *testing.T) {
 
 	// s -> d
 	encrypted2 := m2.encryptChar('s')
-	if encrypted2 != 'd' {
-		t.Errorf("character 's' encrypted to '%c', expected 'd'", encrypted2)
+	if encrypted2 != 'r' {
+		t.Errorf("character 's' encrypted to '%c', expected 'r'", encrypted2)
 	}
 
 }
