@@ -120,19 +120,27 @@ func TestInitRotors(t *testing.T) {
 	}
 }
 
-/*
-// Test calculation of taken steps.
-func TestSetTakenSteps(t *testing.T) {
+// Test position and taken steps setter.
+func TestSetPosition(t *testing.T) {
 	testMachine := new(Machine)
 
+	// 1st configuration
 	testMachine.setNumberOfRotors(3)
 	testMachine.setStep(2)
 	testMachine.setCycle(13)
 
-	// Correct position
-	if err := testMachine.setTakenSteps([]int{2, 4, 4}); err != nil {
+	if err := testMachine.setRotorsPosition([]int{2, 4, 4}); err != nil {
 		t.Errorf("correct position produces err")
 	} else {
+		// Verify position
+		positions := []int{2, 4, 4}
+		for i, pos := range testMachine.CurrentRotors() {
+			if positions[i] != pos {
+				t.Errorf("incorrect position\n expected %v, found %v", positions[i], pos)
+			}
+		}
+
+		// Verify taken steps
 		steps := []int{1, 2, 2}
 		for i, step := range testMachine.takenSteps {
 			if steps[i] != step {
@@ -141,26 +149,31 @@ func TestSetTakenSteps(t *testing.T) {
 		}
 	}
 
-	// Incorrect position
-	if err := testMachine.setTakenSteps([]int{1, 2, 0}); err == nil {
-		t.Errorf("incorrect position produces err")
-	} else {
-		steps := []int{0, 0, 0}
-		for i, step := range testMachine.takenSteps {
-			if steps[i] != step {
-				t.Errorf("incorrect taken step\n expected %v, found %v", steps[i], step)
-			}
-		}
+	if err := testMachine.setRotorsPosition([]int{1, 2, 0}); err == nil {
+		t.Errorf("incorrect position doesn't produce err")
 	}
 
+	if err := testMachine.setRotorsPosition([]int{3, -22, 6}); err == nil {
+		t.Errorf("incorrect position doesn't produce err")
+	}
+
+	// 2nd configuration
 	testMachine.setNumberOfRotors(7)
 	testMachine.setStep(13)
 	testMachine.setCycle(2)
 
-	// Correct position
-	if err := testMachine.setTakenSteps([]int{13, 13, 0, 13, 13, 13, 0}); err != nil {
+	if err := testMachine.setRotorsPosition([]int{13, 13, 0, 13, 13, 13, 0}); err != nil {
 		t.Errorf("correct position produces err")
 	} else {
+		// Verify position
+		positions := []int{13, 13, 0, 13, 13, 13, 0}
+		for i, pos := range testMachine.CurrentRotors() {
+			if positions[i] != pos {
+				t.Errorf("incorrect position\n expected %v, found %v", positions[i], pos)
+			}
+		}
+
+		// Verify taken steps
 		steps := []int{1, 1, 0, 1, 1, 1, 0}
 		for i, step := range testMachine.takenSteps {
 			if steps[i] != step {
@@ -169,61 +182,45 @@ func TestSetTakenSteps(t *testing.T) {
 		}
 	}
 
-	// Incorrect position
-	if err := testMachine.setTakenSteps([]int{14, 12, 1, 0, 0, 0, 0}); err == nil {
-		t.Errorf("incorrect position produces err")
-	} else {
-		steps := []int{0, 0, 0, 0, 0, 0, 0}
-		for i, step := range testMachine.takenSteps {
-			if steps[i] != step {
-				t.Errorf("incorrect taken step\n expected %v, found %v", steps[i], step)
-			}
+	if err := testMachine.setRotorsPosition([]int{14, 12, 1, 0, 0, 0, 0}); err == nil {
+		t.Errorf("incorrect position doesn't produce err")
+	}
+}
+
+// Test validation of step and cycle sizes.
+func TestAreStepCycleValid(t *testing.T) {
+	testMachine := new(Machine)
+
+	correct := [][2]int{
+		{1, 1},
+		{1, 2},
+		{2, 1},
+		{1, 13},
+		{13, 1},
+		{1, 26},
+		{26, 1},
+		{2, 13},
+		{13, 2},
+	}
+
+	for _, comb := range correct {
+		if err := testMachine.areStepCycleValid(comb[0], comb[1]); err != nil {
+			t.Errorf("correct step-cycle produces err")
 		}
 	}
-}
 
-// Test position setter.
-func TestSetPosition(t *testing.T) {
-	testMachine := new(Machine)
-	testMachine.setNumberOfRotors(3)
-
-	// Test wrong positions
-	if err := testMachine.setRotorsPosition([]int{3, -22, 6}); err == nil {
-		t.Errorf("incorrect rotor positions accepted")
+	if err := testMachine.areStepCycleValid(23, 32); err == nil {
+		t.Errorf("incorrect step-cycle doesn't produce err")
 	}
 
-	// Test correct positions
-	if err := testMachine.setRotorsPosition([]int{3, 22, 6}); err != nil {
-		t.Errorf("correct positions not accepted")
+	if err := testMachine.areStepCycleValid(1, -3); err == nil {
+		t.Errorf("incorrect step-cycle doesn't produce err")
+	}
+
+	if err := testMachine.areStepCycleValid(0, 1); err == nil {
+		t.Errorf("incorrect step-cycle doesn't produce err")
 	}
 }
-
-// Test step setter.
-func TestSetStep(t *testing.T) {
-	testMachine := new(Machine)
-
-	if err := testMachine.setStep(23); err != nil {
-		t.Errorf("correct step size \"%d\" not accepted", 23)
-	}
-
-	if err := testMachine.setStep(0); err == nil {
-		t.Errorf("incorrect step size \"%d\" accepted", 0)
-	}
-}
-
-// Test cycle setter.
-func TestCycleSetter(t *testing.T) {
-	testMachine := new(Machine)
-
-	if err := testMachine.setCycle(5); err != nil {
-		t.Errorf("correct cycle size \"%d\" not accepted", 5)
-	}
-
-	if err := testMachine.setCycle(0); err == nil {
-		t.Errorf("incorrect cycle size \"%d\" accepted", 0)
-	}
-}
-*/
 
 // takeSteps steps the rotors given number of steps.
 func takeSteps(m *Machine, steps int) {
