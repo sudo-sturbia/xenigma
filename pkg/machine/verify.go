@@ -38,9 +38,10 @@ func (m *Machine) isInit() error {
 	}
 }
 
-// areRotorsInit returns true if rotors are initialized correctly.
+// areRotorsInit returns true if rotors are initialized correctly and
+// verifies all rotor related values.
 func (m *Machine) areRotorsInit() bool {
-	if m.rotors == nil {
+	if m.rotors == nil || m.takenSteps == nil {
 		return false
 	}
 
@@ -48,6 +49,14 @@ func (m *Machine) areRotorsInit() bool {
 		if !helper.AreElementsOrderedIndices(rotor[:]) {
 			return false
 		}
+	}
+
+	if err := m.areStepCycleValid(m.step, m.cycle); err != nil {
+		return false
+	}
+
+	if err := m.arePositionsValid(m.CurrentRotors()); err != nil {
+		return false
 	}
 
 	return true
