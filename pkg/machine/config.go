@@ -41,7 +41,7 @@ func Read(path string) (*Machine, error) {
 	}
 
 	// Verify correct initialization
-	if err := m.isInit(); err != nil {
+	if err := m.IsConfigCorrect(); err != nil {
 		return nil, err
 	}
 
@@ -125,7 +125,7 @@ func parseMachineJSON(fileContents []byte) (*Machine, error) {
 // Returns an error if Machine is not initialized correctly or
 // unable to write to file.
 func (m *Machine) Write(path string) error {
-	if err := m.isInit(); err != nil {
+	if err := m.IsConfigCorrect(); err != nil {
 		return err
 	}
 

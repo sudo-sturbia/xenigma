@@ -13,9 +13,9 @@ func (err *initError) Error() string {
 	return "incorrect init, " + err.message
 }
 
-// isInit verifies that all fields of a machine were initialized
-// correctly. If not an error is returned.
-func (m *Machine) isInit() error {
+// IsConfigCorrect verifies that all fields of the machine are
+// initialized correctly, returns an error if not.
+func (m *Machine) IsConfigCorrect() error {
 	switch {
 	case len(m.pathConnections) != m.numberOfRotors:
 		return &initError{"invalid number of pathway layers"}

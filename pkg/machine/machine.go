@@ -134,7 +134,7 @@ func (m *Machine) SetComponents(
 	m.setReflector(reflector)
 	m.initRotors(rotorsPositions, step, cycle)
 
-	return m.isInit()
+	return m.IsConfigCorrect()
 }
 
 // PathConnections returns electric pathway connections

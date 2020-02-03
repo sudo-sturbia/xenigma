@@ -12,7 +12,7 @@ import (
 // results. Non-alphabetical characters are returned without change, and don't
 // affect rotors' movement (rotors are not shifted).
 func (m *Machine) Encrypt(message string) (string, error) {
-	if err := m.isInit(); err != nil {
+	if err := m.IsConfigCorrect(); err != nil {
 		return "", err
 	}
 
