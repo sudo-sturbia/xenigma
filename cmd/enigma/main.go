@@ -28,7 +28,6 @@ var (
 
 func main() {
 	flag.Parse()
-
 	help()
 
 	m := getMachine()
@@ -38,19 +37,15 @@ func main() {
 
 	if *write != "" { // Write message to file at given path
 		helper.WriteStringToFile(encrypted, *write)
-	} else {
+	} else { // Print encrypted message
 		fmt.Println(encrypted)
 	}
 
-	if *update { // Write updated configs to ~/.config/enigma.json
-		err := m.Write(os.Getenv("HOME") + "/.config/enigma.json")
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
+	updateIf(m)
 }
 
-// getMachine evaluates flags and returns a machine to use.
+// getMachine evaluates flags and returns a machine to use based
+// on used flags.
 func getMachine() *machine.Machine {
 	m := new(machine.Machine)
 	switch {
@@ -119,4 +114,15 @@ func getMessage() string {
 	}
 
 	return message
+}
+
+// updateIf checks if -update flag was specified, if so updates
+// config at ~/.config/enigma.json
+func updateIf(m *machine.Machine) {
+	if *update { // Write updated configs to ~/.config/enigma.json
+		err := m.Write(os.Getenv("HOME") + "/.config/enigma.json")
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 }
