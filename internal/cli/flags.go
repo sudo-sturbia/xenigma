@@ -139,6 +139,21 @@ func updateIf(m *machine.Machine) {
 	}
 }
 
+// verifyIf  handles the execution of -verify flag.
+// Verifies config at given path, prints a message accordingly and exits.
+func verifyIf() {
+	if *verify != "" {
+		defer os.Exit(0)
+
+		_, err := machine.Read(*verify)
+		if err != nil {
+			fmt.Printf("Config is INCORRECT\n%s\n", err.Error())
+		} else {
+			fmt.Println("Config is CORRECT")
+		}
+	}
+}
+
 // helpIf handles the execution of -help, -h, or -config-h flags.
 // Prints specified help message and exits.
 func helpIf() {

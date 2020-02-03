@@ -17,6 +17,7 @@ func Execute() {
 	flag.Parse()
 
 	helpIf()
+	verifyIf()
 
 	m := getMachine()
 	defaultsIf(m)
