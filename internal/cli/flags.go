@@ -182,10 +182,11 @@ func helpIf() {
 				"\n" +
 				"    -help                        Print a detailed help message.\n" +
 				"\n" +
-				"    -help                        Print a detailed help message.\n" +
-				"\n" +
 				"    -config-h                    Print a help message specifying how to\n" +
 				"                                 configure a machine.\n" +
+				"\n" +
+				"    -verify <path>               Verify the correctness of the configuration\n" +
+				"                                 at the given path.\n" +
 				"\n" +
 				"    -generate <numberofrotors>   Generate a machine with specified number\n" +
 				"                                 of rotors and use it for encryption.\n" +
