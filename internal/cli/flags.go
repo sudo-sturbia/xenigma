@@ -162,7 +162,7 @@ func helpIf() {
 		defer os.Exit(0)
 		fmt.Println(
 			"Usage\n" +
-				"    enigma [options] <message>\n" +
+				"    xenigma [options] <message>\n" +
 				"For more details use -help.")
 
 	}
@@ -172,10 +172,10 @@ func helpIf() {
 		defer os.Exit(0)
 		fmt.Println(
 			"Description\n" +
-				"    enigma is a modified version of the enigma encryption machine.\n" +
+				"    xenigma is a modified version of the xenigma encryption machine.\n" +
 				"\n" +
 				"Usage\n" +
-				"    enigma [options] <message>\n" +
+				"    xenigma [options] <message>\n" +
 				"\n" +
 				"Options\n" +
 				"    -h                           Print a short help message.\n" +
@@ -215,8 +215,8 @@ func helpIf() {
 				"                                 Default values are \"a\"'s for rotor positions,\n" +
 				"                                 1 for step size, and 26 for cycle size.\n" +
 				"\n" +
-				"enigma is licensed under MIT license.\n" +
-				"For source code check the github repo [github.com/sudo-sturbia/enigma].")
+				"xenigma is licensed under MIT license.\n" +
+				"For source code check the github repo [github.com/sudo-sturbia/xenigma].")
 	}
 
 	// Configuration help message
@@ -225,10 +225,10 @@ func helpIf() {
 		fmt.Println(
 			"Configuration\n" +
 				"\n" +
-				"    enigma allows for configuration of all machine's componenets through\n" +
+				"    xenigma allows for configuration of all machine's componenets through\n" +
 				"    JSON. Configurations file should be located at ~/.config/engima.json\n" +
 				"\n" +
-				"    An example of a ~/.config/enigma.json is the following\n" +
+				"    An example of a ~/.config/xenigma.json is the following\n" +
 				"\n" +
 				"    {\n" +
 				"        \"pathways\": [\n" +
@@ -243,7 +243,7 @@ func helpIf() {
 				"        \"rotorCycle\": 26\n" +
 				"    }\n" +
 				"\n" +
-				"    enigma allows for a variable number of rotors. The number of rotors is\n" +
+				"    xenigma allows for a variable number of rotors. The number of rotors is\n" +
 				"    is decided through the number of electric pathways arrays, or the number\n" +
 				"    of rotor positions, which should be equal.\n" +
 				"\n" +
@@ -256,7 +256,7 @@ func helpIf() {
 				"    \"a\" is connected to \"b\", \"b\" must also be connected to \"a\". Otherwise\n" +
 				"    connections are considered incorrect.\n" +
 				"\n" +
-				"    enigma also allows for configuration of rotors' step and cycle sizes.\n" +
+				"    xenigma also allows for configuration of rotors' step and cycle sizes.\n" +
 				"    Step size is the number of positions a rotor jumps when shifting. For\n" +
 				"    example if a rotor, with step size 2, is at position \"a\", then the rotor\n" +
 				"    will jump to \"c\" when shifted once.\n" +
