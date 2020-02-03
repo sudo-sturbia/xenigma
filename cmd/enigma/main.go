@@ -29,6 +29,8 @@ var (
 func main() {
 	flag.Parse()
 
+	help()
+
 	m := getMachine()
 	message := getMessage()
 
