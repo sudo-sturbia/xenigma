@@ -18,8 +18,8 @@ func (m *Machine) initRotors(positions []int, stepSize int, cycleSize int) error
 	return nil
 }
 
-// UseRotorDefaults use default value for rotor related components.
-// Defaults are a's for rotors' positions, 1 for step size, and 26
+// UseRotorDefaults sets rotor related components to their default values.
+// Defaults are "a"'s for rotors' positions, 1 for step size, and 26
 // (size of the alphabet) for cycle size.
 func (m *Machine) UseRotorDefaults() {
 	m.resetRotorsPosition()
@@ -35,11 +35,9 @@ func (m *Machine) setRotorsPosition(positions []int) error {
 		return err
 	}
 
-	m.rotors = make([][alphabetSize]int, m.numberOfRotors)
+	m.rotors = make([]int, m.numberOfRotors)
 	for i := 0; i < m.numberOfRotors; i++ {
-		for j := 0; j < alphabetSize; j++ {
-			m.rotors[i][j] = (j + positions[i]) % alphabetSize
-		}
+		m.rotors[i] = positions[i] % alphabetSize
 	}
 
 	m.setTakenSteps(positions)
@@ -51,9 +49,7 @@ func (m *Machine) setRotorsPosition(positions []int) error {
 // of taken steps to 0.
 func (m *Machine) resetRotorsPosition() {
 	for i := 0; i < alphabetSize; i++ {
-		for j := 0; j < m.numberOfRotors; j++ {
-			m.rotors[j][i] = i
-		}
+		m.rotors[i] = 0
 	}
 
 	m.resetTakenSteps()
@@ -96,14 +92,9 @@ func (m *Machine) arePositionsValid(positions []int) error {
 	return nil
 }
 
-// CurrentRotors returns a slice containing current position of each rotor.
-func (m *Machine) CurrentRotors() []int {
-	current := make([]int, m.numberOfRotors)
-	for i := 0; i < m.numberOfRotors; i++ {
-		current[i] = m.rotors[i][0]
-	}
-
-	return current
+// RotorPositions returns a slice containing current position of each rotor.
+func (m *Machine) RotorPositions() []int {
+	return m.rotors
 }
 
 // setStepAndCycle verifies and sets both step size and cycle size.
@@ -181,9 +172,7 @@ func (m *Machine) stepRotors() {
 	for i := 0; i < m.numberOfRotors; i++ {
 		// If previous rotor completed a full cycle
 		if i == 0 || (m.takenSteps[i-1] == m.cycle) {
-			for j := 0; j < alphabetSize; j++ {
-				m.rotors[i][j] = (m.rotors[i][j] + m.step) % alphabetSize
-			}
+			m.rotors[i] = (m.rotors[i] + m.step) % alphabetSize
 
 			if i != m.numberOfRotors-1 {
 				m.takenSteps[i]++

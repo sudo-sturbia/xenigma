@@ -25,7 +25,7 @@ func TestStepRotors(t *testing.T) {
 	if takeSteps(testMachine, 1); !isPosCorrect(testMachine, []int{13, 0, 0}) {
 		t.Errorf(
 			"incorrect positions after 1 step of size 13,\n expected %v, got %v",
-			[]int{13, 0, 0}, testMachine.CurrentRotors(),
+			[]int{13, 0, 0}, testMachine.RotorPositions(),
 		)
 
 	}
@@ -33,7 +33,7 @@ func TestStepRotors(t *testing.T) {
 	if takeSteps(testMachine, alphabetSize); !isPosCorrect(testMachine, []int{13, 13, 0}) {
 		t.Errorf(
 			"incorrect positions after 27 steps of size 13, expected %v, got %v",
-			[]int{13, 13, 0}, testMachine.CurrentRotors(),
+			[]int{13, 13, 0}, testMachine.RotorPositions(),
 		)
 	}
 
@@ -43,14 +43,14 @@ func TestStepRotors(t *testing.T) {
 	if takeSteps(testMachine, 1); !isPosCorrect(testMachine, []int{1, 0, 0}) {
 		t.Errorf(
 			"incorrect positions after 1 step with cycle size 2, expected %v, got %v",
-			[]int{1, 0, 0}, testMachine.CurrentRotors(),
+			[]int{1, 0, 0}, testMachine.RotorPositions(),
 		)
 	}
 
 	if takeSteps(testMachine, alphabetSize); !isPosCorrect(testMachine, []int{1, 13, 6}) {
 		t.Errorf(
 			"incorrect positions after 27 steps with cycle size 2, expected %v, got %v",
-			[]int{1, 13, 6}, testMachine.CurrentRotors(),
+			[]int{1, 13, 6}, testMachine.RotorPositions(),
 		)
 	}
 
@@ -61,7 +61,7 @@ func TestStepRotors(t *testing.T) {
 	if takeSteps(testMachine, 20); !isPosCorrect(testMachine, []int{16, 6, 0}) {
 		t.Errorf(
 			"incorrect positions after 1 step with cycle size 2, expected %v, got %v",
-			[]int{16, 6, 0}, testMachine.CurrentRotors(),
+			[]int{16, 6, 0}, testMachine.RotorPositions(),
 		)
 	}
 
@@ -72,7 +72,7 @@ func TestStepRotors(t *testing.T) {
 	if takeSteps(testMachine, 11881376); !isPosCorrect(testMachine, []int{0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0}) {
 		t.Errorf(
 			"incorrect positions after 11881376 steps for a 12 rotor machine, expected %v, got %v",
-			[]int{0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0}, testMachine.CurrentRotors(),
+			[]int{0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0}, testMachine.RotorPositions(),
 		)
 	}
 }
@@ -134,7 +134,7 @@ func TestSetPosition(t *testing.T) {
 	} else {
 		// Verify position
 		positions := []int{2, 4, 4}
-		for i, pos := range testMachine.CurrentRotors() {
+		for i, pos := range testMachine.RotorPositions() {
 			if positions[i] != pos {
 				t.Errorf("incorrect position\n expected %v, found %v", positions[i], pos)
 			}
@@ -167,7 +167,7 @@ func TestSetPosition(t *testing.T) {
 	} else {
 		// Verify position
 		positions := []int{13, 13, 0, 13, 13, 13, 0}
-		for i, pos := range testMachine.CurrentRotors() {
+		for i, pos := range testMachine.RotorPositions() {
 			if positions[i] != pos {
 				t.Errorf("incorrect position\n expected %v, found %v", positions[i], pos)
 			}
@@ -245,10 +245,8 @@ func arePropertiesCorrect(testMachine *Machine, positions []int, step int, cycle
 // isPosCorrect verifies current position of rotors.
 func isPosCorrect(testMachine *Machine, positions []int) bool {
 	for i := 0; i < testMachine.numberOfRotors; i++ {
-		for j := 0; j < alphabetSize; j++ {
-			if testMachine.rotors[i][j] != (j+positions[i])%alphabetSize {
-				return false
-			}
+		if testMachine.rotors[i] != positions[i]%alphabetSize {
+			return false
 		}
 	}
 

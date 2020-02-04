@@ -13,9 +13,9 @@ func (err *initError) Error() string {
 	return "incorrect init, " + err.message
 }
 
-// isInit verifies that all fields of a machine were initialized
-// correctly. If not an error is returned.
-func (m *Machine) isInit() error {
+// IsConfigCorrect verifies that all fields of the machine are
+// initialized correctly, returns an error if not.
+func (m *Machine) IsConfigCorrect() error {
 	switch {
 	case len(m.pathConnections) != m.numberOfRotors:
 		return &initError{"invalid number of pathway layers"}
@@ -45,8 +45,8 @@ func (m *Machine) areRotorsInit() bool {
 		return false
 	}
 
-	for _, rotor := range m.rotors {
-		if !helper.AreElementsOrderedIndices(rotor[:]) {
+	for _, rotorHead := range m.rotors {
+		if rotorHead < 0 || rotorHead >= alphabetSize {
 			return false
 		}
 	}
@@ -55,7 +55,7 @@ func (m *Machine) areRotorsInit() bool {
 		return false
 	}
 
-	if err := m.arePositionsValid(m.CurrentRotors()); err != nil {
+	if err := m.arePositionsValid(m.RotorPositions()); err != nil {
 		return false
 	}
 

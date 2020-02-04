@@ -3,23 +3,59 @@ Package machine represents an enigma machine used for encryption and
 decryption of text messages.
 
 The machine consists of the following components: electric pathways,
-reflector, plugboard, and a variable number rotors. All of which can
-be configured through JSON or a collective setter.
+reflector, plugboard, and a variable number of rotors.
 
-A machine can be created using machine.Load, machine.Generate, machine.Read,
-or by simply creating a Machine object and calling SetComponents method.
+A machine object can be created using machine.Load, machine.Generate,
+machine.Read, or by simply creating a empty Machine object and calling
+SetComponents method.
 
 machine.Load is meant for usage in an independent program. The other
 three options are more suitable for usage when the package is imported.
 
-A machine can have any number of rotors given that it's > 0. Other
-properties related to rotors such as step and cycle sizes can also be
-configured.
-
-Encrypt method is used to encrypt (or decrypt) a given message as
-the following example
+Encrypt is the method used for encryption (or decryption) of strings
+and is simply used as the following.
     m := machine.Generate(3)
     encrypted := m.Encrypt("message")
+
+Configuration
+
+All components of the machine can be configured through JSON or using the
+collective setter SetComponents. An example of a JSON config file is the
+following
+	{
+		"pathways": [
+			["a", "b", "c", ...],
+			["a", "b", "c", ...],
+			["a", "b", "c", ...]
+		],
+		"reflector": ["a", "b", "c", ...],
+		"plugboard": ["a", "b", "c", ...],
+		"rotorPositions": ["a", "b", "c"],
+		"rotorStep": 1,
+		"rotorCycle": 26
+	}
+
+Connections: pathways, reflector, and plugboard, are all specified through
+JSON arrays where elements' indices represent a character's position in
+the alphabet. Meaning that if, in reflector array, element at index 0 is
+"b" then "a" is connected to "b".
+
+A machine can have any number of rotors given that it's > 0. A machine's
+step and cycle sizes can also be configured.
+
+Step represents the size of the shift between rotor steps. For example if
+step size is 2 then rotors jump 2 positions when shifting. A rotor at position
+"a" jumps to "c".
+
+Cycle represents the number of steps considered a full cycle, after which
+the following rotor is shifted. For example in a 3-rotor machine if cycle
+size is 13 then the second rotor is shifted once every time the first rotor
+completes 13 steps, the third rotor operates similarly but depends on second
+rotor's movement, etc.
+
+To avoid collisions and guarantee that a rotor configuration can be reached
+using only one step sequence (step x cycle) must divide 26 (alphabet size).
+Combinations that don't satisfy that relation are considered wrong.
 
 Licensed under MIT license @github.com/sudo-sturbia
 */
@@ -46,11 +82,11 @@ type Machine struct {
 	reflector            [alphabetSize]int   // Reflector connections, symmetric
 	plugboardConnections [alphabetSize]int   // Plugboard connections, symmetric
 
-	numberOfRotors int                 // Number of rotors used in the machine
-	rotors         [][alphabetSize]int // Mechanical rotors, 1st element is rotor's position
-	takenSteps     []int               // Number of steps taken by each rotor except the last
-	step           int                 // Size of shift between rotor steps (move)
-	cycle          int                 // Number of rotor steps considered a full cycle
+	numberOfRotors int   // Number of rotors used in the machine
+	rotors         []int // Mechanical rotors' heads
+	takenSteps     []int // Number of steps taken by each rotor except the last
+	step           int   // Size of shift between rotor steps (move)
+	cycle          int   // Number of rotor steps considered a full cycle
 }
 
 // Load returns a fully initialized Machine object. Configurations of
@@ -98,7 +134,7 @@ func (m *Machine) SetComponents(
 	m.setReflector(reflector)
 	m.initRotors(rotorsPositions, step, cycle)
 
-	return m.isInit()
+	return m.IsConfigCorrect()
 }
 
 // PathConnections returns electric pathway connections

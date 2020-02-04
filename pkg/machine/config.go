@@ -41,7 +41,7 @@ func Read(path string) (*Machine, error) {
 	}
 
 	// Verify correct initialization
-	if err := m.isInit(); err != nil {
+	if err := m.IsConfigCorrect(); err != nil {
 		return nil, err
 	}
 
@@ -122,10 +122,10 @@ func parseMachineJSON(fileContents []byte) (*Machine, error) {
 }
 
 // Write writes configurations of a Machine object to a JSON file.
-// Returns an error if Machine is not initialized correctly ot
+// Returns an error if Machine is not initialized correctly or
 // unable to write to file.
 func (m *Machine) Write(path string) error {
-	if err := m.isInit(); err != nil {
+	if err := m.IsConfigCorrect(); err != nil {
 		return err
 	}
 
@@ -150,7 +150,7 @@ func (m *Machine) Write(path string) error {
 	// Rotors
 	jsonM.RotorsPositions = make([]string, m.numberOfRotors)
 	for i := 0; i < m.numberOfRotors; i++ {
-		jsonM.RotorsPositions[i] = intToStr(m.CurrentRotors()[i])
+		jsonM.RotorsPositions[i] = intToStr(m.RotorPositions()[i])
 	}
 
 	jsonM.Step = m.step
