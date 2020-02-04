@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// Example of usage of the enigma package.
+// Example of usage of the machine package.
 func Example() {
 	// Generate a random configuration
 	rand.Seed(time.Now().UnixNano())

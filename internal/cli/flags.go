@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/sudo-sturbia/enigma/pkg/helper"
-	"github.com/sudo-sturbia/enigma/pkg/machine"
+	"github.com/sudo-sturbia/xenigma/pkg/helper"
+	"github.com/sudo-sturbia/xenigma/pkg/machine"
 )
 
 // Command line flags.
@@ -27,11 +27,11 @@ var (
 )
 
 // correctIf handles the execution of -correct flag.
-// Loads configuration at ~/.config/enigma.json, if configuration is
+// Loads configuration at ~/.config/xenigma.json, if configuration is
 // incorrect a newly generated machine with specified number of rotors
-// is saved to ~/.config/enigma.json and returned.
+// is saved to ~/.config/xenigma.json and returned.
 func correctIf() *machine.Machine {
-	if *correct > 0 { // Load ~/.config/enigma.json, change if wrong
+	if *correct > 0 { // Load ~/.config/xenigma.json, change if wrong
 		m, err := machine.Load(*correct, true)
 		if err != nil {
 			if m == nil {
@@ -72,12 +72,12 @@ func generateIf() *machine.Machine {
 
 // generatewIf handles the execution of -gen-w flag.
 // Returns a newly generated machine with specified number of rotors
-// and writes config to ~/.config/enigma.json
+// and writes config to ~/.config/xenigma.json
 func generatewIf() *machine.Machine {
-	if *generateW > 0 { // Generate and write to ~/.config/enigma.json
+	if *generateW > 0 { // Generate and write to ~/.config/xenigma.json
 		m := machine.Generate(*generateW)
 
-		err := m.Write(os.Getenv("HOME") + "/.config/enigma.json")
+		err := m.Write(os.Getenv("HOME") + "/.config/xenigma.json")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -129,10 +129,10 @@ func readIf(message string) string {
 }
 
 // updateIf checks if -update flag was specified, if so updates
-// config at ~/.config/enigma.json
+// config at ~/.config/xenigma.json
 func updateIf(m *machine.Machine) {
-	if *update { // Write updated configs to ~/.config/enigma.json
-		err := m.Write(os.Getenv("HOME") + "/.config/enigma.json")
+	if *update { // Write updated configs to ~/.config/xenigma.json
+		err := m.Write(os.Getenv("HOME") + "/.config/xenigma.json")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -172,7 +172,7 @@ func helpIf() {
 		defer os.Exit(0)
 		fmt.Println(
 			"Description\n" +
-				"    xenigma is a modified version of the xenigma encryption machine.\n" +
+				"    xenigma is a modified version of the enigma encryption machine.\n" +
 				"\n" +
 				"Usage\n" +
 				"    xenigma [options] <message>\n" +
@@ -193,13 +193,13 @@ func helpIf() {
 				"\n" +
 				"    -gen-w <numberofrotors>      Generate a machine with specified number\n" +
 				"                                 of rotors, use it for encryption, and write\n" +
-				"                                 generated configs to ~/.config/engima.json\n" +
+				"                                 generated configs to ~/.config/xenigma.json\n" +
 				"\n" +
-				"    -correct <numberofrotors>    Load ~/.config/engima.json, generate a new\n" +
+				"    -correct <numberofrotors>    Load ~/.config/xenigma.json, generate a new\n" +
 				"                                 machine if configs are incorrect.\n" +
 				"\n" +
 				"    -load <path>                 Load and use config at given path instead\n" +
-				"                                 of ~/.config/engima.json\n" +
+				"                                 of ~/.config/xenigma.json\n" +
 				"\n" +
 				"    -read <path>                 Read and encrypt contents of file at given\n" +
 				"                                 path. If both -read is invoked and a message\n" +
@@ -208,9 +208,9 @@ func helpIf() {
 				"\n" +
 				"    -write <path>                Write encrypted message to file at given path.\n" +
 				"\n" +
-				"    -update                      Save updated config to ~/.config/engima.json\n" +
+				"    -update                      Save updated config to ~/.config/xenigma.json\n" +
 				"                                 before exiting. Updated config is config at\n" +
-				"                                 ~/.config/engima.json after rotor shifting.\n" +
+				"                                 ~/.config/xenigma.json after rotor shifting.\n" +
 				"\n" +
 				"    -default-rotors              Use default values for rotor-related fields.\n" +
 				"                                 Default values are \"a\"'s for rotor positions,\n" +
@@ -227,7 +227,7 @@ func helpIf() {
 			"Configuration\n" +
 				"\n" +
 				"    xenigma allows for configuration of all machine's componenets through\n" +
-				"    JSON. Configurations file should be located at ~/.config/engima.json\n" +
+				"    JSON. Configurations file should be located at ~/.config/xenigma.json\n" +
 				"\n" +
 				"    An example of a ~/.config/xenigma.json is the following\n" +
 				"\n" +

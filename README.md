@@ -3,23 +3,22 @@
 
 ## How to install?
 
-```
+```shell
 go get github.com/sudo-sturbia/xenigma/cmd/xenigma
 ```
 
 ## How to use?
 
 `xenigma` can be used as a command line tool or exported for usage as a package.
-
-For documentation of the package check [godoc](godoc.org/github.com/sudo-sturbia/xenigma/pkg/machine).
+For documentation of the package check [godoc](https://godoc.org/github.com/sudo-sturbia/xenigma/pkg/machine).
 
 For command line tool, the help message below is available
 
-```
+```shell
 xenigma -help
 ```
 
-```console
+```
 Description
     xenigma is a modified version of the enigma encryption machine.
 
@@ -42,13 +41,13 @@ Options
 
     -gen-w <numberofrotors>      Generate a machine with specified number
                                  of rotors, use it for encryption, and write
-                                 generated configs to ~/.config/engima.json
+                                 generated configs to ~/.config/xenigma.json
 
-    -correct <numberofrotors>    Load ~/.config/engima.json, generate a new
+    -correct <numberofrotors>    Load ~/.config/xenigma.json, generate a new
                                  machine if configs are incorrect.
 
     -load <path>                 Load and use config at given path instead
-                                 of ~/.config/engima.json
+                                 of ~/.config/xenigma.json
 
     -read <path>                 Read and encrypt contents of file at given
                                  path. If both -read is invoked and a message
@@ -57,15 +56,26 @@ Options
 
     -write <path>                Write encrypted message to file at given path.
 
-    -update                      Save updated config to ~/.config/engima.json
+    -update                      Save updated config to ~/.config/xenigma.json
                                  before exiting. Updated config is config at
-                                 ~/.config/engima.json after rotor shifting.
+                                 ~/.config/xenigma.json after rotor shifting.
 
     -default-rotors              Use default values for rotor-related fields.
                                  Default values are "a"'s for rotor positions,
                                  1 for step size, and 26 for cycle size.
 
 xenigma is licensed under MIT license.
+```
+
+### Usage example
+
+```shell
+xenigma -gen-w 50 Hello, world! # Generate a 50-rotor machine, write generated config to
+                                # ~/.config/xenigma.json, and use generated machine to 
+                                # encrypt "Hello, world!".
+```
+```
+onjjk, gqkdx!
 ```
 
 ## What's different?
@@ -120,9 +130,9 @@ Both reflector and plugboard arrays should be symmetric,
 meaning that if "a" is connected to "b", "b" must also be connected to "a";
 Otherwise connections are considered incorrect.
 
-A configuration help message similar to the above explaination is available through
+A configuration help message similar to the above is available from the command line.
 
-```
-xenigma -config-h
+```shell
+xenigma -config-h # Generate configuration help message.
 ```
 

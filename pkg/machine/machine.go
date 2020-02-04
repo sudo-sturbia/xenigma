@@ -1,6 +1,6 @@
 /*
-Package machine represents an enigma machine used for encryption and
-decryption of text messages.
+Package machine represents an xenigma machine which is a modified version
+of the enigma machine used for encryption and decryption of text messages.
 
 The machine consists of the following components: electric pathways,
 reflector, plugboard, and a variable number of rotors.
@@ -90,7 +90,7 @@ type Machine struct {
 }
 
 // Load returns a fully initialized Machine object. Configurations of
-// Machine's fields are read from config file $HOME/.config/enigma.json
+// Machine's fields are read from config file $HOME/.config/xenigma.json
 // If the file contains correct configurations, a machine object is
 // initialized and returned with error being nil.
 // Otherwise overwrite parameter is checked. If overwrite is true, random
@@ -98,12 +98,12 @@ type Machine struct {
 // to file, a machine object with the same configs is returned and error
 // is nil. Otherwise an initialization error is returned and Machine is nil.
 func Load(numberOfRotors int, overwrite bool) (*Machine, error) {
-	machine, err := Read(os.Getenv("HOME") + "/.config/enigma.json")
+	machine, err := Read(os.Getenv("HOME") + "/.config/xenigma.json")
 
 	if err != nil {
 		if overwrite {
 			machine = Generate(numberOfRotors)
-			if err = machine.Write(os.Getenv("HOME") + "/.config/enigma.json"); err != nil {
+			if err = machine.Write(os.Getenv("HOME") + "/.config/xenigma.json"); err != nil {
 				return machine, &initError{err.Error()}
 			}
 

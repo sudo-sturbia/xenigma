@@ -1,7 +1,7 @@
 package machine
 
 import (
-	"github.com/sudo-sturbia/enigma/pkg/helper"
+	"github.com/sudo-sturbia/xenigma/pkg/helper"
 )
 
 // Initializion error
