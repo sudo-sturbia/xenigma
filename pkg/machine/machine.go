@@ -62,7 +62,9 @@ Licensed under MIT license @github.com/sudo-sturbia
 package machine
 
 import (
+	"math/rand"
 	"os"
+	"time"
 )
 
 const (
@@ -78,15 +80,11 @@ const (
 // Machine represents an enigma machine with mechanical components.
 // Components are electric pathways, reflector, plugboard, and rotors.
 type Machine struct {
-	pathConnections      [][alphabetSize]int // Connections that form electric pathways
-	reflector            [alphabetSize]int   // Reflector connections, symmetric
-	plugboardConnections [alphabetSize]int   // Plugboard connections, symmetric
+	reflector [alphabetSize]int // Reflector connections, symmetric
+	plugboard [alphabetSize]int // Plugboard connections, symmetric
 
-	numberOfRotors int   // Number of rotors used in the machine
-	rotors         []int // Mechanical rotors' heads
-	takenSteps     []int // Number of steps taken by each rotor except the last
-	step           int   // Size of shift between rotor steps (move)
-	cycle          int   // Number of rotor steps considered a full cycle
+	rotors         []Rotor // Machine's mechanical rotors
+	numberOfRotors int     // Number of rotors used in the machine
 }
 
 // Load returns a fully initialized Machine object. Configurations of
@@ -118,33 +116,34 @@ func Load(numberOfRotors int, overwrite bool) (*Machine, error) {
 
 // SetComponents initializes all components of the machine.
 // Returns an error if given incorrect configurations.
-func (m *Machine) SetComponents(
-	pathways [][alphabetSize]int,
-	plugboard [alphabetSize]int,
-	reflector [alphabetSize]int,
-	rotorsPositions []int, step int, cycle int) error {
-
-	if len(pathways) != len(rotorsPositions) {
-		return &initError{"rotors and electric pathways are of different sizes"}
+func (m *Machine) SetComponents(rotors []Rotor, plugboard [alphabetSize]int, reflector [alphabetSize]int) error {
+	if err := m.SetRotors(rotors); err != nil {
+		return err
 	}
 
-	m.setNumberOfRotors(len(pathways))
-	m.setPathConnections(pathways)
-	m.setPlugboard(plugboard)
-	m.setReflector(reflector)
-	m.initRotors(rotorsPositions, step, cycle)
+	m.SetPlugboard(plugboard)
+	m.SetReflector(reflector)
 
 	return m.IsConfigCorrect()
 }
 
-// PathConnections returns electric pathway connections
-func (m *Machine) PathConnections() [][alphabetSize]int {
-	return m.pathConnections
-}
+// Generate creates a machine object with a specified number of rotors
+// containing randomly generated component configurations.
+func Generate(numberOfRotors int) *Machine {
+	rand.Seed(time.Now().UnixNano())
 
-// setPathConnections sets path connections array in Machine.
-func (m *Machine) setPathConnections(paths [][alphabetSize]int) {
-	m.pathConnections = paths
+	m := new(Machine)
+
+	rotors := make([]Rotor, numberOfRotors)
+	for i := 0; i < numberOfRotors; i++ {
+		rotors[i] = *GenerateRotor()
+	}
+	m.SetRotors(rotors)
+
+	m.GeneratePlugboard()
+	m.GenerateReflector()
+
+	return m
 }
 
 // Reflector returns reflector connections.
@@ -152,17 +151,47 @@ func (m *Machine) Reflector() [alphabetSize]int {
 	return m.reflector
 }
 
-// setReflector sets reflector connections.
-func (m *Machine) setReflector(reflector [alphabetSize]int) {
+// SetReflector sets reflector connections.
+func (m *Machine) SetReflector(reflector [alphabetSize]int) {
 	m.reflector = reflector
+}
+
+// GenerateReflector creates random reflector connections.
+func (m *Machine) GenerateReflector() {
+	// Create half of the connections
+	halfConnections := [alphabetSize / 2]int{13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}
+	rand.Shuffle(alphabetSize/2, func(i, j int) {
+		halfConnections[i], halfConnections[j] =
+			halfConnections[j], halfConnections[i]
+	})
+
+	for i := 0; i < len(halfConnections); i++ {
+		m.reflector[i] = halfConnections[i]
+		m.reflector[halfConnections[i]] = i
+	}
 }
 
 // PlugboardConnections returns plugboard connections.
 func (m *Machine) PlugboardConnections() [alphabetSize]int {
-	return m.plugboardConnections
+	return m.plugboard
 }
 
-// setPlugboard sets reflector connections.
-func (m *Machine) setPlugboard(plugboard [alphabetSize]int) {
-	m.plugboardConnections = plugboard
+// SetPlugboard sets plugboard connections.
+func (m *Machine) SetPlugboard(plugboard [alphabetSize]int) {
+	m.plugboard = plugboard
+}
+
+// GeneratePlugboard creates random plugboard connections.
+func (m *Machine) GeneratePlugboard() {
+	// Create half of the connections
+	halfConnections := [alphabetSize / 2]int{13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}
+	rand.Shuffle(alphabetSize/2, func(i, j int) {
+		halfConnections[i], halfConnections[j] =
+			halfConnections[j], halfConnections[i]
+	})
+
+	for i := 0; i < len(halfConnections); i++ {
+		m.plugboard[i] = halfConnections[i]
+		m.plugboard[halfConnections[i]] = i
+	}
 }

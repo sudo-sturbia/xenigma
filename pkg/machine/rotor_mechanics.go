@@ -16,7 +16,7 @@ func (m *Machine) stepRotors() {
 	}
 }
 
-// SetRotors verifies and sets machine's rotors'. Returns an error
+// SetRotors verifies and sets machine's rotors. Returns an error
 // if configurations of given rotors are incorrect, nil otherwise.
 func (m *Machine) SetRotors(rotors []Rotor) error {
 	if rotors == nil || len(rotors) <= 0 {

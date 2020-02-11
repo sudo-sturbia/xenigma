@@ -2,6 +2,7 @@ package machine
 
 import (
 	"fmt"
+	"math/rand"
 
 	"github.com/sudo-sturbia/xenigma/pkg/helper"
 )
@@ -13,6 +14,24 @@ type Rotor struct {
 	takenSteps int               // Number of rotor's taken steps.
 	step       int               // Size of shift between rotor steps.
 	cycle      int               // Number of rotor steps considered a full cycle.
+}
+
+// GenerateRotor generates and rotor with random configurations and
+// returns a pointer to it.
+func GenerateRotor() *Rotor {
+	r := new(Rotor)
+	r.pathways = [alphabetSize]int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
+		14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}
+
+	rand.Shuffle(alphabetSize, func(j, k int) {
+		r.pathways[j], r.pathways[k] = r.pathways[k], r.pathways[j]
+	})
+
+	r.setPosition(rand.Intn(alphabetSize), DefaultStep, DefaultCycle)
+	r.setStep(DefaultStep)
+	r.setCycle(DefaultCycle)
+
+	return r
 }
 
 // takeStep shifts rotor's position one step forward.
