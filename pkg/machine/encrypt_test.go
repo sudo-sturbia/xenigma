@@ -52,6 +52,15 @@ func TestEncrypt(t *testing.T) {
 	}
 }
 
+// Benchmark encryption in a 1000-rotor machine.
+func BenchmarkEncrypt(b *testing.B) {
+	m := Generate(1000)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		m.Encrypt("Hello, world!\nThis is a benchmark.")
+	}
+}
+
 // Test encryption and decryption of messages.
 func TestEncryptDecrypt(t *testing.T) {
 	encryptor, err := Read("../../test/data/config-1.json")

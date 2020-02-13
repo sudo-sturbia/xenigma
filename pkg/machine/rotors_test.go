@@ -77,6 +77,15 @@ func TestStepRotors(t *testing.T) {
 	}
 }
 
+// Benchmark rotor stepping 1000 steps in a 1000-rotor machine.
+func BenchmarkStepRotors(b *testing.B) {
+	m := Generate(1000)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		takeSteps(m, 1000)
+	}
+}
+
 // Test initialization of rotors.
 func TestInitRotors(t *testing.T) {
 	testMachine := new(Machine)
