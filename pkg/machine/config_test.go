@@ -121,10 +121,17 @@ func areSimilar(m1 *Machine, m2 *Machine) bool {
 
 	numberOfRotors := m1.numberOfRotors
 
-	// Pathways
+	// Rotors
 	for i := 0; i < numberOfRotors; i++ {
+		if m1.rotors[i].position != m2.rotors[i].position ||
+			m1.rotors[i].takenSteps != m2.rotors[i].takenSteps ||
+			m1.rotors[i].cycle != m2.rotors[i].cycle ||
+			m1.rotors[i].step != m2.rotors[i].step {
+			return false
+		}
+
 		for j := 0; j < alphabetSize; j++ {
-			if m1.pathConnections[i][j] != m2.pathConnections[i][j] {
+			if m1.rotors[i].pathways[j] != m2.rotors[i].pathways[j] {
 				return false
 			}
 		}
@@ -139,14 +146,7 @@ func areSimilar(m1 *Machine, m2 *Machine) bool {
 
 	// Plugboard
 	for i := 0; i < alphabetSize; i++ {
-		if m1.plugboardConnections[i] != m2.plugboardConnections[i] {
-			return false
-		}
-	}
-
-	// Rotors
-	for i := 0; i < numberOfRotors; i++ {
-		if m1.rotors[i] != m2.rotors[i] {
+		if m1.plugboard[i] != m2.plugboard[i] {
 			return false
 		}
 	}
