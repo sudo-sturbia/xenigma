@@ -7,6 +7,12 @@ import (
 	"github.com/sudo-sturbia/xenigma/pkg/helper"
 )
 
+// Default step and cycle sizes used for a rotor.
+const (
+	DefaultStep  = 1
+	DefaultCycle = 26
+)
+
 // Rotor represents a mechanical rotor used in xenigma.
 type Rotor struct {
 	pathways   [alphabetSize]int // Connections that form electric pathways.
@@ -20,8 +26,10 @@ type Rotor struct {
 // returns a pointer to it.
 func GenerateRotor() *Rotor {
 	r := new(Rotor)
-	r.pathways = [alphabetSize]int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
-		14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}
+	r.pathways = [alphabetSize]int{
+		0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
+		14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
+	}
 
 	rand.Shuffle(alphabetSize, func(j, k int) {
 		r.pathways[j], r.pathways[k] = r.pathways[k], r.pathways[j]

@@ -37,12 +37,30 @@ func (m *Machine) SetRotors(rotors []Rotor) error {
 	return nil
 }
 
+// areRotorsCorrect returns true if rotors are initialized correctly and
+// verifies all rotor related values.
+func (m *Machine) areRotorsCorrect() bool {
+	if m.rotors == nil || len(m.rotors) == 0 || m.numberOfRotors != len(m.rotors) {
+		return false
+	}
+
+	for _, rotor := range m.rotors {
+		if err := rotor.IsConfigCorrect(); err != nil {
+			return false
+		}
+	}
+
+	return true
+}
+
 // Setting returns current rotor setting (position of machine's rotors).
-func (m *Machine) Setting() {
+func (m *Machine) Setting() []int {
 	setting := make([]int, m.numberOfRotors)
 	for i, rotor := range m.rotors {
 		setting[i] = rotor.Position()
 	}
+
+	return setting
 }
 
 // setNumberOfRotors sets number of used rotors.

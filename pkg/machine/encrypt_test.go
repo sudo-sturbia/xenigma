@@ -123,8 +123,8 @@ func TestEncryptCharAlpha(t *testing.T) {
 		t.Errorf("could not read configurations\n%s", err.Error())
 	}
 
-	// r -> u
-	encrypted1 := m1.encryptChar('r')
+	// r -> n
+	encrypted1 := m1.encryptChar('r', m1.flippedConnections())
 	if encrypted1 != 'n' {
 		t.Errorf("character 'r' encrypted to '%c', expected 'n'", encrypted1)
 	}
@@ -135,8 +135,8 @@ func TestEncryptCharAlpha(t *testing.T) {
 		t.Errorf("could not read configurations\n%s", err.Error())
 	}
 
-	// s -> d
-	encrypted2 := m2.encryptChar('s')
+	// s -> r
+	encrypted2 := m2.encryptChar('s', m2.flippedConnections())
 	if encrypted2 != 'r' {
 		t.Errorf("character 's' encrypted to '%c', expected 'r'", encrypted2)
 	}
@@ -153,7 +153,7 @@ func TestEncryptCharNonAlpha(t *testing.T) {
 
 	nonAlpha := []byte{',', ' ', '1', '\n', '[', '\t'}
 	for _, char := range nonAlpha {
-		encrypted := m.encryptChar(char)
+		encrypted := m.encryptChar(char, m.flippedConnections())
 		if encrypted != char {
 			t.Errorf("character '%c' encrypted to '%c', expected '%c'", char, encrypted, char)
 		}

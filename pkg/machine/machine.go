@@ -65,17 +65,11 @@ import (
 	"math/rand"
 	"os"
 	"time"
+
+	"github.com/sudo-sturbia/xenigma/pkg/helper"
 )
 
-const (
-	alphabetSize = 26
-
-	// DefaultStep represents a Machine's default step size.
-	DefaultStep = 1
-
-	// DefaultCycle represents a Machine's default cycle size.
-	DefaultCycle = 26
-)
+const alphabetSize = 26
 
 // Machine represents an enigma machine with mechanical components.
 // Components are electric pathways, reflector, plugboard, and rotors.
@@ -85,6 +79,15 @@ type Machine struct {
 
 	rotors         []Rotor // Machine's mechanical rotors
 	numberOfRotors int     // Number of rotors used in the machine
+}
+
+// Initializion error
+type initError struct {
+	message string
+}
+
+func (err *initError) Error() string {
+	return "incorrect init, " + err.message
 }
 
 // Load returns a fully initialized Machine object. Configurations of
@@ -121,8 +124,13 @@ func (m *Machine) SetComponents(rotors []Rotor, plugboard [alphabetSize]int, ref
 		return err
 	}
 
-	m.SetPlugboard(plugboard)
-	m.SetReflector(reflector)
+	if err := m.SetPlugboard(plugboard); err != nil {
+		return err
+	}
+
+	if err := m.SetReflector(reflector); err != nil {
+		return err
+	}
 
 	return m.IsConfigCorrect()
 }
@@ -146,52 +154,87 @@ func Generate(numberOfRotors int) *Machine {
 	return m
 }
 
+// IsConfigCorrect verifies that all fields of the machine are
+// initialized correctly, returns an error if not.
+func (m *Machine) IsConfigCorrect() error {
+	switch {
+	case !m.areRotorsCorrect():
+		return &initError{"rotors configurations are invalid"}
+	case !m.isReflectorCorrect():
+		return &initError{"reflector connections are incorrect"}
+	case !m.isPlugboardCorrect():
+		return &initError{"plugboard connections are incorrect"}
+	default:
+		return nil
+	}
+}
+
 // Reflector returns reflector connections.
 func (m *Machine) Reflector() [alphabetSize]int {
 	return m.reflector
 }
 
-// SetReflector sets reflector connections.
-func (m *Machine) SetReflector(reflector [alphabetSize]int) {
+// Plugboard returns plugboard connections.
+func (m *Machine) Plugboard() [alphabetSize]int {
+	return m.plugboard
+}
+
+// SetReflector sets reflector connections. Returns an error
+// if given connections are incorrect.
+func (m *Machine) SetReflector(reflector [alphabetSize]int) error {
 	m.reflector = reflector
+	if !m.isReflectorCorrect() {
+		return &initError{"given reflector connections are incorrect"}
+	}
+
+	return nil
+}
+
+// SetPlugboard sets plugboard connections. Returns an error
+// if given connections are incorrect.
+func (m *Machine) SetPlugboard(plugboard [alphabetSize]int) error {
+	m.plugboard = plugboard
+	if !m.isPlugboardCorrect() {
+		return &initError{"given plugboard connections are incorrect"}
+	}
+
+	return nil
 }
 
 // GenerateReflector creates random reflector connections.
 func (m *Machine) GenerateReflector() {
-	// Create half of the connections
-	halfConnections := [alphabetSize / 2]int{13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}
+	half := []int{13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}
 	rand.Shuffle(alphabetSize/2, func(i, j int) {
-		halfConnections[i], halfConnections[j] =
-			halfConnections[j], halfConnections[i]
+		half[i], half[j] = half[j], half[i]
 	})
 
-	for i := 0; i < len(halfConnections); i++ {
-		m.reflector[i] = halfConnections[i]
-		m.reflector[halfConnections[i]] = i
+	// Assign symmetric values to machine's reflector
+	for i := 0; i < alphabetSize/2; i++ {
+		m.reflector[i], m.reflector[half[i]] = half[i], i
 	}
-}
-
-// PlugboardConnections returns plugboard connections.
-func (m *Machine) PlugboardConnections() [alphabetSize]int {
-	return m.plugboard
-}
-
-// SetPlugboard sets plugboard connections.
-func (m *Machine) SetPlugboard(plugboard [alphabetSize]int) {
-	m.plugboard = plugboard
 }
 
 // GeneratePlugboard creates random plugboard connections.
 func (m *Machine) GeneratePlugboard() {
-	// Create half of the connections
-	halfConnections := [alphabetSize / 2]int{13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}
+	half := []int{13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}
 	rand.Shuffle(alphabetSize/2, func(i, j int) {
-		halfConnections[i], halfConnections[j] =
-			halfConnections[j], halfConnections[i]
+		half[i], half[j] = half[j], half[i]
 	})
 
-	for i := 0; i < len(halfConnections); i++ {
-		m.plugboard[i] = halfConnections[i]
-		m.plugboard[halfConnections[i]] = i
+	// Assign symmetric values to machine's plugboard
+	for i := 0; i < alphabetSize/2; i++ {
+		m.plugboard[i], m.plugboard[half[i]] = half[i], i
 	}
+}
+
+// isReflectorCorrect returns true if reflector is initialized correctly.
+func (m *Machine) isReflectorCorrect() bool {
+	return helper.AreElementsIndices(m.reflector[:]) &&
+		helper.IsSymmetric(m.reflector[:])
+}
+
+// isPlugboardCorrect returns true if plugboard connections initialized correctly.
+func (m *Machine) isPlugboardCorrect() bool {
+	return helper.AreElementsIndices(m.plugboard[:]) &&
+		helper.IsSymmetric(m.plugboard[:])
 }
