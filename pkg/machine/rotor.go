@@ -22,6 +22,17 @@ type Rotor struct {
 	cycle      int               // Number of rotor steps considered a full cycle.
 }
 
+// NewRotor returns a pointer to a new Rotor object initialized with the specified
+// fields. Returns an initialization error if fields are incorrect.
+func NewRotor(pathways [alphabetSize]int, position, step, cycle int) (*Rotor, error) {
+	r := new(Rotor)
+	if err := r.InitRotor(pathways, position, step, cycle); err != nil {
+		return nil, err
+	}
+
+	return r, nil
+}
+
 // GenerateRotor generates and rotor with random configurations and
 // returns a pointer to it.
 func GenerateRotor() *Rotor {
