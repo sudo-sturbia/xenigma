@@ -23,6 +23,12 @@ func (m *Machine) SetRotors(rotors []*Rotor) error {
 		return &initError{"no rotors given"}
 	}
 
+	for i, rotor := range rotors {
+		if rotor == nil {
+			return &initError{fmt.Sprintf("rotor %d: doesn't exist", i)}
+		}
+	}
+
 	m.setNumberOfRotors(len(rotors))
 
 	m.rotors = make([]*Rotor, m.numberOfRotors)

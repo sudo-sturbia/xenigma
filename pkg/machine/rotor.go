@@ -98,10 +98,6 @@ func (r *Rotor) isGivenConfigCorrect(pathways [alphabetSize]int, position, step,
 		return &initError{"electric pathways are incorrect"}
 	}
 
-	if (position)%step != 0 || position < 0 || position > alphabetSize {
-		return &initError{"rotor's position is incorrect"}
-	}
-
 	if step <= 0 {
 		return &initError{fmt.Sprintf("invalid step size %d", step)}
 	}
@@ -112,6 +108,10 @@ func (r *Rotor) isGivenConfigCorrect(pathways [alphabetSize]int, position, step,
 
 	if ((alphabetSize) % (step * cycle)) != 0 {
 		return &initError{"cycle size and step size are not compatible, some collisions may occur"}
+	}
+
+	if (position)%step != 0 || position < 0 || position > alphabetSize {
+		return &initError{"rotor's position is incorrect"}
 	}
 
 	return nil
