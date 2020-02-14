@@ -9,15 +9,21 @@ import (
 )
 
 // jsonMachine is a struct used for reading and writing of Machine's configs
-// into a json file. Fields in jsonMachine mirror those in a Machine but use
-// string arrays instead of int arrays.
+// from/into a json file. Fields in jsonMachine mirror those in a Machine but
+// use string arrays instead of int arrays.
 type jsonMachine struct {
-	PathConnections      [][alphabetSize]string `json:"pathways"`
-	Reflector            [alphabetSize]string   `json:"reflector"`
-	PlugboardConnections [alphabetSize]string   `json:"plugboard"`
-	RotorsPositions      []string               `json:"rotorPositions"`
-	Step                 int                    `json:"rotorStep"`
-	Cycle                int                    `json:"rotorCycle"`
+	Rotors    []*jsonRotor         `json:"rotors"`
+	Reflector [alphabetSize]string `json:"reflector"`
+	Plugboard [alphabetSize]string `json:"plugboard"`
+}
+
+// jsonRotor is used to marshall/unmarshall Rotor configs from/into a json
+// file. Fields in jsonRotor mirror those in Rotor but use strings.
+type jsonRotor struct {
+	Pathways [alphabetSize]string `json:"pathways"`
+	Position string               `json:"position"`
+	Step     int                  `json:"step"`
+	Cycle    int                  `json:"cycle"`
 }
 
 // Read loads a machine from a JSON file and verifies its configurations.
@@ -35,7 +41,7 @@ func Read(path string) (*Machine, error) {
 		return nil, fmt.Errorf("could not read contents of config file %s", path)
 	}
 
-	m, err := parseMachineJSON(fileContents)
+	m, err := parseMachine(fileContents)
 	if err != nil {
 		return nil, fmt.Errorf("could not unmarshal %s: %s", path, err.Error())
 	}
@@ -48,44 +54,41 @@ func Read(path string) (*Machine, error) {
 	return m, nil
 }
 
-// parseMachineJSON parses a given file's byte array into character arrays,
+// parseMachine parses a given file's byte array into character arrays,
 // Creates a Machine object, Sets Machine's fields, and returns a pointer.
 // An error is returned in case of invalid configs.
-func parseMachineJSON(fileContents []byte) (*Machine, error) {
+func parseMachine(fileContents []byte) (*Machine, error) {
 	var jsonM jsonMachine
-
 	if err := json.Unmarshal(fileContents, &jsonM); err != nil {
 		return nil, err
 	}
 
-	// Verify arrays' sizes
-	if len(jsonM.PathConnections) != len(jsonM.RotorsPositions) {
-		return nil, &initError{"pathways and rotors positions arrays are not of the same size"}
+	// Verify rotors' slice
+	if jsonM.Rotors == nil || len(jsonM.Rotors) == 0 {
+		return nil, &initError{"no rotors given"}
 	}
 
-	// Parse jsonM into a Machine
 	m := new(Machine)
-	m.setNumberOfRotors(len(jsonM.PathConnections))
 
-	// Electric pathways
-	m.pathConnections = make([][alphabetSize]int, m.numberOfRotors)
-
-	for i := 0; i < m.numberOfRotors; i++ {
-		for j, connection := range jsonM.PathConnections[i] {
-			if num, verify := strToInt(connection); verify {
-				m.pathConnections[i][j] = num
-			} else {
-				return nil, &initError{fmt.Sprintf("pathways contain invalid value %v",
-					connection)}
-			}
-
+	// Rotors
+	rotorCount := len(jsonM.Rotors)
+	rotors := make([]*Rotor, rotorCount)
+	for i := 0; i < rotorCount; i++ {
+		if rotor, err := m.parseRotor(jsonM.Rotors[i]); err != nil {
+			return nil, err
+		} else {
+			rotors[i] = rotor
 		}
 	}
 
+	if err := m.SetRotors(rotors); err != nil {
+		return nil, err
+	}
+
 	// Plugboard
-	for i, connection := range jsonM.PlugboardConnections {
+	for i, connection := range jsonM.Plugboard {
 		if num, verify := strToInt(connection); verify {
-			m.plugboardConnections[i] = num
+			m.plugboard[i] = num
 		} else {
 			return nil, &initError{fmt.Sprintf("plugboard contains invalid value %v",
 				connection)}
@@ -102,23 +105,42 @@ func parseMachineJSON(fileContents []byte) (*Machine, error) {
 		}
 	}
 
-	// Rotors
-	rotorsPositions := make([]int, m.numberOfRotors)
-	for i, position := range jsonM.RotorsPositions {
-		if num, verify := strToInt(position); verify {
-			rotorsPositions[i] = num
-		} else {
-			return nil, &initError{fmt.Sprintf("rotorsPositions contains invalid value %v",
-				position)}
-		}
+	return m, nil
+}
 
+// parseRotor parses a given jsonRotor into a Rotor object. Returns
+// parsed Rotor and an error in case of incorrect configs.
+func (m *Machine) parseRotor(parse *jsonRotor) (*Rotor, error) {
+	parsed := new(Rotor)
+
+	var (
+		pathways [alphabetSize]int
+		position int
+	)
+
+	// Pathways
+	for i, connection := range parse.Pathways {
+		if num, ok := strToInt(connection); ok {
+			pathways[i] = num
+		} else {
+			return nil, &initError{fmt.Sprintf("rotor pathways contain invalid value %v",
+				connection)}
+		}
 	}
 
-	if err := m.initRotors(rotorsPositions, jsonM.Step, jsonM.Cycle); err != nil {
+	// Position, step, and cycle.
+	if num, ok := strToInt(parse.Position); ok {
+		position = num
+	} else {
+		return nil, &initError{fmt.Sprintf("given rotor position %v is incorrect",
+			position)}
+	}
+
+	if err := parsed.InitRotor(pathways, position, parse.Step, parse.Cycle); err != nil {
 		return nil, err
 	}
 
-	return m, nil
+	return parsed, nil
 }
 
 // Write writes configurations of a Machine object to a JSON file.
@@ -131,30 +153,19 @@ func (m *Machine) Write(path string) error {
 
 	jsonM := new(jsonMachine)
 
-	// Electric pathways
-	jsonM.PathConnections = make([][alphabetSize]string, m.numberOfRotors)
-	for i := 0; i < m.numberOfRotors; i++ {
-		for j := 0; j < alphabetSize; j++ {
-			jsonM.PathConnections[i][j] = intToStr(m.pathConnections[i][j])
-		}
-	}
-
 	for i := 0; i < alphabetSize; i++ {
 		// Plugboard
-		jsonM.PlugboardConnections[i] = intToStr(m.plugboardConnections[i])
+		jsonM.Plugboard[i] = intToStr(m.plugboard[i])
 
 		// Reflector
 		jsonM.Reflector[i] = intToStr(m.reflector[i])
 	}
 
 	// Rotors
-	jsonM.RotorsPositions = make([]string, m.numberOfRotors)
+	jsonM.Rotors = make([]*jsonRotor, m.numberOfRotors)
 	for i := 0; i < m.numberOfRotors; i++ {
-		jsonM.RotorsPositions[i] = intToStr(m.RotorPositions()[i])
+		jsonM.Rotors[i] = m.marshalRotor(m.rotors[i])
 	}
-
-	jsonM.Step = m.step
-	jsonM.Cycle = m.cycle
 
 	contents, err := json.MarshalIndent(jsonM, "", "\t")
 	if err != nil {
@@ -167,6 +178,24 @@ func (m *Machine) Write(path string) error {
 	}
 
 	return nil
+}
+
+// marshalRotor creates and returns a jsonRotor object with properties
+// similar to given Rotor object.
+func (m *Machine) marshalRotor(rotor *Rotor) *jsonRotor {
+	marshalled := new(jsonRotor)
+
+	// Pathways
+	for i := 0; i < alphabetSize; i++ {
+		marshalled.Pathways[i] = intToStr(rotor.pathways[i])
+	}
+
+	// Position, step, and cycle
+	marshalled.Position = intToStr(rotor.position)
+	marshalled.Step = rotor.step
+	marshalled.Cycle = rotor.cycle
+
+	return marshalled
 }
 
 // strToInt verifies that a given string contains one alphabetical
