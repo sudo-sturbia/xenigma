@@ -77,8 +77,8 @@ type Machine struct {
 	reflector [alphabetSize]int // Reflector connections, symmetric
 	plugboard [alphabetSize]int // Plugboard connections, symmetric
 
-	rotors         []Rotor // Machine's mechanical rotors
-	numberOfRotors int     // Number of rotors used in the machine
+	rotors         []*Rotor // Machine's mechanical rotors
+	numberOfRotors int      // Number of rotors used in the machine
 }
 
 // Initializion error
@@ -119,7 +119,7 @@ func Load(numberOfRotors int, overwrite bool) (*Machine, error) {
 
 // SetComponents initializes all components of the machine.
 // Returns an error if given incorrect configurations.
-func (m *Machine) SetComponents(rotors []Rotor, plugboard [alphabetSize]int, reflector [alphabetSize]int) error {
+func (m *Machine) SetComponents(rotors []*Rotor, plugboard [alphabetSize]int, reflector [alphabetSize]int) error {
 	if err := m.SetRotors(rotors); err != nil {
 		return err
 	}
@@ -142,9 +142,9 @@ func Generate(numberOfRotors int) *Machine {
 
 	m := new(Machine)
 
-	rotors := make([]Rotor, numberOfRotors)
+	rotors := make([]*Rotor, numberOfRotors)
 	for i := 0; i < numberOfRotors; i++ {
-		rotors[i] = *GenerateRotor()
+		rotors[i] = GenerateRotor()
 	}
 	m.SetRotors(rotors)
 
@@ -159,7 +159,7 @@ func Generate(numberOfRotors int) *Machine {
 func (m *Machine) IsConfigCorrect() error {
 	switch {
 	case !m.areRotorsCorrect():
-		return &initError{"rotors configurations are invalid"}
+		return &initError{"rotors' configurations are invalid"}
 	case !m.isReflectorCorrect():
 		return &initError{"reflector connections are incorrect"}
 	case !m.isPlugboardCorrect():

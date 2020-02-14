@@ -18,14 +18,14 @@ func (m *Machine) stepRotors() {
 
 // SetRotors verifies and sets machine's rotors. Returns an error
 // if configurations of given rotors are incorrect, nil otherwise.
-func (m *Machine) SetRotors(rotors []Rotor) error {
+func (m *Machine) SetRotors(rotors []*Rotor) error {
 	if rotors == nil || len(rotors) <= 0 {
 		return &initError{"no rotors given"}
 	}
 
 	m.setNumberOfRotors(len(rotors))
 
-	m.rotors = make([]Rotor, m.numberOfRotors)
+	m.rotors = make([]*Rotor, m.numberOfRotors)
 	for i, rotor := range rotors {
 		if err := rotor.IsConfigCorrect(); err != nil {
 			return fmt.Errorf("rotor %d: %s", i, err.Error())

@@ -123,15 +123,15 @@ func TestStepRotors(t *testing.T) {
 	)
 
 	takeSteps(testMachine, 15)
-	if !compareSettings(testMachine, []int{13, 13, 13}) {
+	if !compareSettings(testMachine, []int{13, 13, 13, 13, 0, 0, 0, 0, 0, 0, 0, 0}) {
 		t.Errorf("incorrect setting, expected %v, got %v",
-			[]int{13, 13, 13}, testMachine.Setting())
+			[]int{13, 13, 13, 13, 0, 0, 0, 0, 0, 0, 0, 0}, testMachine.Setting())
 	}
 
 	takeSteps(testMachine, 30)
-	if !compareSettings(testMachine, []int{13, 0, 13}) {
+	if !compareSettings(testMachine, []int{13, 0, 13, 13, 0, 13, 0, 0, 0, 0, 0, 0}) {
 		t.Errorf("incorrect setting, expected %v, got %v",
-			[]int{13, 0, 13}, testMachine.Setting())
+			[]int{13, 0, 13, 13, 0, 13, 0, 0, 0, 0, 0, 0}, testMachine.Setting())
 	}
 
 	// 3 rotors, rotor 0 {step = 1, cycle = 1}
@@ -238,20 +238,7 @@ func TestSetRotors(t *testing.T) {
 	r2, _ := NewRotor(pathways, 11, 1, 26)
 	r3, _ := NewRotor(pathways, 24, 1, 26)
 
-	err = testMachine.SetRotors([]Rotor{*r1, *r2, *r3})
-	if err == nil {
-		t.Errorf("incorrect set of rotors doesn't produce error")
-	}
-
-	// Incorrect pathways
-	pathways = [alphabetSize]int{
-		1, 2, 0, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
-		14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
-	}
-
-	r1, _ = NewRotor(pathways, 0, 1, 26)
-
-	err = testMachine.SetRotors([]Rotor{*r1, *r2, *r3})
+	err = testMachine.SetRotors([]*Rotor{r1, r2, r3})
 	if err == nil {
 		t.Errorf("incorrect set of rotors doesn't produce error")
 	}
@@ -288,30 +275,20 @@ func TestInitRotor(t *testing.T) {
 	if _, err := NewRotor(pathways, 0, 1, 0); err == nil {
 		t.Errorf("incorrect configuration doesn't produce error")
 	}
-
-	// Incorrect init - wrong pathways
-	pathways = [alphabetSize]int{
-		1, 2, 0, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
-		14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
-	}
-
-	if _, err := NewRotor(pathways, 0, 1, 26); err == nil {
-		t.Errorf("incorrect configuration doesn't produce error")
-	}
 }
 
 // Return an array of rotors initialized with the given properties
 // and with pathway connections ["a", "b", "c", ...] for all.
-func initRotorArr(rotorHeads []int, steps []int, cycles []int) []Rotor {
+func initRotorArr(rotorHeads []int, steps []int, cycles []int) []*Rotor {
 	pathways := [alphabetSize]int{
 		0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
 		14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
 	}
 
 	rotorCount := len(rotorHeads)
-	rotors := make([]Rotor, rotorCount)
+	rotors := make([]*Rotor, rotorCount)
 	for i := 0; i < rotorCount; i++ {
-		rotors[i].InitRotor(pathways, rotorHeads[i], steps[i], cycles[i])
+		rotors[i], _ = NewRotor(pathways, rotorHeads[i], steps[i], cycles[i])
 	}
 
 	return rotors
