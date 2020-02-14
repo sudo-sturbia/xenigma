@@ -8,9 +8,9 @@ import (
 
 // Encrypt encrypts a string using a Machine object.
 // Returns encrypted string and an error in case of an incorrect configuration.
-// Uppercase and lowercase letters are treated similarly and produce the same
-// results. Non-alphabetical characters are returned without change, and don't
-// affect rotors' movement (rotors are not shifted).
+// When encrypting uppercase and lowercase letters are treated similarly and
+// produce the same results. Non-alphabetical characters are returned without
+// change, and don't affect rotors' movement (rotors are not shifted).
 func (m *Machine) Encrypt(message string) (string, error) {
 	if err := m.IsConfigCorrect(); err != nil {
 		return "", err

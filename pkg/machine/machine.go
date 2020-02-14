@@ -1,61 +1,96 @@
 /*
 Package machine represents an xenigma machine which is a modified version
-of the enigma machine used for encryption and decryption of text messages.
+of enigma used for encryption and decryption of text messages.
 
-The machine consists of the following components: electric pathways,
-reflector, plugboard, and a variable number of rotors.
+The machine consists of Rotors, plugboard, and reflector. machine package
+contains two structs machine.Machine, and machine.Rotor.
 
 A machine object can be created using machine.Load, machine.Generate,
-machine.Read, or by simply creating a empty Machine object and calling
-SetComponents method.
+machine.Read, or by creating a machine pointer and using available setters
+to specify machine's components.
 
-machine.Load is meant for usage in an independent program. The other
+machine.Load is meant for usage in an independent program, the other
 three options are more suitable for usage when the package is imported.
 
-Encrypt is the method used for encryption (or decryption) of strings
-and is simply used as the following.
-    m := machine.Generate(3)
-    encrypted := m.Encrypt("message")
+Encryption / decryption is done using Machine.Encrypt, which can be used
+simply as the following.
+    m := machine.Generate(10)
+    encrypted := m.Encrypt("Hello, world!")
 
 Configuration
 
-All components of the machine can be configured through JSON or using the
-collective setter SetComponents. An example of a JSON config file is the
-following
+Every component of xenigma can be configured through JSON, or by using
+available setters. An example of a JSON config file is the following
 	{
-		"pathways": [
-			["a", "b", "c", ...],
-			["a", "b", "c", ...],
-			["a", "b", "c", ...]
+		"rotors": [
+			{
+				"pathways": ["a", "b", "c", ...],
+				"position": "a",
+				"step": 1,
+				"cycle": 26
+			},
+			{
+				"pathways": ["a", "b", "c", ...],
+				"position": "b",
+				"step": 1,
+				"cycle": 26
+			},
+			{
+				"pathways": ["a", "b", "c", ...],
+				"position": "c",
+				"step": 1,
+				"cycle": 26
+			}
 		],
+
 		"reflector": ["a", "b", "c", ...],
-		"plugboard": ["a", "b", "c", ...],
-		"rotorPositions": ["a", "b", "c"],
-		"rotorStep": 1,
-		"rotorCycle": 26
+		"plugboard": ["a", "b", "c", ...]
 	}
 
-Connections: pathways, reflector, and plugboard, are all specified through
-JSON arrays where elements' indices represent a character's position in
-the alphabet. Meaning that if, in reflector array, element at index 0 is
-"b" then "a" is connected to "b".
+Rotors
 
-A machine can have any number of rotors given that it's > 0. A machine's
-step and cycle sizes can also be configured.
+Rotors are represented using machine.Rotor struct. A xenigma machine
+can have any number of rotors, the number of rotors is size the of "rotors"
+array in JSON or the size of the slice given to the setter.
 
-Step represents the size of the shift between rotor steps. For example if
-step size is 2 then rotors jump 2 positions when shifting. A rotor at position
-"a" jumps to "c".
+Rotor's fields are: pathways, position, step, and cycle.
 
-Cycle represents the number of steps considered a full cycle, after which
-the following rotor is shifted. For example in a 3-rotor machine if cycle
-size is 13 then the second rotor is shifted once every time the first rotor
-completes 13 steps, the third rotor operates similarly but depends on second
-rotor's movement, etc.
+Pathways are the electric connections between characters. Pathways
+are represented using a 26 element array where indices represent characters
+and array elements represent the character they are connected to. For
+example if element at index 0 is "b", then "a" (character 0) is connected
+to "b".
 
-To avoid collisions and guarantee that a rotor configuration can be reached
-using only one step sequence (step x cycle) must divide 26 (alphabet size).
-Combinations that don't satisfy that relation are considered wrong.
+Position is the current position of the rotor, which must be reachable
+from the starting position "a".
+
+Step is the number of positions a rotor shifts when stepping once
+(the size of rotor's jump.) For example if a rotor at position "a", with
+step = 3 steps once, then rotor's position changes to "d". The default step
+size is 1.
+
+Cycle is the number of rotor steps considered a full cycle, after which
+the following rotor steps (is shifted.) For example, if a rotor has
+a cycle = 13, then the rotor needs to complete 13 steps in order for the
+following rotor to step once. The default cycle size is 26.
+
+To avoid position collisions and guarantee that a rotor configuration
+can be reached using only one sequence of steps, (step*cycle) must divide
+26 -> (step*cycle % 26 == 0). Combinations that don't satisfy that relation
+are considered wrong.
+
+Reflector
+
+Reflector is a connections array similar to pathways with a condition
+that it must be symmetric, meaning that if "a" is connected to "b", then
+"b" must also be connected to "a".
+
+Plugboard
+
+Plugboard is also a connections array exactly the same as a reflector.
+Note that the plugboard is required to have 26 elements, so characters
+not connected to anything should be connected to themselves (so that
+they wouldn't be transformed.)
 
 Licensed under MIT license @github.com/sudo-sturbia
 */
@@ -169,12 +204,12 @@ func (m *Machine) IsConfigCorrect() error {
 	}
 }
 
-// Reflector returns reflector connections.
+// Reflector returns machine's reflector connections.
 func (m *Machine) Reflector() [alphabetSize]int {
 	return m.reflector
 }
 
-// Plugboard returns plugboard connections.
+// Plugboard returns machine's plugboard connections.
 func (m *Machine) Plugboard() [alphabetSize]int {
 	return m.plugboard
 }
@@ -201,7 +236,7 @@ func (m *Machine) SetPlugboard(plugboard [alphabetSize]int) error {
 	return nil
 }
 
-// GenerateReflector creates random reflector connections.
+// GenerateReflector creates random reflector connections for the current machine.
 func (m *Machine) GenerateReflector() {
 	half := []int{13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}
 	rand.Shuffle(alphabetSize/2, func(i, j int) {
@@ -214,7 +249,7 @@ func (m *Machine) GenerateReflector() {
 	}
 }
 
-// GeneratePlugboard creates random plugboard connections.
+// GeneratePlugboard creates random plugboard connections for the current machine.
 func (m *Machine) GeneratePlugboard() {
 	half := []int{13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}
 	rand.Shuffle(alphabetSize/2, func(i, j int) {

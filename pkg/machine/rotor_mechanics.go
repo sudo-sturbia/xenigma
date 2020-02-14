@@ -59,7 +59,7 @@ func (m *Machine) areRotorsCorrect() bool {
 	return true
 }
 
-// Setting returns current rotor setting (position of machine's rotors).
+// Setting returns current rotor setting (positions of machine's rotors).
 func (m *Machine) Setting() []int {
 	setting := make([]int, m.numberOfRotors)
 	for i, rotor := range m.rotors {

@@ -74,11 +74,12 @@ func parseMachine(fileContents []byte) (*Machine, error) {
 	rotorCount := len(jsonM.Rotors)
 	rotors := make([]*Rotor, rotorCount)
 	for i := 0; i < rotorCount; i++ {
-		if rotor, err := m.parseRotor(jsonM.Rotors[i]); err != nil {
+		rotor, err := m.parseRotor(jsonM.Rotors[i])
+		if err != nil {
 			return nil, err
-		} else {
-			rotors[i] = rotor
 		}
+
+		rotors[i] = rotor
 	}
 
 	if err := m.SetRotors(rotors); err != nil {

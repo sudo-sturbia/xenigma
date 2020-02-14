@@ -33,8 +33,8 @@ func NewRotor(pathways [alphabetSize]int, position, step, cycle int) (*Rotor, er
 	return r, nil
 }
 
-// GenerateRotor generates and rotor with random configurations and
-// returns a pointer to it.
+// GenerateRotor generates and returns a rotor with random configurations
+// and returns a pointer to it.
 func GenerateRotor() *Rotor {
 	r := new(Rotor)
 	r.pathways = [alphabetSize]int{
@@ -75,10 +75,10 @@ func (r *Rotor) InitRotor(pathways [alphabetSize]int, position, step, cycle int)
 	return nil
 }
 
-// DefaultProperties sets all rotor's properties, except pathways,
+// UseDefaultProperties sets all rotor's fields, except pathways,
 // to their default values. Defaults are 'a' for position, 1 for
 // step size, and 26 for cycle size.
-func (r *Rotor) DefaultProperties() {
+func (r *Rotor) UseDefaultProperties() {
 	r.setPosition(0, DefaultStep, DefaultCycle)
 	r.setStep(DefaultStep)
 	r.setCycle(DefaultCycle)
