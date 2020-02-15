@@ -43,6 +43,22 @@ func (m *Machine) SetRotors(rotors []*Rotor) error {
 	return nil
 }
 
+// UseRotorsDefaults sets all properties of machine's rotors, except pathways
+// to their default values. Returns an error if rotors are not initialized.
+func (m *Machine) UseRotorsDefaults() error {
+	for i, rotor := range m.rotors {
+		if rotor == nil {
+			return &initError{fmt.Sprintf("rotor %d: doesn't exist.", i)}
+		}
+
+		rotor.resetPosition()
+		rotor.setStep(DefaultStep)
+		rotor.setCycle(DefaultCycle)
+	}
+
+	return nil
+}
+
 // areRotorsCorrect returns true if rotors are initialized correctly and
 // verifies all rotor related values.
 func (m *Machine) areRotorsCorrect() bool {

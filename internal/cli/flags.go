@@ -91,7 +91,9 @@ func generatewIf() *machine.Machine {
 // defaultsIf handles the execution of -default-rotors flag.
 func defaultsIf(m *machine.Machine) {
 	if *defaults { // Use default values for rotors
-		m.UseRotorDefaults()
+		if err := m.UseRotorsDefaults(); err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
@@ -147,9 +149,9 @@ func verifyIf() {
 
 		_, err := machine.Read(*verify)
 		if err != nil {
-			fmt.Printf("Config is INCORRECT\n%s\n", err.Error())
+			fmt.Printf("INVALID: %s\n", err.Error())
 		} else {
-			fmt.Println("Config is CORRECT")
+			fmt.Println("VALID")
 		}
 	}
 }
@@ -232,39 +234,65 @@ func helpIf() {
 				"    An example of a ~/.config/xenigma.json is the following\n" +
 				"\n" +
 				"    {\n" +
-				"        \"pathways\": [\n" +
-				"             [\"a\", \"b\", \"c\", ...],\n" +
-				"             [\"a\", \"b\", \"c\", ...],\n" +
-				"             [\"a\", \"b\", \"c\", ...]\n" +
+				"        \"rotors\": [\n" +
+				"            {\n" +
+				"                \"pathways\": [\"a\", \"b\", \"c\", ...],\n" +
+				"                \"position\": \"a\",\n" +
+				"                \"step\": 1,\n" +
+				"                \"cycle\": 26\n" +
+				"            },\n" +
+				"            {\n" +
+				"                \"pathways\": [\"a\", \"b\", \"c\", ...],\n" +
+				"                \"position\": \"b\",\n" +
+				"                \"step\": 1,\n" +
+				"                \"cycle\": 26\n" +
+				"            },\n" +
+				"            {\n" +
+				"                \"pathways\": [\"a\", \"b\", \"c\", ...],\n" +
+				"                \"position\": \"c\",\n" +
+				"                \"step\": 1,\n" +
+				"                \"cycle\": 26\n" +
+				"            }\n" +
 				"        ],\n" +
+				"        \n" +
 				"        \"reflector\": [\"a\", \"b\", \"c\", ...],\n" +
-				"        \"plugboard\": [\"a\", \"b\", \"c\", ...],\n" +
-				"        \"rotorPositions\": [\"a\", \"b\", \"c\"],\n" +
-				"        \"rotorStep\": 1,\n" +
-				"        \"rotorCycle\": 26\n" +
-				"    }\n" +
+				"        \"plugboard\": [\"a\", \"b\", \"c\", ...]\n" +
+				"	}\n" +
 				"\n" +
-				"    xenigma allows for a variable number of rotors. The number of rotors is\n" +
-				"    is decided through the number of electric pathways arrays, or the number\n" +
-				"    of rotor positions, which should be equal.\n" +
+				"    Rotors\n" +
 				"\n" +
-				"    Connections, such as pathways, plugboard, and reflector are specified\n" +
-				"    through arrays where an element's index represents a character's position\n" +
-				"    in the alphabet. For example if element at index 0 of plugboard array is\n" +
-				"    \"c\", then \"a\" is connected to \"c\"." +
+				"    xenigma allows for any number of rotors. The number of rotors is the size\n" +
+				"    of \"rotors\" array in ~/.config/xenigma.json\n" +
 				"\n" +
-				"    Both reflector and plugboard arrays should be symmetric, meaning that if\n" +
-				"    \"a\" is connected to \"b\", \"b\" must also be connected to \"a\". Otherwise\n" +
-				"    connections are considered incorrect.\n" +
+				"    Rotor's fields are: pathways, position, step, and cycle.\n" +
 				"\n" +
-				"    xenigma also allows for configuration of rotors' step and cycle sizes.\n" +
-				"    Step size is the number of positions a rotor jumps when shifting. For\n" +
-				"    example if a rotor, with step size 2, is at position \"a\", then the rotor\n" +
-				"    will jump to \"c\" when shifted once.\n" +
-				"    Cycle size is the number of steps a rotor takes to complete a full cycle.\n" +
-				"    when a rotor completes a full cycle, the adjacent rotor is shifted. For\n" +
-				"    example in a 3-rotor machine if cycle size is 13 then the second rotor\n " +
-				"    is shifted once every time the first rotor completes 13 steps, the third\n " +
-				"    rotor operates similarly but depends on second rotor's movement, etc.")
+				"    Pathways are represented using a 26 element array where indices represent \n" +
+				"    characters and array elements represent the character they are connected\n" +
+				"    to. For example if element at index 0 is \"b\", then \"a\" (character 0) is \n" +
+				"    connected to \"b\".\n" +
+				"\n" +
+				"    Position is an integer which represents the current position of the rotor, \n" +
+				"    and must be reachable from the starting position (\"a\").\n" +
+				"\n" +
+				"    Step is the number of positions a rotor shifts when stepping once (the size \n" +
+				"    of rotor's jump.) For example if a rotor at position \"a\", with step = 3, \n" +
+				"    steps once, then rotor's position changes to \"d\". The default step size is 1.\n" +
+				"\n" +
+				"    Cycle is the number of rotor steps considered a full cycle, after which the\n" +
+				"    following rotor steps (is shifted.) For example, if a rotor has a cycle = 13,\n" +
+				"    then the rotor needs to complete 13 steps in order for the following rotor \n" +
+				"    to step once. The default cycle size is 26.\n" +
+				"\n" +
+				"    Reflector\n" +
+				"\n" +
+				"    Reflector is a connections array similar to pathways with a condition that\n" +
+				"    it must be symmetric, meaning that if \"a\" is connected to \"b\", then \"b\" \n" +
+				"    must also be connected to \"a\".\n" +
+				"\n" +
+				"    Plugboard\n" +
+				"    Plugboard is also a connections array exactly the same as a reflector.\n" +
+				"    Note that the plugboard is required to have 26 elements, so characters not\n" +
+				"    connected to anything should be connected to themselves (so that they\n" +
+				"    wouldn't be transformed.)")
 	}
 }
