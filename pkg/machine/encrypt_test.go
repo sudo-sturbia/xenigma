@@ -6,6 +6,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/sudo-sturbia/xenigma/pkg/helper"
 )
 
 // Example of usage of the machine package.
@@ -52,12 +54,23 @@ func TestEncrypt(t *testing.T) {
 	}
 }
 
-// Benchmark encryption in a 1000-rotor machine.
+// Benchmark encryption using a 1000-rotor machine.
 func BenchmarkEncrypt(b *testing.B) {
 	m := Generate(1000)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		m.Encrypt("Hello, world!\nThis is a benchmark.")
+	}
+}
+
+// Benchmark encryption of README.md using a 1000-rotor machine.
+func BenchmarkEncryptREADME(b *testing.B) {
+	m := Generate(1000)
+	message := helper.ReadStringFromFile("../../README.md")
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		m.Encrypt(message)
 	}
 }
 
