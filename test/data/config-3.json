@@ -1,15 +1,43 @@
 {
-    "pathways": [
-        ["j", "h", "s", "e", "y", "z", "r", "k", "p", "m", "x", "i", "w", "b", "v", "f", "d", "c", "a", "t", "l", "o", "n", "g", "u", "q"],
-        ["r", "x", "m", "b", "h", "e", "j", "f", "y", "d", "n", "c", "g", "t", "l", "z", "p", "v", "o", "a", "q", "w", "u", "s", "k", "i"],
-        ["t", "s", "h", "m", "c", "v", "n", "y", "r", "q", "p", "e", "i", "u", "k", "z", "w", "d", "j", "a", "f", "x", "g", "b", "o", "l"],
-        ["n", "c", "v", "w", "q", "t", "h", "z", "o", "m", "a", "s", "x", "r", "g", "u", "d", "i", "f", "k", "j", "b", "e", "y", "p", "l"],
-        ["t", "s", "h", "m", "c", "v", "n", "y", "r", "q", "p", "e", "i", "u", "k", "z", "w", "d", "j", "a", "f", "x", "g", "b", "o", "l"],
-        ["n", "c", "v", "w", "q", "t", "h", "z", "o", "m", "a", "s", "x", "r", "g", "u", "d", "i", "f", "k", "j", "b", "e", "y", "p", "l"]
+    "rotors": [
+        {
+            "pathways": ["j", "h", "s", "e", "y", "z", "r", "k", "p", "m", "x", "i", "w", "b", "v", "f", "d", "c", "a", "t", "l", "o", "n", "g", "u", "q"],
+            "position": "a",
+            "step": 1,
+            "cycle": 26
+        },
+        {
+            "pathways": ["r", "x", "m", "b", "h", "e", "j", "f", "y", "d", "n", "c", "g", "t", "l", "z", "p", "v", "o", "a", "q", "w", "u", "s", "k", "i"],
+            "position": "b",
+            "step": 1,
+            "cycle": 26
+        },
+        {
+            "pathways": ["t", "s", "h", "m", "c", "v", "n", "y", "r", "q", "p", "e", "i", "u", "k", "z", "w", "d", "j", "a", "f", "x", "g", "b", "o", "l"],
+            "position": "c",
+            "step": 1,
+            "cycle": 26
+        },
+        {
+            "pathways": ["n", "c", "v", "w", "q", "t", "h", "z", "o", "m", "a", "s", "x", "r", "g", "u", "d", "i", "f", "k", "j", "b", "e", "y", "p", "l"],
+            "position": "a",
+            "step": 1,
+            "cycle": 26
+        },
+        {
+            "pathways": ["t", "s", "h", "m", "c", "v", "n", "y", "r", "q", "p", "e", "i", "u", "k", "z", "w", "d", "j", "a", "f", "x", "g", "b", "o", "l"],
+            "position": "b",
+            "step": 1,
+            "cycle": 26
+        },
+        {
+            "pathways": ["n", "c", "v", "w", "q", "t", "h", "z", "o", "m", "a", "s", "x", "r", "g", "u", "d", "i", "f", "k", "j", "b", "e", "y", "p", "l"],
+            "position": "c",
+            "step": 1,
+            "cycle": 26
+        }
     ],
+
     "reflector": ["q", "y", "x", "n", "o", "r", "t", "w", "v", "p", "u", "z", "s", "d", "e", "j", "a", "f", "m", "g", "k", "i", "h", "c", "b", "l"],
-    "plugboard": ["r", "n", "w", "q", "p", "u", "v", "o", "y", "x", "s", "t", "z", "b", "h", "e", "d", "a", "k", "l", "f", "g", "c", "j", "i", "m"],
-    "rotorPositions": ["a", "b", "c", "a", "b", "c"],
-    "rotorStep": 1,
-    "rotorCycle": 26
+    "plugboard": ["r", "n", "w", "q", "p", "u", "v", "o", "y", "x", "s", "t", "z", "b", "h", "e", "d", "a", "k", "l", "f", "g", "c", "j", "i", "m"]
 }

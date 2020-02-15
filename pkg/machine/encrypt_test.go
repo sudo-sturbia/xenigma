@@ -6,6 +6,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/sudo-sturbia/xenigma/pkg/helper"
 )
 
 // Example of usage of the machine package.
@@ -49,6 +51,26 @@ func TestEncrypt(t *testing.T) {
 	encrypted2, _ := m2.Encrypt("Hello, again!")
 	if encrypted2 != "lcsml, fccmb!" {
 		t.Errorf("incorrect encryption of \"Hello, again!\",\nexpected \"lcsml, fccmb!\", got \"%s\"", encrypted2)
+	}
+}
+
+// Benchmark encryption using a 1000-rotor machine.
+func BenchmarkEncrypt(b *testing.B) {
+	m := Generate(1000)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		m.Encrypt("Hello, world!\nThis is a benchmark.")
+	}
+}
+
+// Benchmark encryption of README.md using a 1000-rotor machine.
+func BenchmarkEncryptREADME(b *testing.B) {
+	m := Generate(1000)
+	message := helper.ReadStringFromFile("../../README.md")
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		m.Encrypt(message)
 	}
 }
 
@@ -123,8 +145,8 @@ func TestEncryptCharAlpha(t *testing.T) {
 		t.Errorf("could not read configurations\n%s", err.Error())
 	}
 
-	// r -> u
-	encrypted1 := m1.encryptChar('r')
+	// r -> n
+	encrypted1 := m1.encryptChar('r', m1.flippedConnections())
 	if encrypted1 != 'n' {
 		t.Errorf("character 'r' encrypted to '%c', expected 'n'", encrypted1)
 	}
@@ -135,8 +157,8 @@ func TestEncryptCharAlpha(t *testing.T) {
 		t.Errorf("could not read configurations\n%s", err.Error())
 	}
 
-	// s -> d
-	encrypted2 := m2.encryptChar('s')
+	// s -> r
+	encrypted2 := m2.encryptChar('s', m2.flippedConnections())
 	if encrypted2 != 'r' {
 		t.Errorf("character 's' encrypted to '%c', expected 'r'", encrypted2)
 	}
@@ -153,7 +175,7 @@ func TestEncryptCharNonAlpha(t *testing.T) {
 
 	nonAlpha := []byte{',', ' ', '1', '\n', '[', '\t'}
 	for _, char := range nonAlpha {
-		encrypted := m.encryptChar(char)
+		encrypted := m.encryptChar(char, m.flippedConnections())
 		if encrypted != char {
 			t.Errorf("character '%c' encrypted to '%c', expected '%c'", char, encrypted, char)
 		}

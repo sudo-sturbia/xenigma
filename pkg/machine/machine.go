@@ -1,92 +1,128 @@
 /*
 Package machine represents an xenigma machine which is a modified version
-of the enigma machine used for encryption and decryption of text messages.
+of enigma used for encryption and decryption of text messages.
 
-The machine consists of the following components: electric pathways,
-reflector, plugboard, and a variable number of rotors.
+The machine consists of Rotors, plugboard, and reflector. machine package
+contains two structs machine.Machine, and machine.Rotor.
 
 A machine object can be created using machine.Load, machine.Generate,
-machine.Read, or by simply creating a empty Machine object and calling
-SetComponents method.
+machine.Read, or by creating a machine pointer and using available setters
+to specify machine's components.
 
-machine.Load is meant for usage in an independent program. The other
+machine.Load is meant for usage in an independent program, the other
 three options are more suitable for usage when the package is imported.
 
-Encrypt is the method used for encryption (or decryption) of strings
-and is simply used as the following.
-    m := machine.Generate(3)
-    encrypted := m.Encrypt("message")
+Encryption / decryption is done using Machine.Encrypt, which can be used
+simply as the following.
+    m := machine.Generate(10)
+    encrypted := m.Encrypt("Hello, world!")
 
 Configuration
 
-All components of the machine can be configured through JSON or using the
-collective setter SetComponents. An example of a JSON config file is the
-following
+Every component of xenigma can be configured through JSON, or by using
+available setters. An example of a JSON config file is the following
 	{
-		"pathways": [
-			["a", "b", "c", ...],
-			["a", "b", "c", ...],
-			["a", "b", "c", ...]
+		"rotors": [
+			{
+				"pathways": ["a", "b", "c", ...],
+				"position": "a",
+				"step": 1,
+				"cycle": 26
+			},
+			{
+				"pathways": ["a", "b", "c", ...],
+				"position": "b",
+				"step": 1,
+				"cycle": 26
+			},
+			{
+				"pathways": ["a", "b", "c", ...],
+				"position": "c",
+				"step": 1,
+				"cycle": 26
+			}
 		],
+
 		"reflector": ["a", "b", "c", ...],
-		"plugboard": ["a", "b", "c", ...],
-		"rotorPositions": ["a", "b", "c"],
-		"rotorStep": 1,
-		"rotorCycle": 26
+		"plugboard": ["a", "b", "c", ...]
 	}
 
-Connections: pathways, reflector, and plugboard, are all specified through
-JSON arrays where elements' indices represent a character's position in
-the alphabet. Meaning that if, in reflector array, element at index 0 is
-"b" then "a" is connected to "b".
+Rotors
 
-A machine can have any number of rotors given that it's > 0. A machine's
-step and cycle sizes can also be configured.
+Rotors are represented using machine.Rotor struct. A xenigma machine
+can have any number of rotors, the number of rotors is size the of "rotors"
+array in JSON or the size of the slice given to the setter.
 
-Step represents the size of the shift between rotor steps. For example if
-step size is 2 then rotors jump 2 positions when shifting. A rotor at position
-"a" jumps to "c".
+Rotor's fields are: pathways, position, step, and cycle.
 
-Cycle represents the number of steps considered a full cycle, after which
-the following rotor is shifted. For example in a 3-rotor machine if cycle
-size is 13 then the second rotor is shifted once every time the first rotor
-completes 13 steps, the third rotor operates similarly but depends on second
-rotor's movement, etc.
+Pathways are the electric connections between characters. Pathways
+are represented using a 26 element array where indices represent characters
+and array elements represent the character they are connected to. For
+example if element at index 0 is "b", then "a" (character 0) is connected
+to "b".
 
-To avoid collisions and guarantee that a rotor configuration can be reached
-using only one step sequence (step x cycle) must divide 26 (alphabet size).
-Combinations that don't satisfy that relation are considered wrong.
+Position is the current position of the rotor, which must be reachable
+from the starting position "a".
+
+Step is the number of positions a rotor shifts when stepping once
+(the size of rotor's jump.) For example if a rotor at position "a", with
+step = 3 steps once, then rotor's position changes to "d". The default step
+size is 1.
+
+Cycle is the number of rotor steps considered a full cycle, after which
+the following rotor steps (is shifted.) For example, if a rotor has
+a cycle = 13, then the rotor needs to complete 13 steps in order for the
+following rotor to step once. The default cycle size is 26.
+
+To avoid position collisions and guarantee that a rotor configuration
+can be reached using only one sequence of steps, (step*cycle) must divide
+26 -> (step*cycle % 26 == 0). Combinations that don't satisfy that relation
+are considered wrong.
+
+Reflector
+
+Reflector is a connections array similar to pathways with a condition
+that it must be symmetric, meaning that if "a" is connected to "b", then
+"b" must also be connected to "a".
+
+Plugboard
+
+Plugboard is also a connections array exactly the same as a reflector.
+Note that the plugboard is required to have 26 elements, so characters
+not connected to anything should be connected to themselves (so that
+they wouldn't be transformed.)
 
 Licensed under MIT license @github.com/sudo-sturbia
 */
 package machine
 
 import (
+	"math/rand"
 	"os"
+	"time"
+
+	"github.com/sudo-sturbia/xenigma/pkg/helper"
 )
 
-const (
-	alphabetSize = 26
-
-	// DefaultStep represents a Machine's default step size.
-	DefaultStep = 1
-
-	// DefaultCycle represents a Machine's default cycle size.
-	DefaultCycle = 26
-)
+const alphabetSize = 26
 
 // Machine represents an enigma machine with mechanical components.
 // Components are electric pathways, reflector, plugboard, and rotors.
 type Machine struct {
-	pathConnections      [][alphabetSize]int // Connections that form electric pathways
-	reflector            [alphabetSize]int   // Reflector connections, symmetric
-	plugboardConnections [alphabetSize]int   // Plugboard connections, symmetric
+	reflector [alphabetSize]int // Reflector connections, symmetric
+	plugboard [alphabetSize]int // Plugboard connections, symmetric
 
-	numberOfRotors int   // Number of rotors used in the machine
-	rotors         []int // Mechanical rotors' heads
-	takenSteps     []int // Number of steps taken by each rotor except the last
-	step           int   // Size of shift between rotor steps (move)
-	cycle          int   // Number of rotor steps considered a full cycle
+	rotors         []*Rotor // Machine's mechanical rotors
+	numberOfRotors int      // Number of rotors used in the machine
+}
+
+// Initializion error
+type initError struct {
+	message string
+}
+
+func (err *initError) Error() string {
+	return "incorrect init, " + err.message
 }
 
 // Load returns a fully initialized Machine object. Configurations of
@@ -118,51 +154,122 @@ func Load(numberOfRotors int, overwrite bool) (*Machine, error) {
 
 // SetComponents initializes all components of the machine.
 // Returns an error if given incorrect configurations.
-func (m *Machine) SetComponents(
-	pathways [][alphabetSize]int,
-	plugboard [alphabetSize]int,
-	reflector [alphabetSize]int,
-	rotorsPositions []int, step int, cycle int) error {
-
-	if len(pathways) != len(rotorsPositions) {
-		return &initError{"rotors and electric pathways are of different sizes"}
+func (m *Machine) SetComponents(rotors []*Rotor, plugboard [alphabetSize]int, reflector [alphabetSize]int) error {
+	if err := m.SetRotors(rotors); err != nil {
+		return err
 	}
 
-	m.setNumberOfRotors(len(pathways))
-	m.setPathConnections(pathways)
-	m.setPlugboard(plugboard)
-	m.setReflector(reflector)
-	m.initRotors(rotorsPositions, step, cycle)
+	if err := m.SetPlugboard(plugboard); err != nil {
+		return err
+	}
+
+	if err := m.SetReflector(reflector); err != nil {
+		return err
+	}
 
 	return m.IsConfigCorrect()
 }
 
-// PathConnections returns electric pathway connections
-func (m *Machine) PathConnections() [][alphabetSize]int {
-	return m.pathConnections
+// Generate creates a machine object with a specified number of rotors
+// containing randomly generated component configurations.
+func Generate(numberOfRotors int) *Machine {
+	rand.Seed(time.Now().UnixNano())
+
+	m := new(Machine)
+
+	rotors := make([]*Rotor, numberOfRotors)
+	for i := 0; i < numberOfRotors; i++ {
+		rotors[i] = GenerateRotor()
+	}
+	m.SetRotors(rotors)
+
+	m.GeneratePlugboard()
+	m.GenerateReflector()
+
+	return m
 }
 
-// setPathConnections sets path connections array in Machine.
-func (m *Machine) setPathConnections(paths [][alphabetSize]int) {
-	m.pathConnections = paths
+// IsConfigCorrect verifies that all fields of the machine are
+// initialized correctly, returns an error if not.
+func (m *Machine) IsConfigCorrect() error {
+	switch {
+	case !m.areRotorsCorrect():
+		return &initError{"rotors' configurations are invalid"}
+	case !m.isReflectorCorrect():
+		return &initError{"reflector connections are incorrect"}
+	case !m.isPlugboardCorrect():
+		return &initError{"plugboard connections are incorrect"}
+	default:
+		return nil
+	}
 }
 
-// Reflector returns reflector connections.
+// Reflector returns machine's reflector connections.
 func (m *Machine) Reflector() [alphabetSize]int {
 	return m.reflector
 }
 
-// setReflector sets reflector connections.
-func (m *Machine) setReflector(reflector [alphabetSize]int) {
+// Plugboard returns machine's plugboard connections.
+func (m *Machine) Plugboard() [alphabetSize]int {
+	return m.plugboard
+}
+
+// SetReflector sets reflector connections. Returns an error
+// if given connections are incorrect.
+func (m *Machine) SetReflector(reflector [alphabetSize]int) error {
 	m.reflector = reflector
+	if !m.isReflectorCorrect() {
+		return &initError{"given reflector connections are incorrect"}
+	}
+
+	return nil
 }
 
-// PlugboardConnections returns plugboard connections.
-func (m *Machine) PlugboardConnections() [alphabetSize]int {
-	return m.plugboardConnections
+// SetPlugboard sets plugboard connections. Returns an error
+// if given connections are incorrect.
+func (m *Machine) SetPlugboard(plugboard [alphabetSize]int) error {
+	m.plugboard = plugboard
+	if !m.isPlugboardCorrect() {
+		return &initError{"given plugboard connections are incorrect"}
+	}
+
+	return nil
 }
 
-// setPlugboard sets reflector connections.
-func (m *Machine) setPlugboard(plugboard [alphabetSize]int) {
-	m.plugboardConnections = plugboard
+// GenerateReflector creates random reflector connections for the current machine.
+func (m *Machine) GenerateReflector() {
+	half := []int{13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}
+	rand.Shuffle(alphabetSize/2, func(i, j int) {
+		half[i], half[j] = half[j], half[i]
+	})
+
+	// Assign symmetric values to machine's reflector
+	for i := 0; i < alphabetSize/2; i++ {
+		m.reflector[i], m.reflector[half[i]] = half[i], i
+	}
+}
+
+// GeneratePlugboard creates random plugboard connections for the current machine.
+func (m *Machine) GeneratePlugboard() {
+	half := []int{13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}
+	rand.Shuffle(alphabetSize/2, func(i, j int) {
+		half[i], half[j] = half[j], half[i]
+	})
+
+	// Assign symmetric values to machine's plugboard
+	for i := 0; i < alphabetSize/2; i++ {
+		m.plugboard[i], m.plugboard[half[i]] = half[i], i
+	}
+}
+
+// isReflectorCorrect returns true if reflector is initialized correctly.
+func (m *Machine) isReflectorCorrect() bool {
+	return helper.AreElementsIndices(m.reflector[:]) &&
+		helper.IsSymmetric(m.reflector[:])
+}
+
+// isPlugboardCorrect returns true if plugboard connections initialized correctly.
+func (m *Machine) isPlugboardCorrect() bool {
+	return helper.AreElementsIndices(m.plugboard[:]) &&
+		helper.IsSymmetric(m.plugboard[:])
 }
