@@ -19,9 +19,6 @@ xenigma -help
 ```
 
 ```
-Description
-    xenigma is a modified version of the enigma encryption machine.
-
 Usage
     xenigma [options] <message>
 
@@ -71,68 +68,88 @@ xenigma is licensed under MIT license.
 
 ```shell
 xenigma -gen-w 50 Hello, world! # Generate a 50-rotor machine, write generated config to
-                                # ~/.config/xenigma.json, and use generated machine to 
+                                # ~/.config/xenigma.json, and use generated machine to
                                 # encrypt "Hello, world!".
 ```
-```
-onjjk, gqkdx!
+```shell
+onjjk, gqkdx! # "Hello, world!" encrypted.
 ```
 
 ## What's different?
 
-All components of `xenigma` are customizable through `JSON`, allowing for more
-complicated encryption.
+`xenigma` allows for configuration of all machine's componenets through `JSON`
+resulting in more complicated encryption.
+Configurations file should be located at **~/.config/xenigma.json**
 
-The default machine configuration should exist at **~/.config/xenigma.json**.
-
-A configuration file typically looks like the following:
+A configuration file typically looks like the following
 
 ```json
 {
-    "pathways": [
-        ["j", "h", "s", "e", "y", "z", "r", "k", "p", "m", "x", "i", "w", "b", "v", "f", "d", "c", "a", "t", "l", "o", "n", "g", "u", "q"],
-        ["n", "c", "v", "w", "q", "t", "h", "z", "o", "m", "a", "s", "x", "r", "g", "u", "d", "i", "f", "k", "j", "b", "e", "y", "p", "l"],
-        ["t", "s", "h", "m", "c", "v", "n", "y", "r", "q", "p", "e", "i", "u", "k", "z", "w", "d", "j", "a", "f", "x", "g", "b", "o", "l"]
+    "rotors": [
+        {
+            "pathways": ["j", "h", "s", "e", "y", "z", "r", "k", "p", "m", "x", "i", "w", "b", "v", "f", "d", "c", "a", "t", "l", "o", "n", "g", "u", "q"],
+            "position": "a",
+            "step": 1,
+            "cycle": 26
+        },
+        {
+            "pathways": ["n", "c", "v", "w", "q", "t", "h", "z", "o", "m", "a", "s", "x", "r", "g", "u", "d", "i", "f", "k", "j", "b", "e", "y", "p", "l"],
+            "position": "b",
+            "step": 1,
+            "cycle": 26
+        },
+        {
+            "pathways": ["t", "s", "h", "m", "c", "v", "n", "y", "r", "q", "p", "e", "i", "u", "k", "z", "w", "d", "j", "a", "f", "x", "g", "b", "o", "l"],
+            "position": "c",
+            "step": 1,
+            "cycle": 26
+        }
     ],
-    "reflector": ["q", "y", "x", "n", "o", "r", "t", "w", "v", "p", "u", "z", "s", "d", "e", "j", "a", "f", "m", "g", "k", "i", "h", "c", "b", "l"],
-    "plugboard": ["r", "n", "w", "q", "p", "u", "v", "o", "y", "x", "s", "t", "z", "b", "h", "e", "d", "a", "k", "l", "f", "g", "c", "j", "i", "m"],
 
-    "rotorPositions": ["a", "b", "c"],
-    "rotorStep": 1,
-    "rotorCycle": 26
+    "reflector": ["q", "y", "x", "n", "o", "r", "t", "w", "v", "p", "u", "z", "s", "d", "e", "j", "a", "f", "m", "g", "k", "i", "h", "c", "b", "l"],
+    "plugboard": ["r", "n", "w", "q", "p", "u", "v", "o", "y", "x", "s", "t", "z", "b", "h", "e", "d", "a", "k", "l", "f", "g", "c", "j", "i", "m"]
 }
 ```
-Some examples are in test/data directory.
 
 ### Rotors
+
 `xenigma` allows for **any number of rotors**.
-The number of rotors is the number of pathways' arrays and rotor positions (which should be equal).
-*For example* in the above example the number of `pathways` (and `rotorPositions`) is 3 so a machine is created with 3 rotors.
+The number of rotors is the size of `"rotors"` array in **~/.config/xenigma.json**
 
-`xenigma` also allows for configuration of rotors' cycle and step sizes.
+**Rotor's fields** are `"pathways"`, `"position"`, `"step"`, and `"cycle"`.
 
-`step` is the number of positions a rotor jumps when shifting.
-*For example* if a rotor, with step size 2, is at position "a", then the rotor's position will jump to "c" when shifted once.
+`"Pathways"` are the electric connections between characters. 
+`"Pathways"` are represented using a 26 element array where indices represent
+characters and array elements represent the character they are connected to.
 
-`cycle` size is the number of steps a rotor takes before completing a full cycle.
-When a rotor completes a full cycle, the adjacent rotor is shifted.
-*For example* in a 3-rotor machine if cycle size is 13 then the second rotor is shifted once every time the first rotor completes 13 steps,
-the third rotor operates similarly but depends on second rotor's movement, etc.
+*For example*, if element at index 0 is "b", then "a" (character 0) is connected to "b".
 
-In a normal enigma machine default values of `step`, and `cycle` are 1, and 26.
+`"Position"` is an integer which represents the current position of the rotor,
+and must be reachable from the starting position *("a")*.
 
-### Connections
-Connections, such as `pathways`, `reflector`, and `plugboard` are specified through arrays of size 26
-where elements' indices represents a character's position in the alphabet.
-*For example* if element at index 0 of plugboard array is "c", then "a" (character at 0) is connected to "c".
+`Step` is the number of positions a rotor shifts when stepping once (the size of rotor's jump.)
 
-Both reflector and plugboard arrays should be symmetric,
-meaning that if "a" is connected to "b", "b" must also be connected to "a";
-Otherwise connections are considered incorrect.
+*For example*, if a rotor at position *"a"*, with *step = 3*, steps once,
+then rotor's position changes to *"d"*. The default step size is 1.
 
-A configuration help message similar to the above is available from the command line.
+`"Cycle"` is the number of rotor steps considered a full cycle, after which the following rotor steps (is shifted.)
+
+*For example*, if a rotor has a *cycle = 13*, then the rotor needs to complete 13 steps in order for the following rotor
+to step once. The default cycle size is 26.
+
+### Reflector
+
+`"Reflector"` is a connections array similar to pathways with a condition that it must be *symmetric*,
+meaning that if *"a"* is connected to *"b"*, then *"b"* must also be connected to *"a"*.
+
+### Plugboard
+`"Plugboard"` is also a connections array exactly the same as a reflector.
+
+*Note that* the plugboard is required to have 26 elements,
+so characters not connected to anything should be connected to themselves (in order to not be transformed.)
+
+A help message similar to the above is available
 
 ```shell
 xenigma -config-h # Generate configuration help message.
 ```
-
