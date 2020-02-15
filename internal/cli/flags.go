@@ -91,7 +91,9 @@ func generatewIf() *machine.Machine {
 // defaultsIf handles the execution of -default-rotors flag.
 func defaultsIf(m *machine.Machine) {
 	if *defaults { // Use default values for rotors
-		m.UseRotorDefaults()
+		if err := m.UseRotorsDefaults(); err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
