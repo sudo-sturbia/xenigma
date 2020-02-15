@@ -1,4 +1,4 @@
-// cli handles parsing of command line arguments and flags
+// Package cli handles parsing of command line arguments and flags
 // and execution of application.
 package cli
 
