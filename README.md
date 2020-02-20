@@ -106,50 +106,78 @@ A configuration file typically looks like the following
         }
     ],
 
-    "reflector": ["q", "y", "x", "n", "o", "r", "t", "w", "v", "p", "u", "z", "s", "d", "e", "j", "a", "f", "m", "g", "k", "i", "h", "c", "b", "l"],
-    "plugboard": ["r", "n", "w", "q", "p", "u", "v", "o", "y", "x", "s", "t", "z", "b", "h", "e", "d", "a", "k", "l", "f", "g", "c", "j", "i", "m"]
+    "reflector": {
+        "connections": ["q", "y", "x", "n", "o", "r", "t", "w", "v", "p", "u", "z", "s", "d", "e", "j", "a", "f", "m", "g", "k", "i", "h", "c", "b", "l"]
+    },
+
+    "plugboard": {
+        "connections": ["r", "n", "w", "q", "p", "u", "v", "o", "y", "x", "s", "t", "z", "b", "h", "e", "d", "a", "k", "l", "f", "g", "c", "j", "i", "m"]
+    }
 }
 ```
 
 ### Rotors
 
+```json
+"rotors": [
+    {
+        "pathways": ["j", "h", "s", "e", "y", "z", "r", "k", "p", "m", "x", "i", "w", "b", "v", "f", "d", "c", "a", "t", "l", "o", "n", "g", "u", "q"],
+        "position": "a",
+        "step": 1,
+        "cycle": 26
+    }
+]
+```
+
 `xenigma` allows for **any number of rotors**.
-The number of rotors is the size of `"rotors"` array in **~/.config/xenigma.json**
+The number of rotors is the size of *"rotors"* array in **~/.config/xenigma.json**
 
-**Rotor's fields** are `"pathways"`, `"position"`, `"step"`, and `"cycle"`.
+Rotor's fields are *pathways*, *position*, *step*, and *cycle*.
 
-`"Pathways"` are the electric connections between characters. 
-`"Pathways"` are represented using a 26 element array where indices represent
+#### Pathways
+Pathways are the electric connections between characters.
+Pathways are represented using a 26 element array where indices represent
 characters and array elements represent the character they are connected to.
 
 *For example*, if element at index 0 is "b", then "a" (character 0) is connected to "b".
 
-`"Position"` is an integer which represents the current position of the rotor,
-and must be reachable from the starting position *("a")*.
+#### Position
+Position is an integer which represents the current position of the rotor.
+The given position must be reachable from the starting position *("a")*.
 
-`Step` is the number of positions a rotor shifts when stepping once (the size of rotor's jump.)
+#### Step
+Step is the number of positions a rotor shifts when stepping once (the size of rotor's jump.)
 
 *For example*, if a rotor at position *"a"*, with *step = 3*, steps once,
 then rotor's position changes to *"d"*. The default step size is 1.
 
-`"Cycle"` is the number of rotor steps considered a full cycle, after which the following rotor steps (is shifted.)
+#### Cycle
+Cycle is the number of rotor steps considered a full cycle, after which the following rotor steps (is shifted.)
 
 *For example*, if a rotor has a *cycle = 13*, then the rotor needs to complete 13 steps in order for the following rotor
 to step once. The default cycle size is 26.
 
 ### Reflector
 
-`"Reflector"` is a connections array similar to pathways with a condition that it must be *symmetric*,
+```json
+"reflector": {
+    "connections": ["q", "y", "x", "n", "o", "r", "t", "w", "v", "p", "u", "z", "s", "d", "e", "j", "a", "f", "m", "g", "k", "i", "h", "c", "b", "l"]
+}
+```
+
+Reflector consists of a connections array similar to pathways with a condition that it must be *symmetric*,
 meaning that if *"a"* is connected to *"b"*, then *"b"* must also be connected to *"a"*.
 
 ### Plugboard
-`"Plugboard"` is also a connections array exactly the same as a reflector.
 
-*Note that* the plugboard is required to have 26 elements,
-so characters not connected to anything should be connected to themselves (in order to not be transformed.)
-
-A help message similar to the above is available
-
-```shell
-xenigma -config-h # Generate configuration help message.
+```json
+"plugboard": {
+    "connections": ["r", "n", "w", "q", "p", "u", "v", "o", "y", "x", "s", "t", "z", "b", "h", "e", "d", "a", "k", "l", "f", "g", "c", "j", "i", "m"]
+}
 ```
+
+Plugboard, also, consists of a connections array exactly the same as a reflector.
+
+Plugboard's connections are required to have 26 elements,
+so characters not connected to anything should be connected to themselves (in order to not be transformed).
+
