@@ -12,9 +12,9 @@ import (
 // from/into a json file. Fields in jsonMachine mirror those in a Machine but
 // use string arrays instead of int arrays.
 type jsonMachine struct {
-	Rotors    []*jsonRotor         `json:"rotors"`
-	Reflector [alphabetSize]string `json:"reflector"`
-	Plugboard [alphabetSize]string `json:"plugboard"`
+	Rotors    []*jsonRotor   `json:"rotors"`
+	Reflector *jsonReflector `json:"reflector"`
+	Plugboard *jsonPlugboard `json:"plugboard"`
 }
 
 // jsonRotor is used to marshall/unmarshall Rotor configs from/into a json
@@ -24,6 +24,18 @@ type jsonRotor struct {
 	Position string               `json:"position"`
 	Step     int                  `json:"step"`
 	Cycle    int                  `json:"cycle"`
+}
+
+// jsonReflector  is used to marshall/unmarshall Reflector configs from/into
+// a json file. Fields in jsonReflector mirror those in Reflector but use strings.
+type jsonReflector struct {
+	Connections [alphabetSize]string `json:"connections"`
+}
+
+// jsonPlugboard is used to marshall/unmarshall Plugboard configs from/into
+// a json file. Fields in jsonPlugboard mirror those in Plugboard but use strings.
+type jsonPlugboard struct {
+	Connections [alphabetSize]string `json:"connections"`
 }
 
 // Read loads a machine from a JSON file and verifies its configurations.
@@ -82,35 +94,26 @@ func parseMachine(fileContents []byte) (*Machine, error) {
 		rotors[i] = rotor
 	}
 
-	if err := m.SetRotors(rotors); err != nil {
+	err := m.SetRotors(rotors)
+	if err != nil {
 		return nil, err
 	}
 
-	// Plugboard
-	for i, connection := range jsonM.Plugboard {
-		if num, verify := strToInt(connection); verify {
-			m.plugboard[i] = num
-		} else {
-			return nil, &initError{fmt.Sprintf("plugboard contains invalid value %v",
-				connection)}
-		}
+	m.plugboard, err = m.parsePlugboard(jsonM.Plugboard)
+	if err != nil {
+		return nil, err
 	}
 
-	// Reflector
-	for i, connection := range jsonM.Reflector {
-		if num, verify := strToInt(connection); verify {
-			m.reflector[i] = num
-		} else {
-			return nil, &initError{fmt.Sprintf("reflector contains invalid value %v",
-				connection)}
-		}
+	m.reflector, err = m.parseReflector(jsonM.Reflector)
+	if err != nil {
+		return nil, err
 	}
 
 	return m, nil
 }
 
 // parseRotor parses a given jsonRotor into a Rotor object. Returns
-// parsed Rotor and an error in case of incorrect configs.
+// parsed object and an error in case of incorrect configs.
 func (m *Machine) parseRotor(parse *jsonRotor) (*Rotor, error) {
 	parsed := new(Rotor)
 
@@ -137,8 +140,50 @@ func (m *Machine) parseRotor(parse *jsonRotor) (*Rotor, error) {
 			position)}
 	}
 
-	if err := parsed.InitRotor(pathways, position, parse.Step, parse.Cycle); err != nil {
+	if err := parsed.Set(pathways, position, parse.Step, parse.Cycle); err != nil {
 		return nil, err
+	}
+
+	return parsed, nil
+}
+
+// parsePlugboard parses a given jsonPlugboard into a Plugboard object. Returns
+// parsed object and an error in case of incorrect configs.
+func (m *Machine) parsePlugboard(parse *jsonPlugboard) (*Plugboard, error) {
+	if parse == nil {
+		return nil, &initError{"non plugboard given"}
+	}
+
+	parsed := new(Plugboard)
+	for i, connection := range parse.Connections {
+		if num, verify := strToInt(connection); verify {
+			parsed.connections[i] = num
+		} else {
+			return nil, &initError{
+				fmt.Sprintf("plugboard connections contain invalid value %v", connection),
+			}
+		}
+	}
+
+	return parsed, nil
+}
+
+// parseReflector parses a given jsonReflector into a Reflector object. Returns
+// parsed object and an error in case of incorrect configs.
+func (m *Machine) parseReflector(parse *jsonReflector) (*Reflector, error) {
+	if parse == nil {
+		return nil, &initError{"non reflector given"}
+	}
+
+	parsed := new(Reflector)
+	for i, connection := range parse.Connections {
+		if num, verify := strToInt(connection); verify {
+			parsed.connections[i] = num
+		} else {
+			return nil, &initError{
+				fmt.Sprintf("reflector connections contain invalid value %v", connection),
+			}
+		}
 	}
 
 	return parsed, nil
@@ -154,15 +199,9 @@ func (m *Machine) Write(path string) error {
 
 	jsonM := new(jsonMachine)
 
-	for i := 0; i < alphabetSize; i++ {
-		// Plugboard
-		jsonM.Plugboard[i] = intToStr(m.plugboard[i])
+	jsonM.Plugboard = m.marshalPlugboard(m.plugboard)
+	jsonM.Reflector = m.marshalReflector(m.reflector)
 
-		// Reflector
-		jsonM.Reflector[i] = intToStr(m.reflector[i])
-	}
-
-	// Rotors
 	jsonM.Rotors = make([]*jsonRotor, m.numberOfRotors)
 	for i := 0; i < m.numberOfRotors; i++ {
 		jsonM.Rotors[i] = m.marshalRotor(m.rotors[i])
@@ -195,6 +234,28 @@ func (m *Machine) marshalRotor(rotor *Rotor) *jsonRotor {
 	marshalled.Position = intToStr(rotor.position)
 	marshalled.Step = rotor.step
 	marshalled.Cycle = rotor.cycle
+
+	return marshalled
+}
+
+// marshalPlugboard creates and returns a jsonPlugboard object with properties
+// similar to given Pluboard object.
+func (m *Machine) marshalPlugboard(plugboard *Plugboard) *jsonPlugboard {
+	marshalled := new(jsonPlugboard)
+	for i := 0; i < alphabetSize; i++ {
+		marshalled.Connections[i] = intToStr(plugboard.connections[i])
+	}
+
+	return marshalled
+}
+
+// marshalReflector creates and returns a jsonReflector object with properties
+// similar to given Reflector object.
+func (m *Machine) marshalReflector(reflector *Reflector) *jsonReflector {
+	marshalled := new(jsonReflector)
+	for i := 0; i < alphabetSize; i++ {
+		marshalled.Connections[i] = intToStr(reflector.connections[i])
+	}
 
 	return marshalled
 }
