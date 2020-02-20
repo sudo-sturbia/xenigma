@@ -20,6 +20,11 @@
         }
     ],
 
-    "reflector": ["x", "y", "w", "z", "p", "t", "s", "o", "q", "r", "v", "n", "u", "l", "h", "e", "i", "j", "g", "f", "m", "k", "c", "a", "b", "d"],
-    "plugboard": ["x", "y", "w", "z", "p", "t", "s", "o", "q", "r", "v", "n", "u", "l", "h", "e", "i", "j", "g", "f", "m", "k", "c", "a", "b", "d"]
+    "reflector": {
+        "connections": ["x", "y", "w", "z", "p", "t", "s", "o", "q", "r", "v", "n", "u", "l", "h", "e", "i", "j", "g", "f", "m", "k", "c", "a", "b", "d"]
+    },
+
+    "plugboard": {
+        "connections": ["x", "y", "w", "z", "p", "t", "s", "o", "q", "r", "v", "n", "u", "l", "h", "e", "i", "j", "g", "f", "m", "k", "c", "a", "b", "d"]
+    }
 }

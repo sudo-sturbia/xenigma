@@ -59,20 +59,20 @@ func (m *Machine) UseRotorsDefaults() error {
 	return nil
 }
 
-// areRotorsCorrect returns true if rotors are initialized correctly and
-// verifies all rotor related values.
-func (m *Machine) areRotorsCorrect() bool {
+// AreRotorsCorrect verifies all machine's rotor related values and returns an
+// error if rotors are not initialized correctly
+func (m *Machine) AreRotorsCorrect() error {
 	if m.rotors == nil || len(m.rotors) == 0 || m.numberOfRotors != len(m.rotors) {
-		return false
+		return &initError{"no rotors exist"}
 	}
 
-	for _, rotor := range m.rotors {
+	for i, rotor := range m.rotors {
 		if err := rotor.IsConfigCorrect(); err != nil {
-			return false
+			return &initError{fmt.Sprintf("rotor %d: %s", i, err.Error())}
 		}
 	}
 
-	return true
+	return nil
 }
 
 // Setting returns current rotor setting (positions of machine's rotors).

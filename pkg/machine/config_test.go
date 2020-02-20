@@ -139,14 +139,14 @@ func areSimilar(m1 *Machine, m2 *Machine) bool {
 
 	// Reflector
 	for i := 0; i < alphabetSize; i++ {
-		if m1.reflector[i] != m2.reflector[i] {
+		if m1.reflector.connections[i] != m2.reflector.connections[i] {
 			return false
 		}
 	}
 
 	// Plugboard
 	for i := 0; i < alphabetSize; i++ {
-		if m1.plugboard[i] != m2.plugboard[i] {
+		if m1.plugboard.connections[i] != m2.plugboard.connections[i] {
 			return false
 		}
 	}
