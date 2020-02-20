@@ -36,33 +36,22 @@ func (m *Machine) encryptChar(char byte, flipped [][alphabetSize]int) byte {
 		return char
 	}
 
-	encryptedChar := m.plugIn(char)
+	encrypted := m.plugboard.plugIn(char)
+
 	for i := 0; i < m.numberOfRotors; i++ {
-		index := (encryptedChar + m.rotors[i].position) % alphabetSize
-		encryptedChar = m.rotors[i].pathways[index]
+		index := (encrypted + m.rotors[i].position) % alphabetSize
+		encrypted = m.rotors[i].pathways[index]
 	}
 
-	encryptedChar = m.reflector[encryptedChar]
+	encrypted = m.reflector.reflect(encrypted)
 
 	for i := m.numberOfRotors - 1; i >= 0; i-- {
-		encryptedChar = (flipped[i][encryptedChar] - m.rotors[i].position + alphabetSize) % alphabetSize
+		encrypted = (flipped[i][encrypted] - m.rotors[i].position + alphabetSize) % alphabetSize
 	}
 
 	m.stepRotors()
 
-	return m.plugOut(encryptedChar)
-}
-
-// plugIn changes a byte (character) to an int (0 -> 25) based on
-// plugboard connections. Used when character is entered.
-func (m *Machine) plugIn(char byte) int {
-	return m.plugboard[int(char-'a')]
-}
-
-// plugOut changes an int to a byte (character) based on
-// plugboard connections. Used when character is returned.
-func (m *Machine) plugOut(char int) byte {
-	return byte(m.plugboard[char] + 'a')
+	return m.plugboard.plugOut(encrypted)
 }
 
 // flippedConnections returns a slice of flipped pathway connections

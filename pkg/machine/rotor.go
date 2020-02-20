@@ -26,7 +26,7 @@ type Rotor struct {
 // fields. Returns an initialization error if fields are incorrect.
 func NewRotor(pathways [alphabetSize]int, position, step, cycle int) (*Rotor, error) {
 	r := new(Rotor)
-	if err := r.InitRotor(pathways, position, step, cycle); err != nil {
+	if err := r.Set(pathways, position, step, cycle); err != nil {
 		return nil, err
 	}
 
@@ -53,16 +53,10 @@ func GenerateRotor() *Rotor {
 	return r
 }
 
-// takeStep shifts rotor's position one step forward.
-func (r *Rotor) takeStep() {
-	r.position = (r.position + r.step) % alphabetSize
-	r.takenSteps = (r.takenSteps + 1) % r.cycle
-}
-
-// InitRotor initializes all rotor's fields including pathway connections,
+// Set initializes all rotor's fields including pathway connections,
 // current position, step size, and cycle size. Returns an error if given
 // parameters are incorrect, nil otherwise.
-func (r *Rotor) InitRotor(pathways [alphabetSize]int, position, step, cycle int) error {
+func (r *Rotor) Set(pathways [alphabetSize]int, position, step, cycle int) error {
 	if err := r.isGivenConfigCorrect(pathways, position, step, cycle); err != nil {
 		return err
 	}
@@ -73,15 +67,6 @@ func (r *Rotor) InitRotor(pathways [alphabetSize]int, position, step, cycle int)
 	r.setCycle(cycle)
 
 	return nil
-}
-
-// UseDefaultProperties sets all rotor's fields, except pathways,
-// to their default values. Defaults are 'a' for position, 1 for
-// step size, and 26 for cycle size.
-func (r *Rotor) UseDefaultProperties() {
-	r.setPosition(0, DefaultStep, DefaultCycle)
-	r.setStep(DefaultStep)
-	r.setCycle(DefaultCycle)
 }
 
 // IsConfigCorrect verifies rotor's current configuration, returns
@@ -115,6 +100,21 @@ func (r *Rotor) isGivenConfigCorrect(pathways [alphabetSize]int, position, step,
 	}
 
 	return nil
+}
+
+// takeStep shifts rotor's position one step forward.
+func (r *Rotor) takeStep() {
+	r.position = (r.position + r.step) % alphabetSize
+	r.takenSteps = (r.takenSteps + 1) % r.cycle
+}
+
+// UseDefaultProperties sets all rotor's fields, except pathways,
+// to their default values. Defaults are 'a' for position, 1 for
+// step size, and 26 for cycle size.
+func (r *Rotor) UseDefaultProperties() {
+	r.setPosition(0, DefaultStep, DefaultCycle)
+	r.setStep(DefaultStep)
+	r.setCycle(DefaultCycle)
 }
 
 // setPathways sets rotor's pathway connections.
