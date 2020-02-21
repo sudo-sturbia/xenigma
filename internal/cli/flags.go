@@ -255,9 +255,14 @@ func helpIf() {
 				"            }\n" +
 				"        ],\n" +
 				"        \n" +
-				"        \"reflector\": [\"a\", \"b\", \"c\", ...],\n" +
-				"        \"plugboard\": [\"a\", \"b\", \"c\", ...]\n" +
-				"	}\n" +
+				"        \"reflector\": {\n" +
+				"            \"connections\": [\"a\", \"b\", \"c\", ...]\n" +
+				"        },\n" +
+				"\n" +
+				"        \"plugboard\": {\n" +
+				"            \"connections\": [\"a\", \"b\", \"c\", ...]\n" +
+				"        }\n" +
+				"    }\n" +
 				"\n" +
 				"    Rotors\n" +
 				"\n" +
@@ -285,14 +290,17 @@ func helpIf() {
 				"\n" +
 				"    Reflector\n" +
 				"\n" +
-				"    Reflector is a connections array similar to pathways with a condition that\n" +
-				"    it must be symmetric, meaning that if \"a\" is connected to \"b\", then \"b\" \n" +
-				"    must also be connected to \"a\".\n" +
+				"    Reflector consists of a connections array similar to pathways with a \n" +
+				"    condition that it must be symmetric, meaning that if \"a\" is connected to \"b\", \n" +
+				"    then \"b\" must also be connected to \"a\".\n" +
 				"\n" +
 				"    Plugboard\n" +
-				"    Plugboard is also a connections array exactly the same as a reflector.\n" +
-				"    Note that the plugboard is required to have 26 elements, so characters not\n" +
-				"    connected to anything should be connected to themselves (so that they\n" +
-				"    wouldn't be transformed.)")
+				"\n" +
+				"    Plugboard, also, consists of a connections array exactly the same as a \n" +
+				"    reflector.\n" +
+				"\n" +
+				"    Plugboard's connections are required to have 26 elements, so characters \n" +
+				"    not connected to anything should be connected to themselves (in order \n" +
+				"    to not be transformed).")
 	}
 }

@@ -1,13 +1,23 @@
 # xenigma
-> A modified version of the enigma encryption machine created in Go.
+A modified version of the enigma machine created in Go.
 
-## How to install?
+## What's different?
+`xenigma` adds another layer of complexity to the original enigma machine.
+
+- Allows for **any number of rotors**.
+- All of machine's components are **fully configurable**.
+- **Handles most user errors**. Configurations are verified throughout every step.
+- All used components can be **randomly generated**.
+- Many different configuration options are provided,
+such as rotor's step, cycle and more.
+
+## How to Install?
 
 ```shell
 go get github.com/sudo-sturbia/xenigma/cmd/xenigma
 ```
 
-## How to use?
+## How to Use?
 
 `xenigma` can be used as a command line tool or exported for usage as a package.
 For documentation of the package check [godoc](https://godoc.org/github.com/sudo-sturbia/xenigma/pkg/machine).
@@ -64,7 +74,7 @@ Options
 xenigma is licensed under MIT license.
 ```
 
-### Usage example
+### Usage Example
 
 ```shell
 xenigma -gen-w 50 Hello, world! # Generate a 50-rotor machine, write generated config to
@@ -75,10 +85,9 @@ xenigma -gen-w 50 Hello, world! # Generate a 50-rotor machine, write generated c
 onjjk, gqkdx! # "Hello, world!" encrypted.
 ```
 
-## What's different?
+## How to Configure?
 
-`xenigma` allows for configuration of all machine's componenets through `JSON`
-resulting in more complicated encryption.
+`xenigma` allows for configuration of all machine's componenets through `JSON`.
 Configurations file should be located at **~/.config/xenigma.json**
 
 A configuration file typically looks like the following
@@ -129,7 +138,7 @@ A configuration file typically looks like the following
 ]
 ```
 
-`xenigma` allows for **any number of rotors**.
+As said before `xenigma` allows for **any number of rotors**.
 The number of rotors is the size of *"rotors"* array in **~/.config/xenigma.json**
 
 Rotor's fields are *pathways*, *position*, *step*, and *cycle*.
@@ -139,23 +148,29 @@ Pathways are the electric connections between characters.
 Pathways are represented using a 26 element array where indices represent
 characters and array elements represent the character they are connected to.
 
-*For example*, if element at index 0 is "b", then "a" (character 0) is connected to "b".
+*For example*, if element at index 0 is "b", then "a" (character 0) is connected
+to "b".
 
 #### Position
 Position is an integer which represents the current position of the rotor.
 The given position must be reachable from the starting position *("a")*.
 
 #### Step
-Step is the number of positions a rotor shifts when stepping once (the size of rotor's jump.)
+Step is the number of positions a rotor shifts when stepping once (the size of
+rotor's jump.)
 
 *For example*, if a rotor at position *"a"*, with *step = 3*, steps once,
 then rotor's position changes to *"d"*. The default step size is 1.
 
 #### Cycle
-Cycle is the number of rotor steps considered a full cycle, after which the following rotor steps (is shifted.)
+Cycle is the number of rotor steps considered a full cycle, after which the
+following rotor steps (is shifted.)
 
-*For example*, if a rotor has a *cycle = 13*, then the rotor needs to complete 13 steps in order for the following rotor
-to step once. The default cycle size is 26.
+*For example*, if a rotor has a *cycle = 13*, then the rotor needs to complete
+13 steps in order for the following rotor to step once. The default cycle size is 26.
+
+To avoid position collisions "step \* cycle" must divide 26. Given step-cycle
+combinations that don't satisfy that relation are considered wrong.
 
 ### Reflector
 
@@ -165,8 +180,9 @@ to step once. The default cycle size is 26.
 }
 ```
 
-Reflector consists of a connections array similar to pathways with a condition that it must be *symmetric*,
-meaning that if *"a"* is connected to *"b"*, then *"b"* must also be connected to *"a"*.
+Reflector consists of a connections array similar to pathways with a condition
+that it must be *symmetric*, meaning that if *"a"* is connected to *"b"*, then
+*"b"* must also be connected to *"a"*.
 
 ### Plugboard
 
@@ -179,5 +195,6 @@ meaning that if *"a"* is connected to *"b"*, then *"b"* must also be connected t
 Plugboard, also, consists of a connections array exactly the same as a reflector.
 
 Plugboard's connections are required to have 26 elements,
-so characters not connected to anything should be connected to themselves (in order to not be transformed).
+so characters not connected to anything should be connected to themselves
+(in order to not be transformed).
 
