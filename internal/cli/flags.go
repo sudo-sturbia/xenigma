@@ -27,11 +27,11 @@ var (
 )
 
 // correctIf handles the execution of -correct flag.
-// Loads configuration at ~/.config/xenigma.json, if configuration is
+// Loads configuration at ~/.config/xenigma.conf, if configuration is
 // incorrect a newly generated machine with specified number of rotors
-// is saved to ~/.config/xenigma.json and returned.
+// is saved to ~/.config/xenigma.conf and returned.
 func correctIf() *machine.Machine {
-	if *correct > 0 { // Load ~/.config/xenigma.json, change if wrong
+	if *correct > 0 { // Load ~/.config/xenigma.conf, change if wrong
 		m, err := machine.Load(*correct, true)
 		if err != nil {
 			if m == nil {
@@ -72,12 +72,12 @@ func generateIf() *machine.Machine {
 
 // generatewIf handles the execution of -gen-w flag.
 // Returns a newly generated machine with specified number of rotors
-// and writes config to ~/.config/xenigma.json
+// and writes config to ~/.config/xenigma.conf
 func generatewIf() *machine.Machine {
-	if *generateW > 0 { // Generate and write to ~/.config/xenigma.json
+	if *generateW > 0 { // Generate and write to ~/.config/xenigma.conf
 		m := machine.Generate(*generateW)
 
-		err := m.Write(os.Getenv("HOME") + "/.config/xenigma.json")
+		err := m.Write(os.Getenv("HOME") + "/.config/xenigma.conf")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -131,10 +131,10 @@ func readIf(message string) string {
 }
 
 // updateIf checks if -update flag was specified, if so updates
-// config at ~/.config/xenigma.json
+// config at ~/.config/xenigma.conf
 func updateIf(m *machine.Machine) {
-	if *update { // Write updated configs to ~/.config/xenigma.json
-		err := m.Write(os.Getenv("HOME") + "/.config/xenigma.json")
+	if *update { // Write updated configs to ~/.config/xenigma.conf
+		err := m.Write(os.Getenv("HOME") + "/.config/xenigma.conf")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -195,13 +195,13 @@ func helpIf() {
 				"\n" +
 				"    -gen-w <numberofrotors>      Generate a machine with specified number\n" +
 				"                                 of rotors, use it for encryption, and write\n" +
-				"                                 generated configs to ~/.config/xenigma.json\n" +
+				"                                 generated configs to ~/.config/xenigma.conf\n" +
 				"\n" +
-				"    -correct <numberofrotors>    Load ~/.config/xenigma.json, generate a new\n" +
+				"    -correct <numberofrotors>    Load ~/.config/xenigma.conf, generate a new\n" +
 				"                                 machine if configs are incorrect.\n" +
 				"\n" +
 				"    -load <path>                 Load and use config at given path instead\n" +
-				"                                 of ~/.config/xenigma.json\n" +
+				"                                 of ~/.config/xenigma.conf\n" +
 				"\n" +
 				"    -read <path>                 Read and encrypt contents of file at given\n" +
 				"                                 path. If both -read is invoked and a message\n" +
@@ -210,9 +210,9 @@ func helpIf() {
 				"\n" +
 				"    -write <path>                Write encrypted message to file at given path.\n" +
 				"\n" +
-				"    -update                      Save updated config to ~/.config/xenigma.json\n" +
+				"    -update                      Save updated config to ~/.config/xenigma.conf\n" +
 				"                                 before exiting. Updated config is config at\n" +
-				"                                 ~/.config/xenigma.json after rotor shifting.\n" +
+				"                                 ~/.config/xenigma.conf after rotor shifting.\n" +
 				"\n" +
 				"    -default-rotors              Use default values for rotor-related fields.\n" +
 				"                                 Default values are \"a\"'s for rotor positions,\n" +
@@ -229,9 +229,9 @@ func helpIf() {
 			"Configuration\n" +
 				"\n" +
 				"    xenigma allows for configuration of all machine's componenets through\n" +
-				"    JSON. Configurations file should be located at ~/.config/xenigma.json\n" +
+				"    JSON. Configurations file should be located at ~/.config/xenigma.conf\n" +
 				"\n" +
-				"    An example of a ~/.config/xenigma.json is the following\n" +
+				"    An example of a ~/.config/xenigma.conf is the following\n" +
 				"\n" +
 				"    {\n" +
 				"        \"rotors\": [\n" +
@@ -267,7 +267,7 @@ func helpIf() {
 				"    Rotors\n" +
 				"\n" +
 				"    xenigma allows for any number of rotors. The number of rotors is the size\n" +
-				"    of \"rotors\" array in ~/.config/xenigma.json\n" +
+				"    of \"rotors\" array in ~/.config/xenigma.conf\n" +
 				"\n" +
 				"    Rotor's fields are: pathways, position, step, and cycle.\n" +
 				"\n" +
