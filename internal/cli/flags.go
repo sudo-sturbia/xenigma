@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/sudo-sturbia/xenigma/pkg/helper"
-	"github.com/sudo-sturbia/xenigma/pkg/machine"
+	"github.com/sudo-sturbia/xenigma/v3/pkg/helper"
+	"github.com/sudo-sturbia/xenigma/v3/pkg/machine"
 )
 
 // Command line flags.

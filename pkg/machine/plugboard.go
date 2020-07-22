@@ -3,7 +3,7 @@ package machine
 import (
 	"math/rand"
 
-	"github.com/sudo-sturbia/xenigma/pkg/helper"
+	"github.com/sudo-sturbia/xenigma/v3/pkg/helper"
 )
 
 // Plugboard is a component used in xenigma machine.

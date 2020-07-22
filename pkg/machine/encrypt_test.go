@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sudo-sturbia/xenigma/pkg/helper"
+	"github.com/sudo-sturbia/xenigma/v3/pkg/helper"
 )
 
 // Example of usage of the machine package.

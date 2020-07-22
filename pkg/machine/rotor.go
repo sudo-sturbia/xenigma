@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/sudo-sturbia/xenigma/pkg/helper"
+	"github.com/sudo-sturbia/xenigma/v3/pkg/helper"
 )
 
 // Default step and cycle sizes used for a rotor.

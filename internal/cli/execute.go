@@ -8,7 +8,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/sudo-sturbia/xenigma/pkg/machine"
+	"github.com/sudo-sturbia/xenigma/v3/pkg/machine"
 )
 
 // Execute evaluates command line arguments and flags, and executes

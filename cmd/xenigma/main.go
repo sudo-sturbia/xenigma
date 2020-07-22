@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/sudo-sturbia/xenigma/internal/cli"
+	"github.com/sudo-sturbia/xenigma/v3/internal/cli"
 )
 
 func main() {
