@@ -14,13 +14,13 @@ A modified version of the enigma machine created in Go.
 ## How to Install?
 
 ```shell
-go get github.com/sudo-sturbia/xenigma/cmd/xenigma
+GO111MODULE=on go get github.com/sudo-sturbia/xenigma/v3/cmd/xenigma
 ```
 
 ## How to Use?
 
 `xenigma` can be used as a command line tool or exported for usage as a package.
-For documentation of the package check [godoc](https://godoc.org/github.com/sudo-sturbia/xenigma/pkg/machine).
+For documentation of the package check [pkg.go.dev](https://pkg.go.dev/mod/github.com/sudo-sturbia/xenigma).
 
 For command line tool, the help message below is available
 
@@ -125,5 +125,5 @@ A configuration file typically looks like the following
 }
 ```
 
-Checkout [How-to-Configure](How-to-Configure.md) to learn about options provided for each component.
+Checkout [How To Configure](HowToConfigure.md) to learn about options provided for each component.
 
