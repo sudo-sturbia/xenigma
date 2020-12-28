@@ -3,8 +3,6 @@ package machine
 import (
 	"fmt"
 	"math/rand"
-
-	"github.com/sudo-sturbia/xenigma/v3/pkg/helper"
 )
 
 // Default step and cycle sizes used for a rotor.
@@ -79,7 +77,7 @@ func (r *Rotor) IsConfigCorrect() error {
 // step size, and cycle size, and returns an error if given values are
 // incorrect or incompatible.
 func (r *Rotor) isGivenConfigCorrect(pathways [alphabetSize]int, position, step, cycle int) error {
-	if !helper.AreElementsIndices(pathways[:]) {
+	if !areElementsIndices(pathways[:]) {
 		return &initError{"electric pathways are incorrect"}
 	}
 

@@ -2,8 +2,6 @@ package machine
 
 import (
 	"math/rand"
-
-	"github.com/sudo-sturbia/xenigma/v3/pkg/helper"
 )
 
 // Plugboard is a set of connections that maps different characters to each
@@ -69,11 +67,11 @@ func (p *Plugboard) Verify() error {
 // verify verifies that given connections are valid, and returns an error
 // if not.
 func verify(connections [alphabetSize]int) error {
-	if !helper.AreElementsIndices(connections[:]) {
+	if !areElementsIndices(connections[:]) {
 		return &initError{"plugboard's connections are incorrect"}
 	}
 
-	if !helper.IsSymmetric(connections[:]) {
+	if !isSymmetric(connections[:]) {
 		return &initError{"plugboard's connections are not symmetric"}
 	}
 
