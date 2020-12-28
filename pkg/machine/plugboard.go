@@ -1,9 +1,5 @@
 package machine
 
-import (
-	"math/rand"
-)
-
 // Plugboard is a set of connections that maps different characters to each
 // other. Plugboard is used as an initial step in xenigma.
 type Plugboard struct {
@@ -25,21 +21,9 @@ func NewPlugboard(connections [alphabetSize]int) (*Plugboard, error) {
 // GeneratePlugboard generates a plugboard with random configurations and
 // returns a pointer to it.
 func GeneratePlugboard() *Plugboard {
-	connections := [alphabetSize]int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}
-
-	rand.Shuffle(alphabetSize, func(i, j int) {
-		connections[i], connections[j] =
-			connections[j], connections[i]
-	})
-
-	// Assign symmetric values to plugboard's connections
-	p := new(Plugboard)
-	for i := 0; i < alphabetSize/2; i++ {
-		p.connections[connections[i]], p.connections[connections[i+13]] =
-			connections[i+13], connections[i]
+	return &Plugboard{
+		connections: generateConnections(),
 	}
-
-	return p
 }
 
 // Connections returns plugboard's connections array.
