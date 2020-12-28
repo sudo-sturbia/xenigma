@@ -2,24 +2,24 @@ package machine
 
 import (
 	"math/rand"
-
-	"github.com/sudo-sturbia/xenigma/v3/pkg/helper"
 )
 
-// Reflector is a component used in xenigma machine.
+// Reflector is a set of connections that maps two characters to each other.
+// Reflector is used as a middle step in xenigma.
 type Reflector struct {
 	connections [alphabetSize]int
 }
 
-// NewReflector creates and returns a plugboard with the given configuration.
-// Returns an error if given configurations are incorrect.
+// NewReflector creates and returns a new reflector. An error is returned if
+// given connections are incorrect.
 func NewReflector(connections [alphabetSize]int) (*Reflector, error) {
-	r := new(Reflector)
-	if err := r.Set(connections); err != nil {
+	if err := verify(connections); err != nil {
 		return nil, err
 	}
 
-	return r, nil
+	return &Reflector{
+		connections: connections,
+	}, nil
 }
 
 // GenerateReflector generates a reflector with random configurations and
@@ -43,43 +43,18 @@ func GenerateReflector() *Reflector {
 	return r
 }
 
-// Set verifies and sets given connections. Returns an error if
-// connections are incorrect.
-func (r *Reflector) Set(connections [alphabetSize]int) error {
-	if err := r.isGivenConfigCorrect(connections); err != nil {
-		return err
-	}
-
-	r.connections = connections
-
-	return nil
+// Connections returns reflector's connections array.
+func (r *Reflector) Connections() [alphabetSize]int {
+	return r.connections
 }
 
 // reflect returns the reflection of the given character using reflector's
 // connections array.
-func (r *Reflector) reflect(char int) int {
+func (r *Reflector) Reflect(char int) int {
 	return r.connections[char]
 }
 
-// IsConfigCorrect returns an error if reflector's connections are incorrect.
-func (r *Reflector) IsConfigCorrect() error {
-	return r.isGivenConfigCorrect(r.connections)
-}
-
-// isGivenConfigCorrect returns true if given connections are correct, false otherwise.
-func (r *Reflector) isGivenConfigCorrect(connections [alphabetSize]int) error {
-	if !helper.AreElementsIndices(connections[:]) {
-		return &initError{"reflector's connections are incorrect"}
-	}
-
-	if !helper.IsSymmetric(connections[:]) {
-		return &initError{"reflector's connections are not symmetric"}
-	}
-
-	return nil
-}
-
-// Connections returns reflector's connections array.
-func (r *Reflector) Connections() [alphabetSize]int {
-	return r.connections
+// Verify returns an error if Reflector's connections are incorrect.
+func (r *Reflector) Verify() error {
+	return verify(r.connections)
 }
