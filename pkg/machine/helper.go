@@ -3,32 +3,8 @@ package machine
 import (
 	"fmt"
 	"io/ioutil"
-	"math/rand"
 	"os"
 )
-
-// generateConnections generates a random array of symmetric connections populated
-// with elements 0 through n-1. Symmetric means that if slice[n] = m, then
-// slice[m] = n.
-func generateConnections() [alphabetSize]int {
-	var ordered [alphabetSize]int
-	for i := 0; i < alphabetSize; i++ {
-		ordered[i] = i
-	}
-
-	rand.Shuffle(
-		alphabetSize,
-		func(i, j int) {
-			ordered[i], ordered[j] = ordered[j], ordered[i]
-		},
-	)
-
-	var connections [alphabetSize]int
-	for i := 0; i < alphabetSize/2; i++ {
-		connections[ordered[i]], connections[ordered[i+13]] = ordered[i+13], ordered[i]
-	}
-	return connections
-}
 
 // areElementsIndices returns true if a slice of size n contains numbers
 // 0 through n - 1.
