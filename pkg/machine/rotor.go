@@ -78,23 +78,23 @@ func (r *Rotor) IsConfigCorrect() error {
 // incorrect or incompatible.
 func (r *Rotor) isGivenConfigCorrect(pathways [alphabetSize]int, position, step, cycle int) error {
 	if !areElementsIndices(pathways[:]) {
-		return &initError{"electric pathways are incorrect"}
+		return fmt.Errorf("electric pathways are incorrect")
 	}
 
 	if step <= 0 {
-		return &initError{fmt.Sprintf("invalid step size %d", step)}
+		return fmt.Errorf("invalid step size %d", step)
 	}
 
 	if cycle <= 0 {
-		return &initError{fmt.Sprintf("invalid cycle size %d", cycle)}
+		return fmt.Errorf("invalid cycle size %d", cycle)
 	}
 
 	if ((alphabetSize) % (step * cycle)) != 0 {
-		return &initError{"cycle size and step size are not compatible, some collisions may occur"}
+		return fmt.Errorf("cycle size and step size are not compatible, some collisions may occur")
 	}
 
 	if (position)%step != 0 || position < 0 || position > alphabetSize {
-		return &initError{"rotor's position is incorrect"}
+		return fmt.Errorf("rotor's position is incorrect")
 	}
 
 	return nil

@@ -20,12 +20,12 @@ func (m *Machine) stepRotors() {
 // if configurations of given rotors are incorrect, nil otherwise.
 func (m *Machine) SetRotors(rotors []*Rotor) error {
 	if rotors == nil || len(rotors) <= 0 {
-		return &initError{"no rotors given"}
+		return fmt.Errorf("no rotors given")
 	}
 
 	for i, rotor := range rotors {
 		if rotor == nil {
-			return &initError{fmt.Sprintf("rotor %d: doesn't exist", i)}
+			return fmt.Errorf("rotor %d: doesn't exist", i)
 		}
 	}
 
@@ -34,7 +34,7 @@ func (m *Machine) SetRotors(rotors []*Rotor) error {
 	m.rotors = make([]*Rotor, m.numberOfRotors)
 	for i, rotor := range rotors {
 		if err := rotor.IsConfigCorrect(); err != nil {
-			return fmt.Errorf("rotor %d: %s", i, err.Error())
+			return fmt.Errorf("rotor %d: %w", i, err)
 		}
 
 		m.rotors[i] = rotor
@@ -48,7 +48,7 @@ func (m *Machine) SetRotors(rotors []*Rotor) error {
 func (m *Machine) UseRotorsDefaults() error {
 	for i, rotor := range m.rotors {
 		if rotor == nil {
-			return &initError{fmt.Sprintf("rotor %d: doesn't exist.", i)}
+			return fmt.Errorf("rotor %d: doesn't exist.", i)
 		}
 
 		rotor.resetPosition()
@@ -63,12 +63,12 @@ func (m *Machine) UseRotorsDefaults() error {
 // error if rotors are not initialized correctly
 func (m *Machine) AreRotorsCorrect() error {
 	if m.rotors == nil || len(m.rotors) == 0 || m.numberOfRotors != len(m.rotors) {
-		return &initError{"no rotors exist"}
+		return fmt.Errorf("no rotors exist")
 	}
 
 	for i, rotor := range m.rotors {
 		if err := rotor.IsConfigCorrect(); err != nil {
-			return &initError{fmt.Sprintf("rotor %d: %s", i, err.Error())}
+			return fmt.Errorf("rotor %d: %w", i, err)
 		}
 	}
 
@@ -88,7 +88,7 @@ func (m *Machine) Setting() []int {
 // setNumberOfRotors sets number of used rotors.
 func (m *Machine) setNumberOfRotors(value int) error {
 	if value <= 0 {
-		return &initError{"invalid number of rotors"}
+		return fmt.Errorf("invalid number of rotors")
 	}
 
 	m.numberOfRotors = value

@@ -116,6 +116,7 @@ Licensed under MIT license @github.com/sudo-sturbia
 package machine
 
 import (
+	"fmt"
 	"math/rand"
 	"os"
 	"time"
@@ -131,15 +132,6 @@ type Machine struct {
 
 	rotors         []*Rotor // Machine's mechanical rotors
 	numberOfRotors int      // Number of rotors used in the machine
-}
-
-// Initializion error
-type initError struct {
-	message string
-}
-
-func (err *initError) Error() string {
-	return "incorrect init, " + err.message
 }
 
 // New creates and returns a new machine object with the given configurations.
@@ -169,13 +161,13 @@ func Load(numberOfRotors int, overwrite bool) (*Machine, error) {
 		if overwrite {
 			machine = Generate(numberOfRotors)
 			if err = machine.Write(os.Getenv("HOME") + "/.config/xenigma.conf"); err != nil {
-				return machine, &initError{err.Error()}
+				return machine, fmt.Errorf("failed to initialize: %w", err)
 			}
 
 			return machine, nil
 		}
 
-		return nil, &initError{err.Error()}
+		return nil, fmt.Errorf("failed to initialize: %w", err)
 	}
 
 	return machine, nil

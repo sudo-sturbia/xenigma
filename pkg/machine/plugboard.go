@@ -1,5 +1,9 @@
 package machine
 
+import (
+	"fmt"
+)
+
 // Plugboard is a set of connections that maps different characters to each
 // other. Plugboard is used as an initial step in xenigma.
 type Plugboard struct {
@@ -52,11 +56,11 @@ func (p *Plugboard) Verify() error {
 // if not.
 func verify(connections [alphabetSize]int) error {
 	if !areElementsIndices(connections[:]) {
-		return &initError{"plugboard's connections are incorrect"}
+		return fmt.Errorf("connections are invalid")
 	}
 
 	if !isSymmetric(connections[:]) {
-		return &initError{"plugboard's connections are not symmetric"}
+		return fmt.Errorf("connections are not symmetric")
 	}
 
 	return nil

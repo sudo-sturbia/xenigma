@@ -77,7 +77,7 @@ func parseMachine(fileContents []byte) (*Machine, error) {
 
 	// Verify rotors' slice
 	if jsonM.Rotors == nil || len(jsonM.Rotors) == 0 {
-		return nil, &initError{"no rotors given"}
+		return nil, fmt.Errorf("no rotors given")
 	}
 
 	m := new(Machine)
@@ -127,8 +127,7 @@ func (m *Machine) parseRotor(parse *jsonRotor) (*Rotor, error) {
 		if num, ok := strToInt(connection); ok {
 			pathways[i] = num
 		} else {
-			return nil, &initError{fmt.Sprintf("rotor pathways contain invalid value %v",
-				connection)}
+			return nil, fmt.Errorf("rotor pathways contain invalid value %v", connection)
 		}
 	}
 
@@ -136,8 +135,7 @@ func (m *Machine) parseRotor(parse *jsonRotor) (*Rotor, error) {
 	if num, ok := strToInt(parse.Position); ok {
 		position = num
 	} else {
-		return nil, &initError{fmt.Sprintf("given rotor position %v is incorrect",
-			position)}
+		return nil, fmt.Errorf("given rotor position %v is incorrect", position)
 	}
 
 	if err := parsed.Set(pathways, position, parse.Step, parse.Cycle); err != nil {
@@ -151,7 +149,7 @@ func (m *Machine) parseRotor(parse *jsonRotor) (*Rotor, error) {
 // parsed object and an error in case of incorrect configs.
 func (m *Machine) parsePlugboard(parse *jsonPlugboard) (*Plugboard, error) {
 	if parse == nil {
-		return nil, &initError{"non plugboard given"}
+		return nil, fmt.Errorf("non plugboard given")
 	}
 
 	parsed := new(Plugboard)
@@ -159,9 +157,7 @@ func (m *Machine) parsePlugboard(parse *jsonPlugboard) (*Plugboard, error) {
 		if num, verify := strToInt(connection); verify {
 			parsed.connections[i] = num
 		} else {
-			return nil, &initError{
-				fmt.Sprintf("plugboard connections contain invalid value %v", connection),
-			}
+			return nil, fmt.Errorf("plugboard connections contain invalid value %v", connection)
 		}
 	}
 
@@ -172,7 +168,7 @@ func (m *Machine) parsePlugboard(parse *jsonPlugboard) (*Plugboard, error) {
 // parsed object and an error in case of incorrect configs.
 func (m *Machine) parseReflector(parse *jsonReflector) (*Reflector, error) {
 	if parse == nil {
-		return nil, &initError{"non reflector given"}
+		return nil, fmt.Errorf("non reflector given")
 	}
 
 	parsed := new(Reflector)
@@ -180,9 +176,7 @@ func (m *Machine) parseReflector(parse *jsonReflector) (*Reflector, error) {
 		if num, verify := strToInt(connection); verify {
 			parsed.connections[i] = num
 		} else {
-			return nil, &initError{
-				fmt.Sprintf("reflector connections contain invalid value %v", connection),
-			}
+			return nil, fmt.Errorf("reflector connections contain invalid value %v", connection)
 		}
 	}
 
@@ -209,12 +203,12 @@ func (m *Machine) Write(path string) error {
 
 	contents, err := json.MarshalIndent(jsonM, "", "\t")
 	if err != nil {
-		return fmt.Errorf("could not create JSON file, %s", err.Error())
+		return fmt.Errorf("could not create JSON file, %w", err)
 	}
 
 	err = ioutil.WriteFile(path, contents, 0744)
 	if err != nil {
-		return fmt.Errorf("could not create JSON file, %s", err.Error())
+		return fmt.Errorf("could not create JSON file, %w", err)
 	}
 
 	return nil
