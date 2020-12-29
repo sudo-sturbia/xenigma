@@ -24,7 +24,7 @@ type Reflector struct {
 // NewPlugboard creates and returns a new plugboard, and an error if given
 // connections are incorrect.
 func NewPlugboard(connections [alphabetSize]int) (*Plugboard, error) {
-	if err := verify(connections); err != nil {
+	if err := verifyConnections(connections); err != nil {
 		return nil, err
 	}
 
@@ -36,7 +36,7 @@ func NewPlugboard(connections [alphabetSize]int) (*Plugboard, error) {
 // NewReflector creates and returns a new reflector. An error is returned if
 // given connections are incorrect.
 func NewReflector(connections [alphabetSize]int) (*Reflector, error) {
-	if err := verify(connections); err != nil {
+	if err := verifyConnections(connections); err != nil {
 		return nil, err
 	}
 
@@ -102,7 +102,7 @@ func (p *Plugboard) PlugIn(char byte) int {
 
 // PlugOut returns the byte mapped to char based on plugboard's
 // connections. Should be used when a character is returned.
-func (p *Plugboard) plugOut(char int) byte {
+func (p *Plugboard) PlugOut(char int) byte {
 	return byte(p.connections[char] + 'a')
 }
 
@@ -114,17 +114,17 @@ func (r *Reflector) Reflect(char int) int {
 
 // Verify returns an error if plugboard's connections are incorrect.
 func (p *Plugboard) Verify() error {
-	return verify(p.connections)
+	return verifyConnections(p.connections)
 }
 
 // Verify returns an error if Reflector's connections are incorrect.
 func (r *Reflector) Verify() error {
-	return verify(r.connections)
+	return verifyConnections(r.connections)
 }
 
-// verify verifies that given connections are valid, and returns an error
-// if not.
-func verify(connections [alphabetSize]int) error {
+// verifyConnections verifies that given connections are valid, and returns an
+// error if not.
+func verifyConnections(connections [alphabetSize]int) error {
 	if !areElementsIndices(connections[:]) {
 		return fmt.Errorf("connections are invalid")
 	}
