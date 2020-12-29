@@ -62,6 +62,12 @@ func GenerateRotor() *Rotor {
 	}
 }
 
+// takeStep moves rotor one step forward.
+func (r *Rotor) takeStep() {
+	r.position = (r.position + r.step) % alphabetSize
+	r.takenSteps = (r.takenSteps + 1) % r.cycle
+}
+
 // Verify verifies rotor's current configuration, returns an error if rotor's
 // fields are incorrect or incompatible.
 func (r *Rotor) Verify() error {
@@ -84,12 +90,6 @@ func verifyRotor(pathways [alphabetSize]int, position, step, cycle int) (err err
 		err = fmt.Errorf("cycle and step are incompatible, some collisions may occur")
 	}
 	return err
-}
-
-// takeStep moves rotor one step forward.
-func (r *Rotor) takeStep() {
-	r.position = (r.position + r.step) % alphabetSize
-	r.takenSteps = (r.takenSteps + 1) % r.cycle
 }
 
 // UseDefaults sets all rotor's fields, except pathways, to their default
