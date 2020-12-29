@@ -122,27 +122,31 @@ import (
 	"time"
 )
 
-const alphabetSize = 26
+const (
+	alphabetSize = 26
+	configPath   = "/.config/xenigma.conf"
+)
 
-// Machine represents an enigma machine with mechanical components.
-// Components are electric pathways, reflector, plugboard, and rotors.
+// Machine represents a xenigma encryption machine. Machine's components are
+// electric pathways, reflector, plugboard, and rotors.
 type Machine struct {
-	reflector *Reflector // Machine's reflector
-	plugboard *Plugboard // Machine's plugboard
-
-	rotors         []*Rotor // Machine's mechanical rotors
-	numberOfRotors int      // Number of rotors used in the machine
+	rotors    *Rotors
+	plugboard *Plugboard
+	reflector *Reflector
 }
 
-// New creates and returns a new machine object with the given configurations.
-// Returns an error if given configurations are incorrect.
-func New(rotors []*Rotor, plugboard *Plugboard, reflector *Reflector) (*Machine, error) {
-	m := new(Machine)
-	if err := m.Set(rotors, plugboard, reflector); err != nil {
+// New creates and returns a new, initialized Machine, and an error if any of
+// the given fields is invalid.
+func New(rotors *Rotors, plugboard *Plugboard, reflector *Reflector) (*Machine, error) {
+	if err := verifyMachine(rotors, plugboard, reflector); err != nil {
 		return nil, err
 	}
 
-	return m, nil
+	return &Machine{
+		rotors:    rotors,
+		plugboard: plugboard,
+		reflector: reflector,
+	}, nil
 }
 
 // Load returns a fully initialized Machine object. Configurations of
@@ -155,95 +159,56 @@ func New(rotors []*Rotor, plugboard *Plugboard, reflector *Reflector) (*Machine,
 // configs is returned and error is nil. Otherwise an initialization
 // error is returned and Machine is nil.
 func Load(numberOfRotors int, overwrite bool) (*Machine, error) {
-	machine, err := Read(os.Getenv("HOME") + "/.config/xenigma.conf")
-
+	machine, err := Read(os.Getenv("HOME") + configPath)
 	if err != nil {
 		if overwrite {
 			machine = Generate(numberOfRotors)
-			if err = machine.Write(os.Getenv("HOME") + "/.config/xenigma.conf"); err != nil {
+			if err = machine.Write(os.Getenv("HOME") + configPath); err != nil {
 				return machine, fmt.Errorf("failed to initialize: %w", err)
 			}
-
 			return machine, nil
 		}
-
-		return nil, fmt.Errorf("failed to initialize: %w", err)
+		return nil, fmt.Errorf("failed to load: %w", err)
 	}
-
 	return machine, nil
 }
 
-// Generate creates a machine object with a specified number of rotors
-// containing randomly generated component configurations.
+// Generate generates a machine with the specified number of rotors containing
+// randomly generated component configurations.
 func Generate(numberOfRotors int) *Machine {
 	rand.Seed(time.Now().UnixNano())
-
-	m := new(Machine)
-
-	rotors := make([]*Rotor, numberOfRotors)
-	for i := 0; i < numberOfRotors; i++ {
-		rotors[i] = GenerateRotor()
+	return &Machine{
+		plugboard: GeneratePlugboard(),
+		reflector: GenerateReflector(),
+		rotors:    GenerateRotors(numberOfRotors),
 	}
-	m.SetRotors(rotors)
-
-	m.plugboard = GeneratePlugboard()
-	m.reflector = GenerateReflector()
-
-	return m
 }
 
-// Set initializes all components of the machine.
-// Returns an error if given incorrect configurations.
-func (m *Machine) Set(rotors []*Rotor, plugboard *Plugboard, reflector *Reflector) error {
-	if err := m.SetRotors(rotors); err != nil {
-		return err
-	}
-
-	if err := m.SetPlugboard(plugboard); err != nil {
-		return err
-	}
-
-	if err := m.SetReflector(reflector); err != nil {
-		return err
-	}
-
-	return m.IsConfigCorrect()
+// Verify verifies that all components of the machine are initialized
+// correctly, and returns an error if not.
+func (m *Machine) Verify() error {
+	return verifyMachine(m.rotors, m.plugboard, m.reflector)
 }
 
-// IsConfigCorrect verifies that all fields of the machine are
-// initialized correctly, returns an error if not.
-func (m *Machine) IsConfigCorrect() error {
-	if err := m.AreRotorsCorrect(); err != nil {
+func verifyMachine(rotors *Rotors, plugboard *Plugboard, reflector *Reflector) error {
+	if rotors == nil {
+		return fmt.Errorf("no rotors given")
+	}
+	if err := rotors.Verify(); err != nil {
 		return err
 	}
 
-	if err := m.reflector.IsConfigCorrect(); err != nil {
+	if reflector == nil {
+		return fmt.Errorf("no reflector given")
+	}
+	if err := reflector.Verify(); err != nil {
 		return err
 	}
 
-	if err := m.plugboard.IsConfigCorrect(); err != nil {
-		return err
+	if plugboard == nil {
+		return fmt.Errorf("no plugboard given")
 	}
-
-	return nil
-}
-
-// SetPlugboard sets machine's plugboard. Returns an error
-// if given connections are incorrect.
-func (m *Machine) SetPlugboard(plugboard *Plugboard) error {
-	m.plugboard = plugboard
-	if err := plugboard.IsConfigCorrect(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// SetReflector sets machine's reflector. Returns an error
-// if given connections are incorrect.
-func (m *Machine) SetReflector(reflector *Reflector) error {
-	m.reflector = reflector
-	if err := reflector.IsConfigCorrect(); err != nil {
+	if err := plugboard.Verify(); err != nil {
 		return err
 	}
 
