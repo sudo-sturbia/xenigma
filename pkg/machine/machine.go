@@ -163,7 +163,7 @@ func Load(numberOfRotors int, overwrite bool) (*Machine, error) {
 	if err != nil {
 		if overwrite {
 			machine = Generate(numberOfRotors)
-			if err = machine.Write(os.Getenv("HOME") + configPath); err != nil {
+			if err = Write(machine, os.Getenv("HOME")+configPath); err != nil {
 				return machine, fmt.Errorf("failed to initialize: %w", err)
 			}
 			return machine, nil
