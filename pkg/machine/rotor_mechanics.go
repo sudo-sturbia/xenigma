@@ -33,7 +33,7 @@ func (m *Machine) SetRotors(rotors []*Rotor) error {
 
 	m.rotors = make([]*Rotor, m.numberOfRotors)
 	for i, rotor := range rotors {
-		if err := rotor.IsConfigCorrect(); err != nil {
+		if err := rotor.Verify(); err != nil {
 			return fmt.Errorf("rotor %d: %w", i, err)
 		}
 
@@ -48,12 +48,13 @@ func (m *Machine) SetRotors(rotors []*Rotor) error {
 func (m *Machine) UseRotorsDefaults() error {
 	for i, rotor := range m.rotors {
 		if rotor == nil {
-			return fmt.Errorf("rotor %d: doesn't exist.", i)
+			return fmt.Errorf("rotor %d doesn't exist", i)
 		}
 
-		rotor.resetPosition()
-		rotor.setStep(DefaultStep)
-		rotor.setCycle(DefaultCycle)
+		rotor.position = 0
+		rotor.takenSteps = 0
+		rotor.step = DefaultStep
+		rotor.cycle = DefaultCycle
 	}
 
 	return nil
@@ -67,7 +68,7 @@ func (m *Machine) AreRotorsCorrect() error {
 	}
 
 	for i, rotor := range m.rotors {
-		if err := rotor.IsConfigCorrect(); err != nil {
+		if err := rotor.Verify(); err != nil {
 			return fmt.Errorf("rotor %d: %w", i, err)
 		}
 	}
