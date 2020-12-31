@@ -48,11 +48,10 @@ func GenerateRotors(count int) *Rotors {
 // takeStep moves the rotors one step forward.
 func (r *Rotors) takeStep() {
 	for i, rotor := range r.rotors {
-		if i == 0 || (r.rotors[i-1].takenSteps == 0) { // Previous rotor completed a full cycle
-			rotor.takeStep()
-		} else { // Rotor didn't shift, so next rotors won't shift
+		if i != 0 && (r.rotors[i-1].takenSteps != 0) { // Previous rotor didn't complete a cycle.
 			break
 		}
+		rotor.takeStep()
 	}
 }
 
