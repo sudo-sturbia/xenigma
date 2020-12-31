@@ -83,12 +83,13 @@ func Write(m *Machine, path string) error {
 
 // Parse parses a given byte array into a Machine, and returns a pointer
 // to it, and an error in case of invalid fields.
-func Parse(contents []byte) (m *Machine, err error) {
+func Parse(contents []byte) (_ *Machine, err error) {
 	var jsonM jsonMachine
 	if err := json.Unmarshal(contents, &jsonM); err != nil {
 		return nil, err
 	}
 
+	m := new(Machine)
 	m.rotors, err = parseRotors(jsonM.Rotors)
 	if err != nil {
 		return nil, err
