@@ -73,11 +73,11 @@ func BenchmarkEncrypt(b *testing.B) {
 	}
 }
 
-// BenchmarkEncryptREADME benchmarks encryption of README.md using a
+// BenchmarkEncryptLICENSE benchmarks encryption of LICENSE using a
 // 1000-rotor machine.
-func BenchmarkEncryptREADME(b *testing.B) {
+func BenchmarkEncryptLICENSE(b *testing.B) {
 	m := Generate(1000)
-	contents, err := ioutil.ReadFile("../../README.md")
+	contents, err := ioutil.ReadFile("../../LICENSE")
 	if err != nil {
 		b.Fatalf("failed to read contents of readme: %s", err.Error())
 	}
