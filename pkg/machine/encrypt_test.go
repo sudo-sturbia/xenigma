@@ -37,12 +37,12 @@ func TestEncrypt(t *testing.T) {
 		want    string
 	}{
 		{
-			path:    "../../test/data/config-1.json",
+			path:    "../../test-data/config-1.json",
 			message: "Hello, world!",
 			want:    "sispr, areko!",
 		},
 		{
-			path:    "../../test/data/config-2.json",
+			path:    "../../test-data/config-2.json",
 			message: "Hello, again!",
 			want:    "lcsml, fccmb!",
 		},
@@ -91,7 +91,7 @@ func BenchmarkEncryptREADME(b *testing.B) {
 
 // TestEncryptDecrypt compares a message with its decryption.
 func TestEncryptDecrypt(t *testing.T) {
-	path := "../../test/data/config-1.json"
+	path := "../../test-data/config-1.json"
 
 	encryptor, err := Read(path)
 	if err != nil {
@@ -129,12 +129,12 @@ func TestReadWriteEncrypt(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 
 	m := Generate(rand.Intn(100) + 3)
-	err := Write(m, "../../test/generate/generated.json")
+	err := Write(m, "../../test-data/generate/generated.json")
 	if err != nil {
 		t.Errorf("failed to write machine: %w", err)
 	}
 
-	r, err := Read("../../test/generate/generated.json")
+	r, err := Read("../../test-data/generate/generated.json")
 	if err != nil {
 		t.Errorf("failed to read machine: %w", err)
 	}
