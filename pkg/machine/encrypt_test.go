@@ -2,6 +2,7 @@ package machine
 
 import (
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"strings"
 	"testing"
@@ -10,49 +11,60 @@ import (
 
 // Example of usage of the machine package.
 func Example() {
-	// Generate a random configuration
 	rand.Seed(time.Now().UnixNano())
 
-	numberOfRotors := rand.Intn(100)
-	m := Generate(numberOfRotors)
+	// Generate a random machine.
+	m := Generate(rand.Intn(100) + 3)
 
-	// Encrypt a message
+	// Encrypt a message.
 	message := "Hello, world!"
 	encrypted, _ := m.Encrypt(message)
 
 	fmt.Printf("message: %s, encryption: %s\n", message, encrypted)
 
-	// Write configurations to a JSON file
-	err := m.Write("generate/generated.json")
+	// Write the machine to a JSON file.
+	err := Write(m, "generate/machine.json")
 	if err != nil {
-		panic("couldn't save configurations")
+		panic("failed to write machine.json")
 	}
 }
 
 // Test encryption of strings.
 func TestEncrypt(t *testing.T) {
-	m1, err := Read("../../test/data/config-1.json")
-	if err != nil {
-		t.Errorf("could not read configurations\n%s", err.Error())
-	}
+	for i, test := range []struct {
+		path    string
+		message string
+		want    string
+	}{
+		{
+			path:    "../../test/data/config-1.json",
+			message: "Hello, world!",
+			want:    "sispr, areko!",
+		},
+		{
+			path:    "../../test/data/config-2.json",
+			message: "Hello, again!",
+			want:    "lcsml, fccmb!",
+		},
+	} {
+		m, err := Read(test.path)
+		if err != nil {
+			t.Errorf("test %d: failed to read machine: %w", i, err)
+		}
 
-	encrypted1, _ := m1.Encrypt("Hello, world!")
-	if encrypted1 != "sispr, areko!" {
-		t.Errorf("incorrect encryption of \"Hello, world!\",\nexpected \"sispr, areko!\", got \"%s\"", encrypted1)
-	}
+		got, err := m.Encrypt(test.message)
+		if err != nil {
+			t.Errorf("test %d: failed to encrypt: %w", i, err)
+		}
 
-	m2, err := Read("../../test/data/config-2.json")
-	if err != nil {
-		t.Errorf("could not read configurations\n%s", err.Error())
-	}
-
-	encrypted2, _ := m2.Encrypt("Hello, again!")
-	if encrypted2 != "lcsml, fccmb!" {
-		t.Errorf("incorrect encryption of \"Hello, again!\",\nexpected \"lcsml, fccmb!\", got \"%s\"", encrypted2)
+		if got != test.want {
+			t.Errorf("test %d: incorrect encryption, want: %s, got: %s", i, test.want, got)
+		}
 	}
 }
 
-// Benchmark encryption using a 1000-rotor machine.
+// BenchmarkEncrypt benchmarks encryption of a small message using a
+// 1000-rotor machine.
 func BenchmarkEncrypt(b *testing.B) {
 	m := Generate(1000)
 	b.ResetTimer()
@@ -61,121 +73,109 @@ func BenchmarkEncrypt(b *testing.B) {
 	}
 }
 
-// Benchmark encryption of README.md using a 1000-rotor machine.
+// BenchmarkEncryptREADME benchmarks encryption of README.md using a
+// 1000-rotor machine.
 func BenchmarkEncryptREADME(b *testing.B) {
 	m := Generate(1000)
-	message := readStringFromFile("../../README.md")
+	contents, err := ioutil.ReadFile("../../README.md")
+	if err != nil {
+		b.Fatalf("failed to read contents of readme: %s", err.Error())
+	}
+	readme := string(contents)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		m.Encrypt(message)
+		m.Encrypt(readme)
 	}
 }
 
-// Test encryption and decryption of messages.
+// TestEncryptDecrypt compares a message with its decryption.
 func TestEncryptDecrypt(t *testing.T) {
-	encryptor, err := Read("../../test/data/config-1.json")
+	path := "../../test/data/config-1.json"
+
+	encryptor, err := Read(path)
 	if err != nil {
-		t.Errorf("could not read configurations\n%s", err.Error())
+		t.Fatalf("failed to read machine: %s", err.Error())
 	}
-
-	decryptor, err := Read("../../test/data/config-1.json")
+	decryptor, err := Read(path)
 	if err != nil {
-		t.Errorf("could not read configurations\n%s", err.Error())
+		t.Fatalf("failed to read machine: %s", err.Error())
 	}
 
-	message := "Hello, world!"
-	encrypted, _ := encryptor.Encrypt(message)
-	decrypted, _ := decryptor.Encrypt(encrypted)
+	for _, message := range []string{
+		"Hello, world!",
+		"This is an encryption example using a xenigma machine.\n" +
+			"Encrypted messages can also be decrypted using the same machine.",
+	} {
+		encrypted, err := encryptor.Encrypt(message)
+		if err != nil {
+			t.Errorf("failed to encrypt message: %w", err)
+		}
 
-	if decrypted != strings.ToLower(message) {
-		t.Errorf("incorrect decryption of %s,\nexpected %s, got %s", encrypted, message, decrypted)
-	}
+		decrypted, err := decryptor.Encrypt(encrypted)
+		if err != nil {
+			t.Errorf("failed to encrypt message: %w", err)
+		}
 
-	message = "This is an example of encryption using an enigma machine.\n" +
-		"Encrypted messages can also be decrypted using the same machine."
-	encrypted, _ = encryptor.Encrypt(message)
-	decrypted, _ = decryptor.Encrypt(encrypted)
-
-	if decrypted != strings.ToLower(message) {
-		t.Errorf("incorrect decryption of %s,\nexpected %s, got %s", encrypted, message, decrypted)
+		if decrypted != strings.ToLower(message) {
+			t.Errorf("failed to decrypt: want %s, got %s", message, decrypted)
+		}
 	}
 }
 
-// Test reading, writing, and encryption.
+// TestReadWriteEncrypt generates a machine, writes it to a file, rereads
+// it, and compares the encryption of the original and read machines.
 func TestReadWriteEncrypt(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 
-	numberOfRotors := rand.Intn(100)
-	m := Generate(numberOfRotors)
-
-	err := m.Write("../../test/generate/generated-3.json")
+	m := Generate(rand.Intn(100) + 3)
+	err := Write(m, "../../test/generate/generated.json")
 	if err != nil {
-		t.Errorf(err.Error())
+		t.Errorf("failed to write machine: %w", err)
 	}
 
-	loaded, err := Read("../../test/generate/generated-3.json")
+	r, err := Read("../../test/generate/generated.json")
 	if err != nil {
-		t.Errorf(err.Error())
+		t.Errorf("failed to read machine: %w", err)
 	}
 
-	message := "Hello, world!"
-	originalEnc, err := m.Encrypt(message)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
+	for _, message := range []string{
+		"Hello, World!",
+		"Another message,",
+		"yet another message.",
+		"One final message that's a bit longer, but not too long.",
+	} {
+		original, err := m.Encrypt(message)
+		if err != nil {
+			t.Errorf("failed to encrypt: %w", err)
+		}
+		read, err := r.Encrypt(message)
+		if err != nil {
+			t.Errorf("failed to encrypt: %w", err)
+		}
 
-	loadedEnc, err := loaded.Encrypt(message)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-
-	if originalEnc != loadedEnc {
-		t.Errorf("same message encrypted differently,\noriginal machine: \"%s\",\nloaded machine: \"%s\"", originalEnc, loadedEnc)
+		if original != read {
+			t.Errorf("different encryption for: %s, original: %s, read: %s", message, original, read)
+		}
 	}
 }
 
-// Test encryption of individual alphabetical characters.
-func TestEncryptCharAlpha(t *testing.T) {
-	// Using configuration 1
-	m1, err := Read("../../test/data/config-1.json")
-	if err != nil {
-		t.Errorf("could not read configurations\n%s", err.Error())
-	}
-
-	// r -> n
-	encrypted1 := m1.encryptChar('r', m1.flippedConnections())
-	if encrypted1 != 'n' {
-		t.Errorf("character 'r' encrypted to '%c', expected 'n'", encrypted1)
-	}
-
-	// Using configuration 2
-	m2, err := Read("../../test/data/config-2.json")
-	if err != nil {
-		t.Errorf("could not read configurations\n%s", err.Error())
-	}
-
-	// s -> r
-	encrypted2 := m2.encryptChar('s', m2.flippedConnections())
-	if encrypted2 != 'r' {
-		t.Errorf("character 's' encrypted to '%c', expected 'r'", encrypted2)
-	}
-
-}
-
-// Test encryption of a list of non-alphabetical characters.
-// Characters are not meant to change when encrypted.
 func TestEncryptCharNonAlpha(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 
-	numberOfRotors := rand.Intn(100)
-	m := Generate(numberOfRotors)
-
-	nonAlpha := []byte{',', ' ', '1', '\n', '[', '\t'}
-	for _, char := range nonAlpha {
-		encrypted := m.encryptChar(char, m.flippedConnections())
-		if encrypted != char {
-			t.Errorf("character '%c' encrypted to '%c', expected '%c'", char, encrypted, char)
+	m := Generate(rand.Intn(100) + 3)
+	reversed := reverseConnections(m)
+	for _, c := range []byte{
+		',',
+		' ',
+		'1',
+		'\n',
+		'[',
+		'\t',
+	} {
+		enc := m.encryptChar(c, reversed)
+		if enc != c {
+			t.Errorf("failed to encrypt '%c', want '%c', got '%c'", c, c, enc)
 		}
 	}
 }

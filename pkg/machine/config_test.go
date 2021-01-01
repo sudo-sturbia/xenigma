@@ -40,7 +40,7 @@ func TestWrite(t *testing.T) {
 	}
 
 	for i := 0; i < 10; i++ {
-		count := rand.Intn(100)
+		count := rand.Intn(100) + 3
 		err := Write(Generate(count), "../../test/generate/generated.json")
 		if err != nil {
 			t.Errorf("test %d: failed to write: %w", i, err)
@@ -72,7 +72,7 @@ func TestReadAndWrite(t *testing.T) {
 	)
 
 	for i := 0; i < 10; i++ {
-		m := Generate(rand.Intn(100))
+		m := Generate(rand.Intn(100) + 3)
 		err := Write(m, "../../test/generate/generated.json")
 		if err != nil {
 			t.Errorf("failed to write: %w", err)
