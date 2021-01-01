@@ -1,11 +1,5 @@
 package machine
 
-import (
-	"fmt"
-	"io/ioutil"
-	"os"
-)
-
 // areElementsIndices returns true if a slice of size n contains numbers
 // 0 through n - 1.
 func areElementsIndices(slice []int) bool {
@@ -46,32 +40,4 @@ func areElementsOrderedIndices(slice []int) bool {
 		}
 	}
 	return true
-}
-
-// writeStringToFile writes given string str to a file with the
-// given path. Handles io errors.
-func writeStringToFile(str string, path string) {
-	err := ioutil.WriteFile(path, []byte(str), 0744)
-	if err != nil {
-		fmt.Printf("could not write to %s, %s", path, err.Error())
-	}
-}
-
-// readStringFromFile returns a string containing all the text in the
-// file with the given path. An empty string is returned in case of an io err.
-func readStringFromFile(path string) string {
-	file, err := os.Open(path)
-	if err != nil {
-		fmt.Printf("could not open %s, %s", path, err.Error())
-		return ""
-	}
-	defer file.Close()
-
-	contents, err := ioutil.ReadAll(file)
-	if err != nil {
-		fmt.Printf("could not read contents of %s, %s", path, err.Error())
-		return ""
-	}
-
-	return string(contents)
 }
