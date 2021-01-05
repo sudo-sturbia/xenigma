@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"unicode"
 )
 
@@ -74,7 +75,13 @@ func Write(m *Machine, path string) error {
 		return fmt.Errorf("failed to write JSON file: %w", err)
 	}
 
-	err = ioutil.WriteFile(path, contents, 0744)
+	dir, _ := filepath.Split(path)
+	err = os.MkdirAll(dir, 0775)
+	if err != nil {
+		return fmt.Errorf("failed to create %s: %w", dir, err)
+	}
+
+	err = ioutil.WriteFile(path, contents, 0664)
 	if err != nil {
 		return fmt.Errorf("failed to write JSON file: %w", err)
 	}
