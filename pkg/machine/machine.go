@@ -118,7 +118,6 @@ package machine
 import (
 	"fmt"
 	"math/rand"
-	"os"
 	"time"
 )
 
@@ -147,30 +146,6 @@ func New(rotors *Rotors, plugboard *Plugboard, reflector *Reflector) (*Machine, 
 		plugboard: plugboard,
 		reflector: reflector,
 	}, nil
-}
-
-// Load returns a fully initialized Machine object. Configurations of
-// Machine's fields are read from config file $HOME/.config/xenigma.conf
-// xenigma.conf is parsed as a normal JSON file. If the file contains
-// correct configurations, a machine object is initialized and returned
-// with error being nil. Otherwise overwrite parameter is checked.
-// If overwrite is true, random configs are generated using the specified
-// number of rotors and written to file, a machine object with the same
-// configs is returned and error is nil. Otherwise an initialization
-// error is returned and Machine is nil.
-func Load(numberOfRotors int, overwrite bool) (*Machine, error) {
-	machine, err := Read(os.Getenv("HOME") + configPath)
-	if err != nil {
-		if overwrite {
-			machine = Generate(numberOfRotors)
-			if err = Write(machine, os.Getenv("HOME")+configPath); err != nil {
-				return machine, fmt.Errorf("failed to initialize: %w", err)
-			}
-			return machine, nil
-		}
-		return nil, fmt.Errorf("failed to load: %w", err)
-	}
-	return machine, nil
 }
 
 // Generate generates a machine with the specified number of rotors containing
@@ -213,6 +188,10 @@ func verifyMachine(rotors *Rotors, plugboard *Plugboard, reflector *Reflector) e
 	}
 
 	return nil
+}
+
+func (m *Machine) Rotors() *Rotors {
+	return m.rotors
 }
 
 // Plugboard returns machine's plugboard.
