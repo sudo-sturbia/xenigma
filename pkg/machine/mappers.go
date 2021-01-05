@@ -106,7 +106,7 @@ func (p *Plugboard) PlugOut(char int) byte {
 	return byte(p.connections[char] + 'a')
 }
 
-// reflect returns the reflection of the given character using reflector's
+// Reflect returns the reflection of the given character using reflector's
 // connections array.
 func (r *Reflector) Reflect(char int) int {
 	return r.connections[char]

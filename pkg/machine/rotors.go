@@ -45,6 +45,14 @@ func GenerateRotors(count int) *Rotors {
 	}
 }
 
+// Rotor returns rotor at position i.
+func (r *Rotors) Rotor(i int) (*Rotor, error) {
+	if i < 0 || i >= r.count {
+		return nil, fmt.Errorf("invalid index %d", i)
+	}
+	return r.rotors[i], nil
+}
+
 // takeStep moves the rotors one step forward.
 func (r *Rotors) takeStep() {
 	for i, rotor := range r.rotors {

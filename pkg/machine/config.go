@@ -64,13 +64,13 @@ func Write(m *Machine, path string) error {
 		return err
 	}
 
-	mToJson := &jsonMachine{
+	mToJSON := &jsonMachine{
 		Rotors:    marshalRotors(m.rotors),
 		Plugboard: marshalPlugboard(m.plugboard),
 		Reflector: marshalReflector(m.reflector),
 	}
 
-	contents, err := json.MarshalIndent(mToJson, "", "\t")
+	contents, err := json.MarshalIndent(mToJSON, "", "\t")
 	if err != nil {
 		return fmt.Errorf("failed to write JSON file: %w", err)
 	}

@@ -190,6 +190,7 @@ func verifyMachine(rotors *Rotors, plugboard *Plugboard, reflector *Reflector) e
 	return nil
 }
 
+// Rotors returns machine's rotors.
 func (m *Machine) Rotors() *Rotors {
 	return m.rotors
 }
