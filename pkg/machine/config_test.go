@@ -1,155 +1,90 @@
 package machine
 
 import (
+	"fmt"
 	"math/rand"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/google/go-cmp/cmp"
 )
 
-// Test reading of correct configs.
-func TestReadCorrectConfig(t *testing.T) {
-	_, err1 := Read("../../test/data/config-1.json")
-	if err1 != nil {
-		t.Errorf("error occured while reading correct configuration 1\n%s", err1.Error())
+// TestRead reads several config files and verifies the output.
+func TestRead(t *testing.T) {
+	const correctCount = 3
+	const incorrectCount = 7
+
+	for i := 1; i <= correctCount; i++ {
+		_, err := Read(fmt.Sprintf("../../test-data/config-%d.json", i))
+		if err != nil {
+			t.Errorf("correct %d: produced error %w", i, err)
+		}
 	}
 
-	_, err2 := Read("../../test/data/config-2.json")
-	if err2 != nil {
-		t.Errorf("error occured while reading correct configuration 2\n%s", err2.Error())
-	}
-
-	_, err3 := Read("../../test/data/config-3.json")
-	if err3 != nil {
-		t.Errorf("error occured while reading correct configuration 3\n%s", err3.Error())
-	}
-}
-
-// Test reading of wrong configs.
-func TestReadIncorrectConfig(t *testing.T) {
-	_, err1 := Read("../../test/data/wrong-config-1.json")
-	if err1 == nil {
-		t.Errorf("error not detected in incorrect configuration 1")
-	}
-
-	_, err2 := Read("../../test/data/wrong-config-2.json")
-	if err2 == nil {
-		t.Errorf("error not detected in incorrect configuration 2")
-	}
-
-	_, err3 := Read("../../test/data/wrong-config-3.json")
-	if err3 == nil {
-		t.Errorf("error not detected in incorrect configuration 3")
-	}
-
-	_, err4 := Read("../../test/data/wrong-config-4.json")
-	if err4 == nil {
-		t.Errorf("error not detected in incorrect configuration 4")
-	}
-
-	_, err5 := Read("../../test/data/wrong-config-5.json")
-	if err5 == nil {
-		t.Errorf("error not detected in incorrect configuration 5")
-	}
-
-	_, err6 := Read("../../test/data/wrong-config-6.json")
-	if err6 == nil {
-		t.Errorf("error not detected in incorrect configuration 6")
-	}
-
-	_, err7 := Read("../../test/data/wrong-config-7.json")
-	if err7 == nil {
-		t.Errorf("error not detected in incorrect configuration 7")
+	for i := 1; i <= incorrectCount; i++ {
+		_, err := Read(fmt.Sprintf("../../test-data/wrong-config-%d.json", i))
+		if err == nil {
+			t.Errorf("incorrect %d: didn't produce error", i)
+		}
 	}
 }
 
-// Test loading of a generated machine.
+// TestWrite tests writing a machine to a file.
 func TestWrite(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 
-	numberOfRotors := rand.Intn(100)
-	m := Generate(numberOfRotors)
-
-	os.MkdirAll("../../test/generate", os.ModePerm)
-	err := m.Write("../../test/generate/generated-1.json")
+	err := os.MkdirAll("../../test-data/generate", os.ModePerm)
 	if err != nil {
-		t.Errorf(err.Error())
+		t.Fatal("failed to create test-data/generate")
 	}
 
-	_, err = os.Open("../../test/generate/generated-1.json")
-	if err != nil {
-		t.Errorf("generated machine was not written correctly")
+	for i := 0; i < 10; i++ {
+		count := rand.Intn(100) + 3
+		err := Write(Generate(count), "../../test-data/generate/generated.json")
+		if err != nil {
+			t.Errorf("test %d: failed to write: %w", i, err)
+		}
+
+		_, err = os.Open("../../test-data/generate/generated.json")
+		if err != nil {
+			t.Errorf("test %d: written machine doesn't exist", i)
+		}
 	}
 }
 
-// Test saving and loading of a machine.
+// TestReadAndWrite tests Read and Write by generating a machine, writing it
+// to a file, reading the file, and comparing written and read.
 func TestReadAndWrite(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 
-	numberOfRotors := rand.Intn(100)
-	m := Generate(numberOfRotors)
-
-	os.MkdirAll("../../test/generate", os.ModePerm)
-	err := m.Write("../../test/generate/generated-2.json")
+	err := os.MkdirAll("../../test-data/generate", os.ModePerm)
 	if err != nil {
-		t.Errorf(err.Error())
+		t.Fatal("failed to create test-data/generate")
 	}
 
-	loaded, err := Read("../../test/generate/generated-2.json")
-	if err != nil {
-		t.Errorf(err.Error())
-	}
+	unexported := cmp.AllowUnexported(
+		Machine{},
+		Rotors{},
+		Rotor{},
+		Plugboard{},
+		Reflector{},
+	)
 
-	// Compare machines
-	if !areSimilar(m, loaded) {
-		t.Errorf("incorrect saving and reloading of a machine")
-	}
-}
-
-// Compare two machines.
-// Returns true if machines are similar, false otherwise.
-func areSimilar(m1 *Machine, m2 *Machine) bool {
-	if m1 == nil && m2 == nil {
-		return true
-	} else if m2 == nil || m1 == nil {
-		return false
-	}
-
-	if m1.numberOfRotors != m2.numberOfRotors {
-		return false
-	}
-
-	numberOfRotors := m1.numberOfRotors
-
-	// Rotors
-	for i := 0; i < numberOfRotors; i++ {
-		if m1.rotors[i].position != m2.rotors[i].position ||
-			m1.rotors[i].takenSteps != m2.rotors[i].takenSteps ||
-			m1.rotors[i].cycle != m2.rotors[i].cycle ||
-			m1.rotors[i].step != m2.rotors[i].step {
-			return false
+	for i := 0; i < 10; i++ {
+		m := Generate(rand.Intn(100) + 3)
+		err := Write(m, "../../test-data/generate/generated.json")
+		if err != nil {
+			t.Errorf("failed to write: %w", err)
 		}
 
-		for j := 0; j < alphabetSize; j++ {
-			if m1.rotors[i].pathways[j] != m2.rotors[i].pathways[j] {
-				return false
-			}
+		r, err := Read("../../test-data/generate/generated.json")
+		if err != nil {
+			t.Errorf("failed to read: %w", err)
+		}
+
+		if diff := cmp.Diff(*m, *r, unexported); diff != "" {
+			t.Errorf("test %d: mismatch (-want +got):\n%s", i, diff)
 		}
 	}
-
-	// Reflector
-	for i := 0; i < alphabetSize; i++ {
-		if m1.reflector.connections[i] != m2.reflector.connections[i] {
-			return false
-		}
-	}
-
-	// Plugboard
-	for i := 0; i < alphabetSize; i++ {
-		if m1.plugboard.connections[i] != m2.plugboard.connections[i] {
-			return false
-		}
-	}
-
-	return true
 }

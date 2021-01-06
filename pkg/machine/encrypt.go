@@ -6,64 +6,54 @@ import (
 	"unicode"
 )
 
-// Encrypt encrypts a string using a Machine object.
-// Returns encrypted string and an error in case of an incorrect configuration.
-// When encrypting uppercase and lowercase letters are treated similarly and
-// produce the same results. Non-alphabetical characters are returned without
-// change, and don't affect rotors' movement (rotors are not shifted).
+// Encrypt encrypts a string message, and return the encrypted string and an
+// error if the machine's fields are invalid. When encrypting uppercase and
+// lowercase letters produce the same results. Non-alphabetical characters are
+// returned without change, and don't affect rotors' movement (rotors are not
+// shifted).
 func (m *Machine) Encrypt(message string) (string, error) {
-	if err := m.IsConfigCorrect(); err != nil {
+	if err := m.Verify(); err != nil {
 		return "", err
 	}
 
-	encryptedBuffer := new(bytes.Buffer)
-
-	flipped := m.flippedConnections()
-
-	message = strings.ToLower(message)
-	for _, char := range message {
-		encryptedBuffer.WriteByte(m.encryptChar(byte(char), flipped))
+	reversed := reverseConnections(m)
+	buffer := new(bytes.Buffer)
+	for _, char := range strings.ToLower(message) {
+		buffer.WriteByte(m.encryptChar(byte(char), reversed))
 	}
-
-	return encryptedBuffer.String(), nil
+	return buffer.String(), nil
 }
 
-// encryptChar encrypts a character using machine.
-// Takes character to encrypt and flipped pathways for usage in the
-// second half of the encryption cycle.
-func (m *Machine) encryptChar(char byte, flipped [][alphabetSize]int) byte {
+// encryptChar encrypts one byte using Machine m. Arguments are the byte to
+// encrypt and the reversed connections to use in the reverse cycle.
+func (m *Machine) encryptChar(char byte, reversed [][alphabetSize]int) byte {
 	if !unicode.IsLetter(rune(char)) {
 		return char
 	}
 
-	encrypted := m.plugboard.plugIn(char)
-
-	for i := 0; i < m.numberOfRotors; i++ {
-		index := (encrypted + m.rotors[i].position) % alphabetSize
-		encrypted = m.rotors[i].pathways[index]
+	encrypted := m.plugboard.PlugIn(char)
+	for i := 0; i < m.rotors.count; i++ {
+		index := (encrypted + m.rotors.rotors[i].position) % alphabetSize
+		encrypted = m.rotors.rotors[i].pathways[index]
 	}
 
-	encrypted = m.reflector.reflect(encrypted)
-
-	for i := m.numberOfRotors - 1; i >= 0; i-- {
-		encrypted = (flipped[i][encrypted] - m.rotors[i].position + alphabetSize) % alphabetSize
+	encrypted = m.reflector.Reflect(encrypted)
+	for i := m.rotors.count - 1; i >= 0; i-- {
+		encrypted = (reversed[i][encrypted] - m.rotors.rotors[i].position + alphabetSize) % alphabetSize
 	}
+	m.rotors.takeStep()
 
-	m.stepRotors()
-
-	return m.plugboard.plugOut(encrypted)
+	return m.plugboard.PlugOut(encrypted)
 }
 
-// flippedConnections returns a slice of flipped pathway connections
-// to be used in encryption cycle after reflecting.
-func (m *Machine) flippedConnections() [][alphabetSize]int {
-	flipped := make([][alphabetSize]int, m.numberOfRotors)
-
-	for i, rotor := range m.rotors {
+// reverseConnections returns a reversed list of the machine's pathway
+// connections.
+func reverseConnections(m *Machine) [][alphabetSize]int {
+	reversed := make([][alphabetSize]int, m.rotors.count)
+	for i, rotor := range m.rotors.rotors {
 		for j, val := range rotor.pathways {
-			flipped[i][val] = j
+			reversed[i][val] = j
 		}
 	}
-
-	return flipped
+	return reversed
 }
