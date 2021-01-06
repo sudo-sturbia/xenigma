@@ -2,10 +2,6 @@
 `xenigma` reads configurations from ~/.config/xenigma/xenigma.conf, which is a JSON
 representation of a machine.
 
-A machine can be generated and written to ~/.config/xenigma/xenigma.conf using `-gen-w`
-flag, for example, `xenigma -gen-w 3 Hello!` generates a 3-rotor machine, writes it
-to xenigma.conf, and uses it to encrypt "Hello!".
-
 See [test data](test-data) for examples of machines. Below is an explaination of each
 component and how to configure it using JSON.
 
@@ -17,7 +13,7 @@ a full machine.
 is not saved.
 
 `-gen-w` generates a machine, writes it to ~/.config/xenigma/xenigma.conf for later
-usage, and uses it encrypt a message.
+usage, and uses it to encrypt a message.
 
 ## Components
 ### Rotors
@@ -40,7 +36,7 @@ Step is the number of positions a rotor shifts when stepping once (the size of r
 jump.) For example, if a rotor at position "a", has step 3, then a jump will change
 rotor's position to "d". The default step is 1.
 
-# Cycle
+#### Cycle
 Cycle is the number of rotor steps considered a full cycle, after which the following
 rotor is shifted. For example, if a rotor has cycle 13, then it needs to complete 13
 steps for the following rotor to step once. The default cycle size is 26.
