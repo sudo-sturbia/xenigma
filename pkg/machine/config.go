@@ -145,7 +145,7 @@ func parseRotor(parse *jsonRotor) (*Rotor, error) {
 
 	position, ok := strToInt(parse.Position)
 	if !ok {
-		return nil, fmt.Errorf("given rotor position %v is incorrect", position)
+		return nil, fmt.Errorf("invalid rotor position %v", position)
 	}
 
 	return NewRotor(pathways, position, parse.Step, parse.Cycle)
@@ -155,7 +155,7 @@ func parseRotor(parse *jsonRotor) (*Rotor, error) {
 // an error if Plugboard has invalid fields.
 func parsePlugboard(parse *jsonPlugboard) (*Plugboard, error) {
 	if parse == nil {
-		return nil, fmt.Errorf("non plugboard given")
+		return nil, fmt.Errorf("no plugboard given")
 	}
 
 	var connections [alphabetSize]int
@@ -173,7 +173,7 @@ func parsePlugboard(parse *jsonPlugboard) (*Plugboard, error) {
 // an error if Reflector has invalid fields.
 func parseReflector(parse *jsonReflector) (*Reflector, error) {
 	if parse == nil {
-		return nil, fmt.Errorf("non reflector given")
+		return nil, fmt.Errorf("no reflector given")
 	}
 
 	var connections [alphabetSize]int
