@@ -66,10 +66,7 @@ import (
 	"time"
 )
 
-const (
-	alphabetSize = 26
-	configPath   = "/.config/xenigma.conf"
-)
+const alphabetSize = 26
 
 // Machine represents a xenigma encryption machine. Machine's components are
 // electric pathways, reflector, plugboard, and rotors.
