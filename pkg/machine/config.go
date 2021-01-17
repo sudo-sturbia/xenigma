@@ -242,14 +242,9 @@ func marshalReflector(reflector *Reflector) *jsonReflector {
 // strToInt verifies that a given string contains one alphabetical
 // character and returns character's position in the alphabet.
 func strToInt(str string) (int, bool) {
-	if len(str) != 1 {
-		return -1, false
-	}
-
-	if unicode.IsLetter(rune(str[0])) {
+	if len(str) == 1 && unicode.IsLetter(rune(str[0])) {
 		return int(byte(unicode.ToLower(rune(str[0]))) - 'a'), true
 	}
-
 	return -1, false
 }
 
