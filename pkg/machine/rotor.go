@@ -78,7 +78,7 @@ func (r *Rotor) Verify() error {
 // cycle size, and returns an error if given values are incorrect or incompatible.
 func verifyRotor(pathways [alphabetSize]int, position, step, cycle int) (err error) {
 	switch {
-	case !areElementsIndices(pathways[:]):
+	case !zeroToNSlice(pathways[:]):
 		err = fmt.Errorf("electric pathways are incorrect")
 	case step <= 0:
 		err = fmt.Errorf("invalid step: %d", step)

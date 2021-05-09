@@ -1,8 +1,8 @@
 package machine
 
-// areElementsIndices returns true if a slice of size n contains numbers
+// zeroToNSlice returns true if a slice of size n contains numbers
 // 0 through n - 1.
-func areElementsIndices(slice []int) bool {
+func zeroToNSlice(slice []int) bool {
 	check := make([]bool, len(slice))
 	for _, value := range slice {
 		if value >= 0 && value < len(slice) {
@@ -18,24 +18,40 @@ func areElementsIndices(slice []int) bool {
 	return true
 }
 
-// isSymmetric returns true if a slice is symmetric. Symmetric means that if
-// slice[n] = m, then slice[m] = n. An empty slice is considered symmetric.
-func isSymmetric(slice []int) bool {
-	min, max := 0, len(slice)-1
-	for i, value := range slice {
-		if value < min || value > max || slice[value] != i {
+// zeroToN returns true if mappings has size n, and contains keys
+// 0 to n-1, mapped to values 0 to n-1.
+func zeroToN(mappings map[int]int, n int) bool {
+	if len(mappings) != n {
+		return false
+	}
+
+	var check [2][]bool
+	for i := 0; i < 2; i++ {
+		check[i] = make([]bool, n)
+	}
+
+	for k, v := range mappings {
+		if k >= 0 && k < n {
+			check[0][k] = true
+		}
+		if v >= 0 && v < n {
+			check[1][v] = true
+		}
+	}
+
+	for i := 0; i < n; i++ {
+		if !check[0][i] || !check[1][i] {
 			return false
 		}
 	}
 	return true
 }
 
-// AreElementsOrderedIndices returns true if a slice of size n contains elements
-// 0 through n-1 in circular order.
-func areElementsOrderedIndices(slice []int) bool {
-	start, length := slice[0], len(slice)
-	for i, value := range slice {
-		if value != (start+i)%length {
+// isSymmetric returns true if mappings are symmetric. Symmetric means that for
+// any k and v, if map[k]=v, then map[v]=k.
+func isSymmetric(mappings map[int]int) bool {
+	for k, v := range mappings {
+		if mappings[k] != v || mappings[v] != k {
 			return false
 		}
 	}
