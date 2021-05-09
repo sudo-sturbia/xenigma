@@ -12,18 +12,18 @@ import (
 // Plugboard is a set of connections that maps different characters to each
 // other. Plugboard is used as an initial step in xenigma.
 type Plugboard struct {
-	connections [alphabetSize]int
+	connections map[int]int
 }
 
 // Reflector is a set of connections that maps two characters to each other.
 // Reflector is used as a middle step in xenigma.
 type Reflector struct {
-	connections [alphabetSize]int
+	connections map[int]int
 }
 
 // NewPlugboard creates and returns a new plugboard, and an error if given
 // connections are incorrect.
-func NewPlugboard(connections [alphabetSize]int) (*Plugboard, error) {
+func NewPlugboard(connections map[int]int) (*Plugboard, error) {
 	if err := verifyConnections(connections); err != nil {
 		return nil, err
 	}
@@ -35,7 +35,7 @@ func NewPlugboard(connections [alphabetSize]int) (*Plugboard, error) {
 
 // NewReflector creates and returns a new reflector. An error is returned if
 // given connections are incorrect.
-func NewReflector(connections [alphabetSize]int) (*Reflector, error) {
+func NewReflector(connections map[int]int) (*Reflector, error) {
 	if err := verifyConnections(connections); err != nil {
 		return nil, err
 	}
@@ -61,10 +61,10 @@ func GenerateReflector() *Reflector {
 	}
 }
 
-// generateConnections generates a random array of symmetric connections populated
+// generateConnections generates a random map of symmetric connections populated
 // with elements 0 through n-1. Symmetric means that if slice[n] = m, then
 // slice[m] = n.
-func generateConnections() [alphabetSize]int {
+func generateConnections() map[int]int {
 	var ordered [alphabetSize]int
 	for i := 0; i < alphabetSize; i++ {
 		ordered[i] = i
@@ -77,20 +77,20 @@ func generateConnections() [alphabetSize]int {
 		},
 	)
 
-	var connections [alphabetSize]int
+	connections := make(map[int]int)
 	for i := 0; i < alphabetSize/2; i++ {
 		connections[ordered[i]], connections[ordered[i+13]] = ordered[i+13], ordered[i]
 	}
 	return connections
 }
 
-// Connections returns plugboard's connections array.
-func (p *Plugboard) Connections() [alphabetSize]int {
+// Connections returns plugboard's connections map.
+func (p *Plugboard) Connections() map[int]int {
 	return p.connections
 }
 
-// Connections returns reflector's connections array.
-func (r *Reflector) Connections() [alphabetSize]int {
+// Connections returns reflector's connections map.
+func (r *Reflector) Connections() map[int]int {
 	return r.connections
 }
 
@@ -124,12 +124,12 @@ func (r *Reflector) Verify() error {
 
 // verifyConnections verifies that given connections are valid, and returns an
 // error if not.
-func verifyConnections(connections [alphabetSize]int) error {
-	if !areElementsIndices(connections[:]) {
+func verifyConnections(connections map[int]int) error {
+	if !zeroToN(connections, alphabetSize) {
 		return fmt.Errorf("connections are invalid")
 	}
 
-	if !isSymmetric(connections[:]) {
+	if !isSymmetric(connections) {
 		return fmt.Errorf("connections are not symmetric")
 	}
 
