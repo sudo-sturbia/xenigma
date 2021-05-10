@@ -2,7 +2,7 @@ package machine
 
 // Contains Plugboard and Reflector struct and their needed functions. This file
 // is named mappers simply because both reflector, and plugboard are used to create
-// mapping of one character to another.
+// mappings of one character to another.
 
 import (
 	"fmt"

@@ -28,12 +28,12 @@ type jsonRotor struct {
 
 // jsonReflector mirrors Reflector struct and is used for json (un)marshalling.
 type jsonReflector struct {
-	Connections [alphabetSize]string `json:"connections"`
+	Connections map[string]string `json:"connections"`
 }
 
 // jsonPlugboard mirrors Plugboard struct and is used for json (un)marshalling.
 type jsonPlugboard struct {
-	Connections [alphabetSize]string `json:"connections"`
+	Connections map[string]string `json:"connections"`
 }
 
 // Read loads a machine from a JSON file, verifies its validity, and returns
@@ -154,17 +154,24 @@ func parseRotor(parse *jsonRotor) (*Rotor, error) {
 // parsePlugboard parses a given jsonPlugboard into a Plugboard, and returns
 // an error if Plugboard has invalid fields.
 func parsePlugboard(parse *jsonPlugboard) (*Plugboard, error) {
-	if parse == nil {
+	if parse == nil || parse.Connections == nil {
 		return nil, fmt.Errorf("no plugboard given")
 	}
+	if len(parse.Connections) != alphabetSize {
+		return nil, fmt.Errorf("invalid plugboard size %v, expected %v", len(parse.Connections), alphabetSize)
+	}
 
-	var connections [alphabetSize]int
-	for i, connection := range parse.Connections {
-		con, ok := strToInt(connection)
+	connections := make(map[int]int)
+	for key, value := range parse.Connections {
+		k, ok := strToInt(key)
 		if !ok {
-			return nil, fmt.Errorf("invalid plugboard connection %v", connection)
+			return nil, fmt.Errorf("invalid plugboard key %v", key)
 		}
-		connections[i] = con
+		v, ok := strToInt(value)
+		if !ok {
+			return nil, fmt.Errorf("invalid plugboard value %v", value)
+		}
+		connections[k] = v
 	}
 	return NewPlugboard(connections)
 }
@@ -172,17 +179,24 @@ func parsePlugboard(parse *jsonPlugboard) (*Plugboard, error) {
 // parseReflector parses a given jsonReflector into a Reflector, and returns
 // an error if Reflector has invalid fields.
 func parseReflector(parse *jsonReflector) (*Reflector, error) {
-	if parse == nil {
+	if parse == nil || parse.Connections == nil {
 		return nil, fmt.Errorf("no reflector given")
 	}
+	if len(parse.Connections) != alphabetSize {
+		return nil, fmt.Errorf("invalid reflector size %v, expected %v", len(parse.Connections), alphabetSize)
+	}
 
-	var connections [alphabetSize]int
-	for i, connection := range parse.Connections {
-		con, ok := strToInt(connection)
+	connections := make(map[int]int)
+	for key, value := range parse.Connections {
+		k, ok := strToInt(key)
 		if !ok {
-			return nil, fmt.Errorf("invalid plugboard connection %v", connection)
+			return nil, fmt.Errorf("invalid reflector key %v", key)
 		}
-		connections[i] = con
+		v, ok := strToInt(value)
+		if !ok {
+			return nil, fmt.Errorf("invalid reflector value %v", value)
+		}
+		connections[k] = v
 	}
 	return NewReflector(connections)
 }
@@ -216,9 +230,9 @@ func marshalRotor(rotor *Rotor) *jsonRotor {
 // marshalPlugboard creates and returns a jsonPlugboard with the same fields
 // as given Plugboard.
 func marshalPlugboard(plugboard *Plugboard) *jsonPlugboard {
-	var connections [alphabetSize]string
-	for i, con := range plugboard.connections {
-		connections[i] = intToStr(con)
+	connections := make(map[string]string)
+	for k, v := range plugboard.connections {
+		connections[intToStr(k)] = intToStr(v)
 	}
 
 	return &jsonPlugboard{
@@ -229,9 +243,9 @@ func marshalPlugboard(plugboard *Plugboard) *jsonPlugboard {
 // marshalReflector creates and returns a jsonReflector with the same fields
 // as given Reflector.
 func marshalReflector(reflector *Reflector) *jsonReflector {
-	var connections [alphabetSize]string
-	for i, con := range reflector.connections {
-		connections[i] = intToStr(con)
+	connections := make(map[string]string)
+	for k, v := range reflector.connections {
+		connections[intToStr(k)] = intToStr(v)
 	}
 
 	return &jsonReflector{
