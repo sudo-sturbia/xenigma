@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/sudo-sturbia/xenigma/v4/pkg/machine"
+	"github.com/sudo-sturbia/xenigma/v5/pkg/machine"
 )
 
 var configPath = fmt.Sprintf("%s/.config/xenigma/xenigma.conf", os.Getenv("HOME"))
