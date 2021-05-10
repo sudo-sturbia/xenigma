@@ -2,61 +2,57 @@
 Package machine represents an xenigma machine, a modified version of enigma
 used for encryption and decryption of text messages.
 
-The machine consists of Rotors, Plugboard, and Reflector. machine package
-contains four structs machine.Machine, machine.Plugboard, machine.Reflector,
-and machine.Rotor. Each of which can be created with pre specified settings
-or generated.
+The machine consists of Rotors, Plugboard, and Reflector. Each of which has
+can be created with pre-specified settings, or generated.
 
-Encryption/decryption is done using Machine.Encrypt, which can be used simply
-as the following.
+Encryption/decryption is done using Machine.Encrypt, which can be used as the
+following.
     m := machine.Generate(10)
     encrypted := m.Encrypt("Hello, world!")
 
 Components
 
-Machine's components can be generated or set at creation/using JSON.
+Machine's components can be generated or specified at creation, or read as
+JSON.
 
 Rotors
 
-Rotors are represented by two structs machine.Rotors and machine.Rotor. A
-machine can have any number of rotors.
+A machine can have any number of rotors, the number of rotors is the size
+of the given rotor array. Rotor's fields are pathways, position, step, and
+cycle.
 
-Rotor's fields are pathways, position, step, and cycle.
-
-Pathways are the electric connections between characters. Pathways are
-represented using a 26 element array where indices represent characters and
-array elements represent the character they are connected to. For example
-if element at index 0 is 1, then "a" (0) is connected to "b" (1).
+Pathways are the electric connections between characters. They are represented
+using a map-like 26 element array where an index and a character represent a
+map pair. Key and value pairs are translated into their position in the english
+alphabet. For example, if pathways[0]=2, then a is mapped to c. Arrays are chosen
+over maps for pathways because ordering matters.
 
 Position is the current position of the rotor, which must be reachable from
 the starting position 0 or "a".
 
-Step is the number of positions a rotor shifts when stepping once (the size
-of rotor's jump.) For example if a rotor at position "a", has step 3, then
-a jump will change rotor's position to "d". The default step is 1.
+Step is the number of positions a rotor jumps when moving one step forward.
+For example, if a rotor with position="a" and step="3" jumps once, the position
+will change to "d". The default step is 1.
 
-Cycle is the number of rotor steps considered a full cycle, after which the
-following rotor is shifted. For example, if a rotor has cycle 13, then it
-needs to complete 13 steps for the following rotor to step once. The default
-cycle size is 26.
+Cycle is the number of steps needed to complete a full cycle, after which the
+following rotor is shifted. For example, if a rotor with cycle=13, then it
+needs to complete 13 steps for the next rotor to move one step. The default
+cycle is 26.
 
-To avoid position collisions and guarantee that rotor's current setting can
-be reached using only one sequence of steps, (step*cycle % 26 == 0) must be
-true. Combinations that don't satisfy this relation are considered wrong.
+To avoid position collisions and guarantee that any of the rotor's settings can
+be reached using only one sequence of steps, (step*cycle)%26 must equal zero.
+Combinations that don't satisfy this relation are considered invalid.
 
 Reflector
 
-Reflector consists of a connections array similar to pathways with a condition
-that it must be symmetric, meaning that if "a" is connected to "b", then "b"
-must also be connected to "a".
+Reflector is connections map, which must contain all characters in the english
+alphabet, and must be symmetric. Symmetry means that if "a" is connected to "b",
+then "b" must also be connected to "a".
 
 Plugboard
 
-Plugboard, also, consists of a connections array with the same condition as a
-reflector.
-
-Plugboard's connections are required to have 26 elements. In order to keep a
-character without a connection, connect it to itself.
+Plugboard is also a connections map similar to reflector. To keep a character
+unconnected/unplugged, connect it to itself.
 */
 package machine
 
